@@ -30,14 +30,14 @@
     </Shell.Resources>
 
     <TabBar>
-        <ShellContent Title="Placeholder"
+        <ShellContent Title="Home"
                       Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:DefaultPage}" />
+                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
 
         <!-- DataTemplate points to views -->
-        <ShellContent Title="Placeholder"
+        <ShellContent Title="BGL Statistics"
                       Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:DefaultPage}" />
+                      ContentTemplate="{DataTemplate views:StatisticsPage}"/>
     </TabBar>
 
 </Shell>

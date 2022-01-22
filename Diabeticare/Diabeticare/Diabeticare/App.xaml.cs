@@ -17,6 +17,12 @@ namespace Diabeticare
 
         protected override void OnStart()
         {
+            /*
+             * Registering routes that are not visible in the navigation bar.
+             * Note: Pages are not loaded if you do not do this
+            */
+            Routing.RegisterRoute("EditBglPage", typeof(EditBglPage));
+            Routing.RegisterRoute("AddBglDataPage", typeof(AddBglDataPage));
         }
 
         protected override void OnSleep()
