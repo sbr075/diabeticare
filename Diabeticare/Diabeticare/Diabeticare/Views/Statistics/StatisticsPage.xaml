@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Diabeticare.Views.StatisticsPage">
+    <ContentPage.Content>
+        <StackLayout>
+
+            <!-- Top button layout -->
+            <StackLayout Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Center" Padding="5">
+                <Button 
+                x:Name="today"
+                Text="I Dag" 
+                HorizontalOptions="Center"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenDayGraph"/>
+
+                <Button
+                x:Name="week" 
+                Text="1 UKE" 
+                HorizontalOptions="Center"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenWeekGraph"/>
+
+                <Button 
+                x:Name="month" 
+                Text="1 MÅNED"
+                HorizontalOptions="Center"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenMonthGraph"/>
+            </StackLayout>
+
+            <!-- Graph layout -->
+            <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" HorizontalOptions="Center">
+                <Label
+                x:Name="LabelMid"
+                TextColor="Black"
+                FontSize="Large"
+                Text="BGL Statistics Page"/>
+            </StackLayout>
+
+
+            <!-- Bottom button layout -->
+            <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="Center" Padding="5">
+                <Button 
+                x:Name="editData"
+                Text="Edit Data"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="Edit_BGL_Data"/>
+
+                <Button
+                x:Name="enterData" 
+                Text="Add Data" 
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="Create_BGL_Data"/>
+            </StackLayout>
+
+        </StackLayout>
+    </ContentPage.Content>
+    
+</ContentPage>
