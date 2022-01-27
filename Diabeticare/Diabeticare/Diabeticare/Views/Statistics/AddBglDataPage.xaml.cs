@@ -16,5 +16,21 @@ namespace Diabeticare.Views
         {
             InitializeComponent();
         }
+
+        private void SaveBglData(object sender, EventArgs e)
+        {
+            /* Save entry (dataField.Text) to database */
+        }
+
+
+        // Called on "TextChanged" instead of "Completed" to avoid confusion for the user.
+        private void Bgl_Entry_Changed(object sender, EventArgs e)
+        {
+            bool emptyEntry = string.IsNullOrEmpty(dataField.Text);
+            if (!emptyEntry)
+            {
+                addData.IsEnabled = true;
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms"
              x:Class="Diabeticare.Views.StatisticsPage">
     <ContentPage.Content>
         <StackLayout>
@@ -12,30 +13,33 @@
                 Text="I Dag" 
                 HorizontalOptions="Center"
                 BackgroundColor="{StaticResource Primary}"
-                Clicked="GenDayGraph"/>
+                Clicked="GenDayChart"/>
 
                 <Button
                 x:Name="week" 
                 Text="1 UKE" 
                 HorizontalOptions="Center"
                 BackgroundColor="{StaticResource Primary}"
-                Clicked="GenWeekGraph"/>
+                Clicked="GenWeekChart"/>
 
                 <Button 
                 x:Name="month" 
                 Text="1 MÅNED"
                 HorizontalOptions="Center"
                 BackgroundColor="{StaticResource Primary}"
-                Clicked="GenMonthGraph"/>
+                Clicked="GenMonthChart"/>
             </StackLayout>
 
-            <!-- Graph layout -->
+            <!-- Chart layout -->
             <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" HorizontalOptions="Center">
                 <Label
                 x:Name="LabelMid"
                 TextColor="Black"
                 FontSize="Large"
-                Text="BGL Statistics Page"/>
+                Text="BGL Statistics Page"
+                HorizontalOptions="Center"/>
+
+                <microcharts:ChartView x:Name="BglChart" HeightRequest="200" WidthRequest="200" />
             </StackLayout>
 
 
