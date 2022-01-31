@@ -202,3 +202,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Migrations
+src/migrations/

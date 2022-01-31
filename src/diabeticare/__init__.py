@@ -41,8 +41,4 @@ def create_app(config_class=Config):
     from diabeticare.main import bp as main_app
     app.register_blueprint(main_app)
 
-    
-
     return app
-
-# Load models here

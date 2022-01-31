@@ -27,7 +27,7 @@ class Config(object):
             "PORT": "5432",
             "NAME": "diabeticare",
             "USER": "postgres",
-            "PASS": "psqldatabasepassword"
+            "PASS": "I5Kw3jesAWDO2NsiMAyt2g"
         }
     }
 
