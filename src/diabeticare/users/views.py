@@ -1,38 +1,65 @@
-from flask import render_template, redirect, url_for, request, jsonify
-from flask_login import login_user, logout_user, current_user
+from flask import request, jsonify
+from flask_wtf.csrf import generate_csrf
 from passlib.hash import sha512_crypt
+import datetime
 
 from diabeticare import db
 from diabeticare.users import bp
 from diabeticare.users.forms import RegistrationForm, LoginForm
 from diabeticare.users.models import User
 
-# REMOVE
 import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("USER VIEWS")
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
+logger = logging.getLogger("VALIDATOR")
 
-@bp.route("/login", methods=['GET', 'POST'])
+def validate_token(username, token):
+    user = User.query.filter_by(username=username).first()
+    logger.info(user.cookie)
+    logger.info(token)
+    return user.cookie == token and datetime.datetime.utcnow() <= user.timer
+
+
+@bp.route("/login", methods=["POST"])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for("main.home"))
-    
-    form = LoginForm()
     if request.method == "POST":
-        if form.validate_on_submit():
-            user = User.query.filter_by(username=form.username.data).first()
-            login_user(user, remember=form.remember_me.data)
+        data = request.get_json()
+        log_form = LoginForm(obj=data)
 
-            return redirect(url_for("main.home"))
+        if log_form.validate():
+            csrf_token = generate_csrf()
+
+            user = User.query.filter_by(username=log_form.username.data).first()
+            user.cookie = csrf_token
+            user.timer = datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
+            db.session.commit()
+
+            return jsonify({"RESPONSE": "Successfully logged in", "CSRF-TOKEN": csrf_token})
+        
+        else:
+            return jsonify({"RESPONSE": log_form.errors})
     
-    return render_template("login.html", form=form)
+    return jsonify({"RESPONSE": "Invalid request"})
 
-@bp.route("/logout", methods=['GET'])
+
+@bp.route("/logout", methods=["POST"])
 def logout():
-    logout_user()
-    return redirect(url_for("main.home"))
+    if request.method == "POST":
+        data = request.get_json()
 
-@bp.route("/register", methods=['GET', 'POST'])
+        if not validate_token(data["username"], request.headers["X-CSRFToken"]):
+            return jsonify({"RESPONSE": "Invalid token"})
+
+        user = User.query.filter_by(username=data["username"]).first()
+        user.cookie = None
+        user.timer  = None
+        db.session.commit()
+
+        return jsonify({"RESPONSE": "Successfully logged out"})
+
+    return jsonify({"RESPONSE": "Invalid request"})
+
+
+@bp.route("/register", methods=["POST"])
 def register():
     if request.method == "POST":
         data = request.get_json()
@@ -45,9 +72,18 @@ def register():
             db.session.add(user)
             db.session.commit()
 
-            return jsonify({"SUCCESS": "Account successfully created!"})
+            return jsonify({"RESPONSE": "Account successfully created!"})
         
         else:
-            return jsonify({"ERROR": reg_form.errors})
+            return jsonify({"RESPONSE": reg_form.errors})
     
-    return jsonify({"ERROR": "Invalid request"})
+    return jsonify({"RESPONSE": "Invalid request"})
+
+
+# Called once upon registration/login to get an initial CSRF token
+@bp.route("/get_cookie", methods=["GET"])
+def get_cookie():
+    if request.method == "GET":
+        return jsonify({"RESPONSE": "CSRF-TOKEN successfully generated", "CSRF-TOKEN": generate_csrf()})
+    
+    return jsonify({"RESPONSE": "Invalid request"})

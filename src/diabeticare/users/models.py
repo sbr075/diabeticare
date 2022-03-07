@@ -11,7 +11,7 @@ class User(UserMixin, db.Model):
     hash_pwd = db.Column(db.String(), nullable=False)
 
     cookie = db.Column(db.String())
-    timer  = db.Column(db.DateTime(), default=datetime.datetime.utcnow() + datetime.timedelta(minutes=5))
+    timer  = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
 
 @login.user_loader
 def load_user(id):

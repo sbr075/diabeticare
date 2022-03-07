@@ -1,4 +1,5 @@
 from flask_wtf.csrf import generate_csrf
+
 from diabeticare import create_app
 
 app = create_app()

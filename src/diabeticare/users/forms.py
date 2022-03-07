@@ -40,5 +40,3 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField("Username", [InputRequired()])
     password = PasswordField("Password", [InputRequired(), validator])
-    remember_me = BooleanField("Remember me")
-    submit = SubmitField("Login")
