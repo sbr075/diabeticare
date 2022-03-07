@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, flash
+from flask import render_template, redirect, url_for, request, jsonify
 from flask_login import login_user, logout_user, current_user
 from passlib.hash import sha512_crypt
 
@@ -6,6 +6,11 @@ from diabeticare import db
 from diabeticare.users import bp
 from diabeticare.users.forms import RegistrationForm, LoginForm
 from diabeticare.users.models import User
+
+# REMOVE
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("USER VIEWS")
 
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
@@ -29,19 +34,20 @@ def logout():
 
 @bp.route("/register", methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for("main.home"))
-    
-    form = RegistrationForm()
     if request.method == "POST":
-        if form.validate_on_submit():
-            hash_pwd = sha512_crypt.hash(form.password.data)
-            user = User(username=form.username.data, email=form.email.data, hash_pwd=hash_pwd)
+        data = request.get_json()
+        reg_form = RegistrationForm(obj=data)
+
+        if reg_form.validate():
+            hash_pwd = sha512_crypt.hash(reg_form.password.data)
+            user = User(username=reg_form.username.data, email=reg_form.email.data, hash_pwd=hash_pwd)
 
             db.session.add(user)
             db.session.commit()
 
-            flash(f"Successfully created user {form.username.data}!")
-            return redirect(url_for("users.login"))
+            return jsonify({"SUCCESS": "Account successfully created!"})
+        
+        else:
+            return jsonify({"ERROR": reg_form.errors})
     
-    return render_template("registration.html", form=form)
+    return jsonify({"ERROR": "Invalid request"})

@@ -18,11 +18,10 @@ def validator(form, field):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField("Username", [InputRequired(), Length(min=3, max=20, message="Username must be between 3 and 20 characters long")])
-    email = StringField("Email", [InputRequired(), Length(max=80, message="Email cannot be longer than 80 characters")])
-    password = PasswordField('Password', [InputRequired(), Length(min=8, max=80, message="Password cannot be less than 8 characters"), EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Confirm password', [InputRequired(), Length(min=8, max=80, message="Password cannot be less than 8 characters"), EqualTo('password', message='Passwords must match')])
-    submit = SubmitField("Register")
+    username = StringField("Username",           [InputRequired(), Length(min=3, max=20, message="Username must be between 3 and 20 characters long")])
+    email    = StringField("Email",              [InputRequired(), Length(max=80, message="Email cannot be longer than 80 characters")])
+    password = PasswordField('Password',         [InputRequired(), Length(min=8, max=80, message="Password cannot be less than 8 characters")])
+    confirm  = PasswordField('Confirm password', [InputRequired(), Length(min=8, max=80, message="Password cannot be less than 8 characters")])
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -33,6 +32,10 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError("Email already taken.")
+    
+    def validate_passwords(self, password, confirm):
+        if password != confirm:
+            raise ValidationError("Passwords do not match.")
 
 class LoginForm(FlaskForm):
     username = StringField("Username", [InputRequired()])
