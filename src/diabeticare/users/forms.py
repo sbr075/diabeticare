@@ -1,13 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField
 from wtforms.validators import InputRequired, EqualTo, Length, ValidationError
 
 from diabeticare.users.models import User
 from passlib.hash import sha512_crypt
-
-import logging
-logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
-logger = logging.getLogger("VALIDATOR")
 
 def validateLogin(form, field):
     username = form.username.data
@@ -33,12 +29,12 @@ def validateLogout(form, field):
 
 
 class LoginForm(FlaskForm):
-    username = StringField("Username",   [InputRequired()])
+    username = StringField("Username",   [InputRequired(), Length(min=3, max=20, message="Username must be between 3 and 20 characters long")])
     password = PasswordField("Password", [InputRequired(), validateLogin])
 
 
 class LogoutForm(FlaskForm):
-    username = StringField("Username", [InputRequired(), validateLogout])
+    username = StringField("Username", [InputRequired(), Length(min=3, max=20, message="Username must be between 3 and 20 characters long"), validateLogout])
 
 
 class RegistrationForm(FlaskForm):

@@ -38,6 +38,9 @@ def create_app(config_class=Config):
     from diabeticare.users import bp as login_app
     app.register_blueprint(login_app, url_prefix="/u")
 
+    from diabeticare.statistics import bp as statistics_app
+    app.register_blueprint(statistics_app, url_prefix="/s")
+
     from diabeticare.main import bp as main_app
     app.register_blueprint(main_app)
 

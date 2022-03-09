@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-bp = Blueprint("users", __name__, template_folder="templates")
+bp = Blueprint("users", __name__)
 
 from diabeticare.users import views
