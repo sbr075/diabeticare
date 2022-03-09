@@ -5,7 +5,11 @@ from wtforms.validators import InputRequired, EqualTo, Length, ValidationError
 from diabeticare.users.models import User
 from passlib.hash import sha512_crypt
 
-def validator(form, field):
+import logging
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
+logger = logging.getLogger("VALIDATOR")
+
+def validateLogin(form, field):
     username = form.username.data
     password = form.password.data
 
@@ -17,11 +21,31 @@ def validator(form, field):
         raise ValidationError("Username or password is incorrect.")
 
 
+def validateLogout(form, field):
+    username = form.username.data
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        raise ValidationError("Invalid user.")
+
+    if not user.token:
+        raise ValidationError("User not logged in.")
+
+
+class LoginForm(FlaskForm):
+    username = StringField("Username",   [InputRequired()])
+    password = PasswordField("Password", [InputRequired(), validateLogin])
+
+
+class LogoutForm(FlaskForm):
+    username = StringField("Username", [InputRequired(), validateLogout])
+
+
 class RegistrationForm(FlaskForm):
     username = StringField("Username",           [InputRequired(), Length(min=3, max=20, message="Username must be between 3 and 20 characters long")])
     email    = StringField("Email",              [InputRequired(), Length(max=80, message="Email cannot be longer than 80 characters")])
-    password = PasswordField('Password',         [InputRequired(), Length(min=8, max=80, message="Password cannot be less than 8 characters")])
-    confirm  = PasswordField('Confirm password', [InputRequired(), Length(min=8, max=80, message="Password cannot be less than 8 characters")])
+    password = PasswordField("Password",         [InputRequired(), EqualTo("confirm"),    Length(min=8, max=80, message="Password cannot be less than 8 characters")])
+    confirm  = PasswordField("Confirm password", [InputRequired(), EqualTo("password"),   Length(min=8, max=80, message="Password cannot be less than 8 characters")])
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -32,11 +56,3 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError("Email already taken.")
-    
-    def validate_passwords(self, password, confirm):
-        if password != confirm:
-            raise ValidationError("Passwords do not match.")
-
-class LoginForm(FlaskForm):
-    username = StringField("Username", [InputRequired()])
-    password = PasswordField("Password", [InputRequired(), validator])

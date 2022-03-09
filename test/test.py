@@ -25,7 +25,7 @@ class HTTPMethods():
         return f"http://127.0.0.1:5000/{args}"
     
     def do_GET_CSRF(self):
-        url = self.create_URL("u/get_cookie")
+        url = self.create_URL("/get_token")
         resp = session.get(url)
         return resp.cookies.get_dict()["CSRF-TOKEN"]
 
@@ -43,8 +43,8 @@ class Tester(HTTPMethods):
     def register(self):
         username = input("Enter username: ")
         password = input("Enter password: ")
-        email    = f"{username}@mail.no"
-        confirm  = password
+        confirm  = input("Enter password: ")
+        email    = input("Enter email: ")
 
         headers = {"X-CSRFToken": self.do_GET_CSRF()}
         data = {"username": username, "email": email, "password": password, "confirm": confirm}

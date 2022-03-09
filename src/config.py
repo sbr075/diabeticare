@@ -25,7 +25,7 @@ class Config(object):
         "default": {
             "HOST": "localhost",
             "PORT": "5432",
-            "NAME": "diabeticare",
+            "NAME": "postgres",
             "USER": "postgres",
             "PASS": "I5Kw3jesAWDO2NsiMAyt2g"
         }

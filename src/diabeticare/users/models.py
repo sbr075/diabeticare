@@ -10,8 +10,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     hash_pwd = db.Column(db.String(), nullable=False)
 
-    cookie = db.Column(db.String())
-    timer  = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
+    token = db.Column(db.String())
+    timer = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
 
 @login.user_loader
 def load_user(id):
