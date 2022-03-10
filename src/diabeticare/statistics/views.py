@@ -11,7 +11,6 @@ import logging
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger("STAT")
 
-
 @bp.route("/bgl/set", methods=["POST"])
 def bgl_set():
 	"""
@@ -184,14 +183,229 @@ def ci_set():
 
 @bp.route("/bgl/get", methods=["GET"])
 def bgl_get():
-	pass
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
+	"""
+	
+	if request.method == "GET":
+		data = request.get_json()
+		username  = data["username"]
+		timestamp = data["timestamp"]
+		token      = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = BGL.query.filter(BGL.user==user, BGL.date>=timestamp)
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": entries, "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
 
 
 @bp.route("/sleep/get", methods=["GET"])
 def sleep_get():
-	pass
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
+	"""
+
+	if request.method == "GET":
+		data = request.get_json()
+		username  = data["username"]
+		timestamp = data["timestamp"]
+		token      = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = Sleep.query.filter(Sleep.user==user, Sleep.start>=timestamp)
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": entries, "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
 
 
 @bp.route("/ci/get", methods=["GET"])
 def ci_get():
-	pass
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
+	"""
+
+	if request.method == "GET":
+		data = request.get_json()
+		username  = data["username"]
+		timestamp = data["timestamp"]
+		token      = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = CI.query.filter(CI.user==user, CI.date>=timestamp)
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": entries, "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
+
+
+@bp.route("/bgl/del", methods=["POST"])
+def bgl_del():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		identifier(s): id of entry
+	"""
+
+	if request.method == "POST":
+		data = request.get_json()
+		username    = data["username"]
+		identifiers = data["identifiers"]
+		token       = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = []
+		for identifier in identifiers:
+			entry = BGL.query.filter(BGL.user==user, BGL.id==identifier)
+			if not entry:
+				return jsonify({"RESPONSE": "Invalid user"})
+			
+			entries.append(entry)
+		
+		for entry in entries:
+			entry.delete()
+
+		db.session.commit()
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
+
+
+@bp.route("/sleep/del", methods=["POST"])
+def sleep_del():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		identifier(s): id of entry
+	"""
+
+	if request.method == "POST":
+		data = request.get_json()
+		username    = data["username"]
+		identifiers = data["identifiers"]
+		token       = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = []
+		for identifier in identifiers:
+			entry = Sleep.query.filter(Sleep.user==user, Sleep.id==identifier)
+			if not entry:
+				return jsonify({"RESPONSE": "Invalid user"})
+			
+			entries.append(entry)
+		
+		for entry in entries:
+			entry.delete()
+		
+		db.session.commit()
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
+
+
+@bp.route("/ci/del", methods=["POST"])
+def bgl_del():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		identifier(s): id of entry
+	"""
+
+	if request.method == "POST":
+		data = request.get_json()
+		username    = data["username"]
+		identifiers = data["identifiers"]
+		token       = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = []
+		for identifier in identifiers:
+			entry = CI.query.filter(CI.user==user, CI.id==identifier)
+			if not entry:
+				return jsonify({"RESPONSE": "Invalid user"})
+			
+			entries.append(entry)
+		
+		for entry in entries:
+			entry.delete()
+		db.session.commit()
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
