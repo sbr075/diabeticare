@@ -1,4 +1,5 @@
-from diabeticare import db
+from diabeticare import db, ma
+from marshmallow import INCLUDE
 
 class BGL(db.Model):
     __tablename__ = "bgl"
@@ -10,6 +11,7 @@ class BGL(db.Model):
     date   = db.Column(db.Integer, nullable=False)
     note = db.Column(db.String(256), nullable=True)
 
+
 class Sleep(db.Model):
     __tablename__ = "sleep"
 
@@ -20,6 +22,7 @@ class Sleep(db.Model):
     stop  = db.Column(db.Integer, nullable=False)
     note  = db.Column(db.String(256), nullable=True)
 
+
 class CI(db.Model):
     __tablename__ = "carbohydrate intake"
 
@@ -29,3 +32,25 @@ class CI(db.Model):
     carbohydrates = db.Column(db.Integer(), nullable=False)
     date = db.Column(db.Integer, nullable=False)
     note = db.Column(db.String(256), nullable=True)
+
+
+class BGLSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = BGL
+    
+    measurement = ma.auto_field()
+    date = ma.auto_field()
+    note = ma.auto_field()
+
+
+class SleepSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Sleep
+
+    start = ma.auto_field()
+    stop = ma.auto_field()
+    note = ma.auto_field()
+
+class CISchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = CI

@@ -4,17 +4,13 @@ from werkzeug.datastructures import MultiDict
 from diabeticare import db
 from diabeticare.statistics import bp
 from diabeticare.statistics.forms import BGLForm, SleepForm, CIForm
-from diabeticare.statistics.models import BGL, Sleep, CI
+from diabeticare.statistics.models import BGL, BGLSchema, Sleep, SleepSchema, CI, CISchema
 from diabeticare.users.models import User
 from diabeticare.main.views import validate_token, update_token
 
 import logging
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger("STAT")
-
-class Object:
-    def __init__(self, **entries):
-        self.__dict__.update(entries)
 
 
 @bp.route("/bgl/set", methods=["POST"])
@@ -216,12 +212,17 @@ def bgl_get():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		entries = BGL.query.filter(BGL.user_id==user.id, BGL.date>=timestamp)
+		entries = BGL.query.filter(BGL.user_id==user.id, BGL.date>=timestamp).all()
+		if entries:
+			bgl_schema = BGLSchema(many=True)
+			results = bgl_schema.dump(entries)
+		else:
+			results = []
 
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": entries, "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -249,12 +250,17 @@ def sleep_get():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		entries = Sleep.query.filter(Sleep.user_id==user.id, Sleep.start>=timestamp)
+		entries = Sleep.query.filter(Sleep.user_id==user.id, Sleep.start>=timestamp).all()
+		if entries:
+			sleep_schema = SleepSchema(many=True)
+			results = sleep_schema.dump(entries)
+		else:
+			results = []
 
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": entries, "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -282,12 +288,17 @@ def ci_get():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		entries = CI.query.filter(CI.user_id==user.id, CI.date>=timestamp)
+		entries = CI.query.filter(CI.user_id==user.id, CI.date>=timestamp).all()
+		if entries:
+			ci_schema = CISchema(many=True)
+			results = ci_schema.dump(entries)
+		else:
+			results = []
 
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": entries, "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 

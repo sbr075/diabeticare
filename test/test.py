@@ -32,14 +32,11 @@ class HTTPMethods():
         resp = session.get(url)
         return resp.json()["CSRF-Token"]
 
-    def do_GET(self, url: str):
-        return session.get(url)
+    def do_GET(self, url: str, headers, data):
+        return session.get(url, headers=headers, json=data)
 
     def do_POST(self, url: str, headers, data):
         return session.post(url, headers=headers, json=data)
-
-    def do_DELETE(self, url: str, data: dict):
-        return session.delete(url, data=data)
 
 
 class Tester(HTTPMethods):
@@ -191,17 +188,75 @@ class Tester(HTTPMethods):
         
         CSRF_TOKEN = resp.json()["CSRF-Token"]
 
+    def bgl_get(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+
+        minutes = int(input("Minutes: "))
+        time = (datetime.datetime.now() - datetime.timedelta(minutes=minutes)).timestamp()
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        data = {"username": USERNAME, "timestamp": time}
+        url = self.create_URL("s/bgl/get")
+
+        resp = self.do_GET(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+
+    def sleep_get(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        minutes = int(input("Minutes: "))
+        time = (datetime.datetime.now() - datetime.timedelta(minutes=minutes)).timestamp()
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        data = {"username": USERNAME, "timestamp": time}
+        url = self.create_URL("s/sleep/get")
+
+        resp = self.do_GET(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+
+    def ci_get(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        minutes = int(input("Minutes: "))
+        time = (datetime.datetime.now() - datetime.timedelta(minutes=minutes)).timestamp()
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        data = {"username": USERNAME, "timestamp": time}
+        url = self.create_URL("s/ci/get")
+
+        resp = self.do_GET(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+
+
 testerFuncs = Tester()
 tests = {
-    "1": testerFuncs.register,
-    "2": testerFuncs.login,
-    "3": testerFuncs.logout,
-    "4": testerFuncs.bgl_add,
-    "5": testerFuncs.sleep_add,
-    "6": testerFuncs.ci_add,
-    "7": testerFuncs.bgl_update,
-    "8": testerFuncs.sleep_update,
-    "9": testerFuncs.ci_update
+    "1":  testerFuncs.register,
+    "2":  testerFuncs.login,
+    "3":  testerFuncs.logout,
+    "4":  testerFuncs.bgl_add,
+    "5":  testerFuncs.sleep_add,
+    "6":  testerFuncs.ci_add,
+    "7":  testerFuncs.bgl_update,
+    "8":  testerFuncs.sleep_update,
+    "9":  testerFuncs.ci_update,
+    "10": testerFuncs.bgl_get,
+    "11": testerFuncs.sleep_get,
+    "12": testerFuncs.ci_get
 }
 
 def main(args):
