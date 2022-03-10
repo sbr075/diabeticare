@@ -4,6 +4,8 @@ import requests
 import argparse
 import logging
 
+import datetime
+
 # Logger
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger("TESTER")
@@ -19,6 +21,7 @@ def arg_parser():
 
 session = requests.Session()
 CSRF_TOKEN = None
+USERNAME = None
 
 class HTTPMethods():
     def create_URL(self, args=""):
@@ -27,7 +30,7 @@ class HTTPMethods():
     def do_GET_CSRF(self):
         url = self.create_URL("/get_token")
         resp = session.get(url)
-        return resp.cookies.get_dict()["CSRF-TOKEN"]
+        return resp.json()["CSRF-Token"]
 
     def do_GET(self, url: str):
         return session.get(url)
@@ -43,8 +46,8 @@ class Tester(HTTPMethods):
     def register(self):
         username = input("Enter username: ")
         password = input("Enter password: ")
-        confirm  = input("Enter password: ")
-        email    = input("Enter email: ")
+        confirm  = password
+        email    = f"{username}@mail.no"
 
         headers = {"X-CSRFToken": self.do_GET_CSRF()}
         data = {"username": username, "email": email, "password": password, "confirm": confirm}
@@ -64,29 +67,83 @@ class Tester(HTTPMethods):
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        global CSRF_TOKEN
-        CSRF_TOKEN = resp.cookies.get_dict()["CSRF-TOKEN"]
+        global CSRF_TOKEN, USERNAME
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        USERNAME = username
 
     def logout(self):
         if not CSRF_TOKEN:
             logger.info(" Not logged in")
             return
 
-        username = input("Enter username: ")
-
         headers = {"X-CSRFToken": CSRF_TOKEN}
-        data = {"username": username}
+        data = {"username": USERNAME}
         url = self.create_URL("u/logout")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
+    
+    def bgl_add(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        value = input("Enter value: ")
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "value": value, "timestamp": time}
+        url = self.create_URL("s/bgl/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+
+    def sleep_add(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "start": time, "stop": time+1000, "timestamp": time}
+        url = self.create_URL("s/sleep/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+
+    def ci_add(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        value = input("Enter value: ")
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "value": value, "timestamp": time}
+        url = self.create_URL("s/ci/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
 
 
 testerFuncs = Tester()
 tests = {
     "1": testerFuncs.register,
     "2": testerFuncs.login,
-    "3": testerFuncs.logout
+    "3": testerFuncs.logout,
+    "4": testerFuncs.bgl_add,
+    "5": testerFuncs.sleep_add,
+    "6": testerFuncs.ci_add,
 }
 
 def main(args):

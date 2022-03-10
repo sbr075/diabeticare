@@ -4,19 +4,19 @@ import datetime
 
 from diabeticare import db
 from diabeticare.main import bp
-from diabeticare.users.models import User
 
 # Called once upon registration/login to get an initial CSRF token
 @bp.route("/get_token", methods=["GET"])
 def get_token():
     if request.method == "GET":
-        return jsonify({"RESPONSE": "CSRF-TOKEN successfully generated", "CSRF-TOKEN": generate_csrf()})
+        return jsonify({"RESPONSE": "CSRF-Token successfully generated", "CSRF-Token": generate_csrf()})
     
     return jsonify({"RESPONSE": "Invalid request"})
 
 
 def validate_token(user, token):
     return user.token == token and datetime.datetime.utcnow() <= user.timer
+
 
 def update_token(user):
     new_token = generate_csrf()
@@ -25,6 +25,7 @@ def update_token(user):
     db.session.commit()
 
     return new_token
+
 
 def nullify_token(user):
     user.token = None

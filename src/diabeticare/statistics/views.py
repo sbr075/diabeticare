@@ -1,8 +1,9 @@
 from flask import request, jsonify
+from werkzeug.datastructures import MultiDict
 
 from diabeticare import db
 from diabeticare.statistics import bp
-from diabeticare.statistics import BGLForm, SleepForm, CIForm
+from diabeticare.statistics.forms import BGLForm, SleepForm, CIForm
 from diabeticare.statistics.models import BGL, Sleep, CI
 from diabeticare.users.models import User
 from diabeticare.main.views import validate_token, update_token
@@ -10,6 +11,11 @@ from diabeticare.main.views import validate_token, update_token
 import logging
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger("STAT")
+
+class Object:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
+
 
 @bp.route("/bgl/set", methods=["POST"])
 def bgl_set():
@@ -42,10 +48,10 @@ def bgl_set():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 
-		bgl_form = BGLForm(obj={"measurement": value, "date": timestamp, "note": note})
+		bgl_form = BGLForm(MultiDict({"measurement": value, "date": timestamp, "note": note}))
 		if bgl_form.validate():
 			if identifier:
-				entry = BGL.query.filter(BGL.user==user, BGL.id==identifier)
+				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
 				if not entry:
 					return jsonify({"RESPONSE": "Invalid user"})
 				
@@ -54,7 +60,7 @@ def bgl_set():
 				entry.date = timestamp
 			
 			else:
-				entry = BGL(user=user, measurement=value, note=note, date=timestamp)
+				entry = BGL(user_id=user.id, measurement=value, note=note, date=timestamp)
 				db.session.add(entry)
 			
 			db.session.commit()
@@ -100,10 +106,10 @@ def sleep_set():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		sleep_form = SleepForm(obj={"start": start, "stop": stop, "note": note})
+		sleep_form = SleepForm(MultiDict({"start": start, "stop": stop, "note": note}))
 		if sleep_form.validate():
 			if identifier:
-				entry = Sleep.query.filter(Sleep.user==user, Sleep.id==identifier)
+				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
 				if not entry:
 					return jsonify({"RESPONSE": "Invalid user"})
 				
@@ -112,7 +118,7 @@ def sleep_set():
 				entry.note  = note
 			
 			else:
-				entry = Sleep(user=user, start=start, stop=stop, note=note)
+				entry = Sleep(user_id=user.id, start=start, stop=stop, note=note)
 				db.session.add(entry)
 			
 			db.session.commit()
@@ -121,6 +127,9 @@ def sleep_set():
 			new_token = update_token(user)
 
 			return jsonify({"RESPONSE": "Request complete", "CSRF-Token": new_token})
+
+		else:
+			return jsonify({"RESPONSE": sleep_form.errors})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -156,10 +165,10 @@ def ci_set():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		ci_form = CIForm(obj={"carbohydrates": value, "date": timestamp, "note": note})
+		ci_form = CIForm(MultiDict({"carbohydrates": value, "date": timestamp, "note": note}))
 		if ci_form.validate():
 			if identifier:
-				entry = CI.query.filter(CI.user==user, CI.id==identifier)
+				entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
 				if not entry:
 					return jsonify({"RESPONSE": "Invalid user"})
 				
@@ -168,7 +177,7 @@ def ci_set():
 				entry.note = note
 
 			else:
-				entry = CI(user=user, carobohydrates=value, date=timestamp, note=note)
+				entry = CI(user_id=user.id, carbohydrates=value, date=timestamp, note=note)
 				db.session.add(entry)
 
 			db.session.commit()
@@ -176,7 +185,10 @@ def ci_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"RESPONSE": "Request complete", "CSRF-Token": new_token})				
+			return jsonify({"RESPONSE": "Request complete", "CSRF-Token": new_token})
+
+		else:
+			return jsonify({"RESPONSE": ci_form.errors})			
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -204,7 +216,7 @@ def bgl_get():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		entries = BGL.query.filter(BGL.user==user, BGL.date>=timestamp)
+		entries = BGL.query.filter(BGL.user_id==user.id, BGL.date>=timestamp)
 
 		# Update user token
 		new_token = update_token(user)
@@ -237,7 +249,7 @@ def sleep_get():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		entries = Sleep.query.filter(Sleep.user==user, Sleep.start>=timestamp)
+		entries = Sleep.query.filter(Sleep.user_id==user.id, Sleep.start>=timestamp)
 
 		# Update user token
 		new_token = update_token(user)
@@ -270,7 +282,7 @@ def ci_get():
 		if not validate_token(user, token):
 			return jsonify({"RESPONSE": "Invalid token"})
 		
-		entries = CI.query.filter(CI.user==user, CI.date>=timestamp)
+		entries = CI.query.filter(CI.user_id==user.id, CI.date>=timestamp)
 
 		# Update user token
 		new_token = update_token(user)
@@ -305,7 +317,7 @@ def bgl_del():
 		
 		entries = []
 		for identifier in identifiers:
-			entry = BGL.query.filter(BGL.user==user, BGL.id==identifier)
+			entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
 			if not entry:
 				return jsonify({"RESPONSE": "Invalid user"})
 			
@@ -349,7 +361,7 @@ def sleep_del():
 		
 		entries = []
 		for identifier in identifiers:
-			entry = Sleep.query.filter(Sleep.user==user, Sleep.id==identifier)
+			entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
 			if not entry:
 				return jsonify({"RESPONSE": "Invalid user"})
 			
@@ -369,7 +381,7 @@ def sleep_del():
 
 
 @bp.route("/ci/del", methods=["POST"])
-def bgl_del():
+def ci_del():
 	"""
 	Request parameters
 	headers
@@ -393,7 +405,7 @@ def bgl_del():
 		
 		entries = []
 		for identifier in identifiers:
-			entry = CI.query.filter(CI.user==user, CI.id==identifier)
+			entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
 			if not entry:
 				return jsonify({"RESPONSE": "Invalid user"})
 			

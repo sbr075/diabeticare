@@ -26,7 +26,7 @@ def login():
             user = User.query.filter_by(username=login_form.username.data).first()
             new_token = update_token(user)
 
-            return jsonify({"RESPONSE": "Successfully logged in", "CSRF-TOKEN": new_token})
+            return jsonify({"RESPONSE": "Successfully logged in", "CSRF-Token": new_token})
         
         else:
             return jsonify({"RESPONSE": login_form.errors})
