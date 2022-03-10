@@ -71,6 +71,89 @@ def bgl_set():
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
+
+@bp.route("/bgl/get", methods=["GET"])
+def bgl_get():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
+	"""
+	
+	if request.method == "GET":
+		data = request.get_json()
+		username  = data["username"]
+		timestamp = data["timestamp"]
+		token      = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = BGL.query.filter(BGL.user_id==user.id, BGL.date>=timestamp).all()
+		if entries:
+			bgl_schema = BGLSchema(many=True)
+			results = bgl_schema.dump(entries)
+		else:
+			results = []
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
+
+
+@bp.route("/bgl/del", methods=["POST"])
+def bgl_del():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		identifier(s): ids of entries (LIST)
+	"""
+
+	if request.method == "POST":
+		data = request.get_json()
+		username    = data["username"]
+		identifiers = data["identifiers"]
+		token       = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = []
+		for identifier in identifiers:
+			entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
+			if not entry.first():
+				return jsonify({"RESPONSE": "Invalid paramaters"})
+			
+			entries.append(entry)
+		
+		for entry in entries:
+			entry.delete()
+
+		db.session.commit()
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
+
+
 @bp.route("/sleep/set", methods=["POST"])
 def sleep_set():
 	"""
@@ -126,6 +209,88 @@ def sleep_set():
 
 		else:
 			return jsonify({"RESPONSE": sleep_form.errors})
+
+	return jsonify({"RESPONSE": "Invalid request"})
+
+
+@bp.route("/sleep/get", methods=["GET"])
+def sleep_get():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
+	"""
+
+	if request.method == "GET":
+		data = request.get_json()
+		username  = data["username"]
+		timestamp = data["timestamp"]
+		token      = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = Sleep.query.filter(Sleep.user_id==user.id, Sleep.start>=timestamp).all()
+		if entries:
+			sleep_schema = SleepSchema(many=True)
+			results = sleep_schema.dump(entries)
+		else:
+			results = []
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
+
+	return jsonify({"RESPONSE": "Invalid request"})
+
+
+@bp.route("/sleep/del", methods=["POST"])
+def sleep_del():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		identifier(s): id of entry
+	"""
+
+	if request.method == "POST":
+		data = request.get_json()
+		username    = data["username"]
+		identifiers = data["identifiers"]
+		token       = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"RESPONSE": "Invalid token"})
+		
+		entries = []
+		for identifier in identifiers:
+			entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
+			if not entry.first():
+				return jsonify({"RESPONSE": "Invalid paramaters"})
+			
+			entries.append(entry)
+		
+		for entry in entries:
+			entry.delete()
+
+		db.session.commit()
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -189,82 +354,6 @@ def ci_set():
 	return jsonify({"RESPONSE": "Invalid request"})
 
 
-@bp.route("/bgl/get", methods=["GET"])
-def bgl_get():
-	"""
-	Request parameters
-	headers
-		X-CSRFToken: current valid token
-	
-	content/data (json format)
-		username:   name of user
-		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
-	"""
-	
-	if request.method == "GET":
-		data = request.get_json()
-		username  = data["username"]
-		timestamp = data["timestamp"]
-		token      = request.headers["X-CSRFToken"]
-
-		# Get user and check token validity
-		user = User.query.filter_by(username=username).first()
-		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
-		
-		entries = BGL.query.filter(BGL.user_id==user.id, BGL.date>=timestamp).all()
-		if entries:
-			bgl_schema = BGLSchema(many=True)
-			results = bgl_schema.dump(entries)
-		else:
-			results = []
-
-		# Update user token
-		new_token = update_token(user)
-
-		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
-
-	return jsonify({"RESPONSE": "Invalid request"})
-
-
-@bp.route("/sleep/get", methods=["GET"])
-def sleep_get():
-	"""
-	Request parameters
-	headers
-		X-CSRFToken: current valid token
-	
-	content/data (json format)
-		username:   name of user
-		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
-	"""
-
-	if request.method == "GET":
-		data = request.get_json()
-		username  = data["username"]
-		timestamp = data["timestamp"]
-		token      = request.headers["X-CSRFToken"]
-
-		# Get user and check token validity
-		user = User.query.filter_by(username=username).first()
-		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
-		
-		entries = Sleep.query.filter(Sleep.user_id==user.id, Sleep.start>=timestamp).all()
-		if entries:
-			sleep_schema = SleepSchema(many=True)
-			results = sleep_schema.dump(entries)
-		else:
-			results = []
-
-		# Update user token
-		new_token = update_token(user)
-
-		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
-
-	return jsonify({"RESPONSE": "Invalid request"})
-
-
 @bp.route("/ci/get", methods=["GET"])
 def ci_get():
 	"""
@@ -303,94 +392,6 @@ def ci_get():
 	return jsonify({"RESPONSE": "Invalid request"})
 
 
-@bp.route("/bgl/del", methods=["POST"])
-def bgl_del():
-	"""
-	Request parameters
-	headers
-		X-CSRFToken: current valid token
-	
-	content/data (json format)
-		username:   name of user
-		identifier(s): id of entry
-	"""
-
-	if request.method == "POST":
-		data = request.get_json()
-		username    = data["username"]
-		identifiers = data["identifiers"]
-		token       = request.headers["X-CSRFToken"]
-
-		# Get user and check token validity
-		user = User.query.filter_by(username=username).first()
-		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
-		
-		entries = []
-		for identifier in identifiers:
-			entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
-			if not entry:
-				return jsonify({"RESPONSE": "Invalid user"})
-			
-			entries.append(entry)
-		
-		for entry in entries:
-			entry.delete()
-
-		db.session.commit()
-
-		# Update user token
-		new_token = update_token(user)
-
-		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
-
-	return jsonify({"RESPONSE": "Invalid request"})
-
-
-@bp.route("/sleep/del", methods=["POST"])
-def sleep_del():
-	"""
-	Request parameters
-	headers
-		X-CSRFToken: current valid token
-	
-	content/data (json format)
-		username:   name of user
-		identifier(s): id of entry
-	"""
-
-	if request.method == "POST":
-		data = request.get_json()
-		username    = data["username"]
-		identifiers = data["identifiers"]
-		token       = request.headers["X-CSRFToken"]
-
-		# Get user and check token validity
-		user = User.query.filter_by(username=username).first()
-		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
-		
-		entries = []
-		for identifier in identifiers:
-			entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
-			if not entry:
-				return jsonify({"RESPONSE": "Invalid user"})
-			
-			entries.append(entry)
-		
-		for entry in entries:
-			entry.delete()
-		
-		db.session.commit()
-
-		# Update user token
-		new_token = update_token(user)
-
-		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
-
-	return jsonify({"RESPONSE": "Invalid request"})
-
-
 @bp.route("/ci/del", methods=["POST"])
 def ci_del():
 	"""
@@ -417,8 +418,8 @@ def ci_del():
 		entries = []
 		for identifier in identifiers:
 			entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
-			if not entry:
-				return jsonify({"RESPONSE": "Invalid user"})
+			if not entry.first():
+				return jsonify({"RESPONSE": "Invalid paramaters"})
 			
 			entries.append(entry)
 		
