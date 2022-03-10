@@ -51,9 +51,9 @@ def bgl_set():
 		bgl_form = BGLForm(MultiDict({"measurement": value, "date": timestamp, "note": note}))
 		if bgl_form.validate():
 			if identifier:
-				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
+				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier).first()
 				if not entry:
-					return jsonify({"RESPONSE": "Invalid user"})
+					return jsonify({"RESPONSE": "Invalid paramaters"})
 				
 				entry.measurement = value
 				entry.note = note
@@ -109,9 +109,9 @@ def sleep_set():
 		sleep_form = SleepForm(MultiDict({"start": start, "stop": stop, "note": note}))
 		if sleep_form.validate():
 			if identifier:
-				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
+				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier).first()
 				if not entry:
-					return jsonify({"RESPONSE": "Invalid user"})
+					return jsonify({"RESPONSE": "Invalid paramaters"})
 				
 				entry.start = start
 				entry.stop  = stop
@@ -168,9 +168,9 @@ def ci_set():
 		ci_form = CIForm(MultiDict({"carbohydrates": value, "date": timestamp, "note": note}))
 		if ci_form.validate():
 			if identifier:
-				entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
+				entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier).first()
 				if not entry:
-					return jsonify({"RESPONSE": "Invalid user"})
+					return jsonify({"RESPONSE": "Invalid paramaters"})
 				
 				entry.carbohydrates = value
 				entry.date = timestamp

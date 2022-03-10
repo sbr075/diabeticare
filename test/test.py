@@ -134,7 +134,62 @@ class Tester(HTTPMethods):
         logger.info(f" Response from server: {resp.json()}")
         
         CSRF_TOKEN = resp.json()["CSRF-Token"]
+    
+    def bgl_update(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        value = input("Enter value: ")
+        identifier = input("Enter existing id: ")
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "value": value, "timestamp": time, "identifier": identifier}
+        url = self.create_URL("s/bgl/set")
 
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+
+    def sleep_update(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        identifier = input("Enter existing id: ")
+
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "start": time, "stop": time+1000, "timestamp": time, "identifier": identifier}
+        url = self.create_URL("s/sleep/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
+
+    def ci_update(self):
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+
+        value = input("Enter value: ")
+        identifier = input("Enter existing id: ")
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "value": value, "timestamp": time, "identifier": identifier}
+        url = self.create_URL("s/ci/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["CSRF-Token"]
 
 testerFuncs = Tester()
 tests = {
@@ -144,6 +199,9 @@ tests = {
     "4": testerFuncs.bgl_add,
     "5": testerFuncs.sleep_add,
     "6": testerFuncs.ci_add,
+    "7": testerFuncs.bgl_update,
+    "8": testerFuncs.sleep_update,
+    "9": testerFuncs.ci_update
 }
 
 def main(args):
