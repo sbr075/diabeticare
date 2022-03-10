@@ -1,6 +1,5 @@
 from flask import request, jsonify
 from passlib.hash import sha512_crypt
-import datetime
 
 from diabeticare import db
 from diabeticare.users import bp
