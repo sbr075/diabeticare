@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:model="clr-namespace:Diabeticare.Models"
+    x:DataType="model:Sleep"
+    x:Class="Diabeticare.Views.SlpEntryPage"
+    Shell.PresentationMode="Modal">
+    
+    <StackLayout Padding="10">
+        <Frame VerticalOptions="CenterAndExpand" HasShadow="True" BorderColor="LightSkyBlue">
+            <StackLayout>
+                <Label Text="Change Sleep Date" HorizontalOptions="Center" FontSize="Medium"/>
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Text="Start" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="End" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <DatePicker x:Name="dateStart" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <DatePicker x:Name="dateEnd" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </Grid>
+
+                <Label Text="Change Sleep Time" HorizontalOptions="Center" FontSize="Medium"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Text="Bedtime" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="Wake-up" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <TimePicker x:Name="timeStart" Format="HH:mm" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <TimePicker x:Name="timeEnd" Format="HH:mm" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </Grid>
+                <Button Text="Cancel" Clicked="CancelUpdate"/>
+                <Button Text="Save" Clicked="SaveUpdatedSlpEntry"/>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</ContentPage>

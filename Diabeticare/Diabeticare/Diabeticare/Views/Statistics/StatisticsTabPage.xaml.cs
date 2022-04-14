@@ -10,9 +10,9 @@ using Xamarin.Forms.Xaml;
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class EditBglPage : ContentPage
+    public partial class StatisticsTabPage : TabbedPage
     {
-        public EditBglPage()
+        public StatisticsTabPage()
         {
             InitializeComponent();
         }

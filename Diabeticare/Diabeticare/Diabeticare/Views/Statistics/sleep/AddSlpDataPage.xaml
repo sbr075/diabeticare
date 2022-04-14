@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"  
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
+    x:DataType="viewmodels:SlpViewModel"
+    x:Class="Diabeticare.Views.AddSlpDataPage">
+    
+    <!-- Setting BindingContext for page -->
+    <ContentPage.BindingContext>
+        <viewmodels:SlpViewModel/>
+    </ContentPage.BindingContext>
+
+    <StackLayout Padding="10">
+        <Label 
+            VerticalOptions="Start" 
+            Text="Add new sleep data" 
+            HorizontalOptions="Center" 
+            FontSize="Large"/>
+
+        <Frame VerticalOptions="CenterAndExpand" HasShadow="True">
+            <StackLayout>
+                <Label Text="Sleep Date" HorizontalOptions="Center" FontSize="Medium"/>
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Label Text="Start" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="End" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <DatePicker Date="{Binding SlpStart, Mode=TwoWay}" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <DatePicker Date="{Binding SlpEnd, Mode=TwoWay}" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </Grid>
+                
+                <Label Text="Sleep Time" HorizontalOptions="Center" FontSize="Medium"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Text="Bedtime" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="Wake-up" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <TimePicker Time="{Binding SlpTimeStart, Mode=TwoWay}" Format="HH:mm" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <TimePicker Time="{Binding SlpTimeEnd, Mode=TwoWay}" Format="HH:mm" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </Grid>
+            </StackLayout>
+        </Frame>
+        
+        <Button
+            Text="Legg til data" 
+            VerticalOptions="End"
+            IsEnabled="True"
+            BackgroundColor="{StaticResource Primary}"
+            Command="{Binding AddSlpCommand}"/>
+    </StackLayout>
+
+</ContentPage>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:model="clr-namespace:Diabeticare.Models"
+    x:Class="Diabeticare.Views.BglEntryPage"
+    x:DataType="model:Bgl"
+    Shell.PresentationMode="Modal">
+    
+    <StackLayout Padding="10">
+        <Frame BorderColor="LightSkyBlue">
+            <StackLayout>
+                <Label Text="Change BGL value" HorizontalOptions="Center"/>
+                <Entry
+                    x:Name="entryField"
+                    Text=""
+                    MaxLength="4" 
+                    Keyboard="Numeric"
+                    HorizontalTextAlignment="Center">
+                </Entry>
+                <Label Text="Change time" HorizontalOptions="Center"/>
+                <TimePicker x:Name="timeSelector" Format="HH:mm"/>
+
+                <Button Text="Cancel" Clicked="CancelUpdate"/>
+                <Button Text="Save" Clicked="SaveUpdatedBglEntry"/>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</ContentPage>

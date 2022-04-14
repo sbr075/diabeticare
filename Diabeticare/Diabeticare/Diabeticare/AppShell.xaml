@@ -34,10 +34,17 @@
                       Icon="icon_feed.png"
                       ContentTemplate="{DataTemplate views:DefaultPage}"/>
 
-        <!-- DataTemplate points to views -->
-        <ShellContent Title="BGL Statistics"
+        <ShellContent Title="Statistics"
                       Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:StatisticsPage}"/>
+                      ContentTemplate="{DataTemplate views:StatisticsTabPage}"/>
+        
+        <ShellContent Title="Exercise"
+                      Icon="icon_feed.png"
+                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
+        
+        <ShellContent Title="Diet"
+                      Icon="icon_feed.png"
+                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
     </TabBar>
 
 </Shell>

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels" 
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+    x:DataType="viewmodels:BglViewModel"
+    x:Class="Diabeticare.Views.AddBglDataPage">
+    
+    <!-- Setting BindingContext for page -->
+    <ContentPage.BindingContext>
+        <viewmodels:BglViewModel/>
+    </ContentPage.BindingContext>
+    
+    <StackLayout Padding="10">
+        <Label 
+            VerticalOptions="Start" 
+            Text="Add new BGL data" 
+            HorizontalOptions="Center" 
+            FontSize="Large"/>
+
+        <Frame VerticalOptions="CenterAndExpand">
+            <StackLayout>
+                
+                <!-- Change max length later -->
+                <Entry 
+                Text="{Binding BglEntry, Mode=TwoWay}"
+                MaxLength="4" 
+                Placeholder="BGL measurement" 
+                Keyboard="Numeric"
+                HorizontalTextAlignment="Center">
+
+                <!--
+                <Entry.Behaviors>
+                    <xct:EventToCommandBehavior 
+                        EventName="Completed"
+                        Command="{Binding CheckBglEntry}"/>
+                </Entry.Behaviors>
+                -->
+                </Entry>
+                
+                <TimePicker Time="{Binding BglTime, Mode=TwoWay}" Format="HH:mm" />
+                
+                <Label 
+                    Text="NB: Målinger registreres i mmol/L" 
+                    HorizontalOptions="Center" 
+                    FontSize="Micro"/>
+            </StackLayout>
+        </Frame>
+        <Button
+            Text="Legg til måling" 
+            VerticalOptions="End"
+            IsEnabled="True"
+            BackgroundColor="{StaticResource Primary}"
+            Command="{Binding AddBglCommand}"/>
+    </StackLayout>
+</ContentPage>
