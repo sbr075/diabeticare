@@ -21,7 +21,7 @@ namespace Diabeticare.Views
 
         readonly int BglLowDangerLimit = 4;
         readonly int BglHighSoftLimit = 10;
-        //readonly int BglHighDangerZone = ?;
+        //readonly int BglHighDangerZone = 12?;
         public BglStatisticsPage()
         {
             InitializeComponent();

@@ -29,8 +29,7 @@
                 Placeholder="BGL measurement" 
                 Keyboard="Numeric"
                 HorizontalTextAlignment="Center">
-
-                <!--
+                    <!--
                 <Entry.Behaviors>
                     <xct:EventToCommandBehavior 
                         EventName="Completed"

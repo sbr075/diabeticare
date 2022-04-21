@@ -93,20 +93,6 @@ namespace Diabeticare.ViewModels
             var route = $"{nameof(BglEntryPage)}?BglID={bgl.ID}";
             await Shell.Current.GoToAsync(route);
         }
-        /*
-        async Task SelectedEntry(object args)
-        {
-            var bgl = args as Bgl;
-            if (bgl == null) return;
-            SelectedBgl = null; // Deselect item
-
-            var update = await App.Current.MainPage.DisplayPromptAsync("Edit Measurement", "Blood Glucose Level", "OK", "CANCEL", initialValue: $"{bgl.BGLmeasurement}", keyboard: Keyboard.Numeric);
-            if (string.IsNullOrEmpty(update)) return; // TODO: display text saying that the entry field was empty
-
-            await App.Bdatabase.UpdateBglEntryAsync(bgl, float.Parse(update), BglTime);
-            await ViewRefresh();
-        }
-        */
 
         // Loads BGL entries
         async Task LoadBglEntries()

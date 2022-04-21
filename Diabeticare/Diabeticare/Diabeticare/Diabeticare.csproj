@@ -49,10 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Views\Statistics\bgl\BglStatisticsPage.xaml.cs">
       <DependentUpon>BglStatisticsPage.xaml</DependentUpon>
     </Compile>
