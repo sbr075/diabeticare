@@ -32,12 +32,12 @@
     <TabBar>
         <ShellContent Title="Home"
                       Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
+                      ContentTemplate="{DataTemplate views:RegisterPage}"/>
 
         <ShellContent Title="Statistics"
                       Icon="icon_feed.png"
                       ContentTemplate="{DataTemplate views:StatisticsTabPage}"/>
-        
+
         <ShellContent Title="Exercise"
                       Icon="icon_feed.png"
                       ContentTemplate="{DataTemplate views:DefaultPage}"/>

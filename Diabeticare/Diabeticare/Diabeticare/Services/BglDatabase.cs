@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Diabeticare.Models;
 using System.Threading.Tasks;
 using SQLite;
-
 
 namespace Diabeticare.Services
 {
@@ -21,7 +19,12 @@ namespace Diabeticare.Services
 
         public async Task<IEnumerable<Bgl>> GetBglEntriesAsync()
         {
+            // Fetch from server
+
+            // Fetch from local
             var bglEntries = await bglDatabase.Table<Bgl>().ToListAsync();
+
+            // Compare entries, and sync server database
             return bglEntries;
         }
 
@@ -33,6 +36,9 @@ namespace Diabeticare.Services
 
         public async Task AddBglEntryAsync(float bglMeasurement, DateTime createdAt, TimeSpan bglTime)
         {
+            // Push to server
+
+            // Push to local
             var bgl = new Bgl
             {
                 BGLmeasurement = bglMeasurement,
@@ -47,7 +53,10 @@ namespace Diabeticare.Services
         {
             if (bglEntry.ID == 0)
                 return null;
-
+               
+            // Push update to server
+               
+            // Push update to local
             bglEntry.BGLmeasurement = newValue;
             bglEntry.BGLtime = newTime;
             return bglDatabase.UpdateAsync(bglEntry);
@@ -55,6 +64,9 @@ namespace Diabeticare.Services
 
         public async Task DeleteBglEntryAsync(int id)
         {
+            // Delete from server
+
+            // Delete from local
             await bglDatabase.DeleteAsync<Bgl>(id);
         }
 

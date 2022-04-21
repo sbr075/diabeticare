@@ -1,8 +1,6 @@
-﻿using Diabeticare.Views;
-using System;
+﻿using System;
 using Xamarin.Forms;
 using System.IO;
-using Xamarin.Forms.Xaml;
 using Diabeticare.Services;
 
 namespace Diabeticare
