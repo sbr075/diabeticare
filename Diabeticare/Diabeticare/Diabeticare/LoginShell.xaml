@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Shell xmlns="http://xamarin.com/schemas/2014/forms" 
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:views="clr-namespace:Diabeticare.Views"
        Title="Diabeticare"
-       x:Class="Diabeticare.AppShell">
+       x:Class="Diabeticare.LoginShell">
 
     <!--
         The overall app visual hierarchy is defined here, along with navigation.
@@ -30,21 +30,12 @@
     </Shell.Resources>
 
     <TabBar>
-        <ShellContent Title="Home"
+        <ShellContent Title="Login"
                       Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
-        
-        <ShellContent Title="Statistics"
-                      Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:StatisticsTabPage}"/>
+                      ContentTemplate="{DataTemplate views:LoginPage}"/>
 
-        <ShellContent Title="Diet"
+        <ShellContent Title="Register"
                       Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
-
-        <ShellContent Title="Exercise"
-                      Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
+                      ContentTemplate="{DataTemplate views:RegisterPage}"/>
     </TabBar>
-
 </Shell>

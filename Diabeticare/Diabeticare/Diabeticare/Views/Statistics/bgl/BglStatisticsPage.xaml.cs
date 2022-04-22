@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SkiaSharp;
 using Microcharts;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Diabeticare.Models;
-using MvvmHelpers.Commands;
+using Diabeticare.ViewModels;
 
 namespace Diabeticare.Views
 {
@@ -27,7 +25,7 @@ namespace Diabeticare.Views
             InitializeComponent();
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
             GenDayChart(null, null);

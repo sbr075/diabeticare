@@ -8,10 +8,28 @@ using System.Net;
 
 namespace Diabeticare.Services
 {
+    public class RegisterModel
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class LoginModel
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class LogoutModel
+    {
+        public string Username { get; set; }
+    }
+
     public class ApiServices
     {
         private readonly static HttpClient HttpClient;
-        private static string api_token;
 
         static ApiServices()
         {
@@ -45,9 +63,9 @@ namespace Diabeticare.Services
 
         public async Task<HttpResponseMessage> RegisterAsync(string username, string email, string password, string confirmPassword)
         {
-            api_token = await FetchToken();
+            string token = await FetchToken();
 
-            var model = new RegisterBindingModel
+            RegisterModel model = new RegisterModel
             {
                 Username = username,
                 Email = email,
@@ -58,7 +76,7 @@ namespace Diabeticare.Services
             string url = "http://10.0.2.2:8000/u/register";
             string content = JsonConvert.SerializeObject(model);
 
-            var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, api_token);
+            var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, token);
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
             return response;
@@ -66,9 +84,9 @@ namespace Diabeticare.Services
 
         public async Task<HttpResponseMessage> LoginAsync(string username, string password)
         {
-            api_token = await FetchToken();
+            string token = await FetchToken();
 
-            var model = new LoginBindingModel
+            LoginModel model = new LoginModel
             {
                 Username = username,
                 Password = password
@@ -77,10 +95,25 @@ namespace Diabeticare.Services
             string url = "http://10.0.2.2:8000/u/login";
             string content = JsonConvert.SerializeObject(model);
 
-            var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, api_token);
+            var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, token);
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
             return response;
+        }
+
+        public async Task LogoutAsync(string username, string token)
+        {
+            LogoutModel model = new LogoutModel
+            {
+                Username = username,
+            };
+
+            string url = "http://10.0.2.2:8000/u/logout";
+            string content = JsonConvert.SerializeObject(model);
+
+            var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, token);
+
+            await HttpClient.SendAsync(httpRequestMessage);
         }
     }
 }

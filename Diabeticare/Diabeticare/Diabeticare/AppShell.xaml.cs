@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Diabeticare.Views;
+﻿using Diabeticare.Views;
 using Xamarin.Forms;
 
 namespace Diabeticare
 {
-    public partial class AppShell : Xamarin.Forms.Shell
+    public partial class AppShell : Shell
     {
         public AppShell()
         {
@@ -19,8 +17,8 @@ namespace Diabeticare
             // Default page
             Routing.RegisterRoute("DefaultPage", typeof(DefaultPage));
 
-            // User pages
-            Routing.RegisterRoute("LoginPage", typeof(LoginPage));
+            // Default statistics page
+            Routing.RegisterRoute("StatisticsTabPage", typeof(StatisticsTabPage));
 
             // BGL pages
             Routing.RegisterRoute("EditBglPage", typeof(EditBglPage));

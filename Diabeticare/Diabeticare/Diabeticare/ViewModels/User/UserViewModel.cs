@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using Diabeticare.Views;
 using Diabeticare.Models;
@@ -9,23 +8,18 @@ using MvvmHelpers.Commands;
 using Xamarin.Forms;
 using Newtonsoft.Json.Linq;
 using MvvmHelpers;
+using System.Windows.Input;
 
 namespace Diabeticare.ViewModels
 {
-    public class LoginViewModel : ViewModelBase
-    // ViewModel for the registration process. This is triggered by the user clicking the button the RegisterPage. 
-    // Utilizes the Api_services to asynchrously send an HTTP-Post with the information to the server. 
-    // TODO: This might not be secure enough. 
+    public class UserViewModel : ViewModelBase
     {
-        public ObservableRangeCollection<User> UsrEntries { get; set; }
-
-        public AsyncCommand LoginCommand { get; }
-        public AsyncCommand<object> SelectedUserCommand { get; }
-        public AsyncCommand<User> DeleteUserCommand { get; }
-        public AsyncCommand DisplayEntries { get; }
-
+        // Variables
         public string Username { get; set; }
+        public string Email { get; set; }
         public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+
         public bool _isChecked;
         public bool IsChecked
         {
@@ -40,24 +34,66 @@ namespace Diabeticare.ViewModels
             set => SetProperty(ref selectedUser, value);
         }
 
-        public LoginViewModel()
+        // Commands
+        public AsyncCommand RegisterCommand { get; }
+        public AsyncCommand LoginCommand { get; }
+        public AsyncCommand LogoutCommand { get; }
+        public AsyncCommand<object> SelectedUserCommand { get; }
+        public AsyncCommand<User> DeleteUserCommand { get; }
+        public AsyncCommand DisplayEntries { get; }
+
+        // User list
+        public ObservableRangeCollection<User> UsrEntries { get; set; }
+
+        // Constructor
+        public UserViewModel()
         {
+            // User list
             UsrEntries = new ObservableRangeCollection<User>();
+
+            // Commands
+            RegisterCommand = new AsyncCommand(Register);
             LoginCommand = new AsyncCommand(Login);
+            LogoutCommand = new AsyncCommand(Logout);
             SelectedUserCommand = new AsyncCommand<object>(SelectedEntry);
             DeleteUserCommand = new AsyncCommand<User>(DeleteUser);
             DisplayEntries = new AsyncCommand(LoadUserEntries);
         }
 
-        public async Task Login()
+        // REGISTER
+        public async Task Register()
         {
             string username = Username;
+            string email = Email;
             string password = Password;
+            string confirmPassword = ConfirmPassword;
 
-            string passwordHash = ComputeSHA256Hash(password);
-            await _Login(username, passwordHash);
+            if (password.Equals(confirmPassword))
+            {
+                string passwordHash = ComputeSHA256Hash(password);
+                string confirmPasswordHash = ComputeSHA256Hash(confirmPassword);
+
+                // Add locally
+                await App.Udatabase.AddUserEntryAsync(username, email);
+
+                // Add to server
+                HttpResponseMessage response = await App.apiServices.RegisterAsync(username, email, passwordHash, confirmPasswordHash);
+                if (response.IsSuccessStatusCode)
+                {
+                    await Shell.Current.GoToAsync(nameof(LoginPage));
+                }
+                else
+                {
+                    await App.Current.MainPage.DisplayAlert("Alert", "Invalid Credentials", "Ok");
+                }
+            }
+            else
+            {
+                await App.Current.MainPage.DisplayAlert("Alert", "Passwords do not match", "Ok");
+            }
         }
 
+        // LOGIN
         private async Task _Login(string username, string password)
         {
             HttpResponseMessage response = await App.apiServices.LoginAsync(username, password);
@@ -76,7 +112,7 @@ namespace Diabeticare.ViewModels
                 await App.Udatabase.UpdateUserTokenAsync(App.user, token);
 
                 // Redirect user to default page
-                await Shell.Current.GoToAsync(nameof(DefaultPage));
+                App.Current.MainPage = new AppShell();
             }
             else
             {
@@ -84,17 +120,13 @@ namespace Diabeticare.ViewModels
             }
         }
 
-        private static string ComputeSHA256Hash(string input)
+        public async Task Login()
         {
-            byte[] data = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
+            string username = Username;
+            string password = Password;
 
-            var sBuilder = new StringBuilder();
-            foreach (byte b in data)
-            {
-                sBuilder.Append(b.ToString("x2"));
-            }
-
-            return sBuilder.ToString();
+            string passwordHash = ComputeSHA256Hash(password);
+            await _Login(username, passwordHash);
         }
 
         // Refresh the user listview
@@ -130,6 +162,33 @@ namespace Diabeticare.ViewModels
             var userEntries = await App.Udatabase.GetUserEntriesAsync();
             UsrEntries.AddRange(userEntries);
             IsBusy = false;
+        }
+
+        // LOGOUT
+        public async Task Logout()
+        {
+            // Tell server user logs out
+            await App.apiServices.LogoutAsync(App.user.Username, App.user.Token);
+
+            // Set user to null (logged out)
+            App.user = null;
+
+            // Redirect to login page
+            App.Current.MainPage = new LoginShell();
+        }
+
+        // HELPER FUNCTIONS
+        private static string ComputeSHA256Hash(string input)
+        {
+            byte[] data = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            var sBuilder = new StringBuilder();
+            foreach (byte b in data)
+            {
+                sBuilder.Append(b.ToString("x2"));
+            }
+
+            return sBuilder.ToString();
         }
     }
 }

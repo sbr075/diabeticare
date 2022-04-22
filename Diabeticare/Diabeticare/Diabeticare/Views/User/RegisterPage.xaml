@@ -3,11 +3,13 @@
     xmlns="http://xamarin.com/schemas/2014/forms"  
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
     xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
-    x:DataType="viewmodels:RegisterViewModel"
-    x:Class="Diabeticare.Views.RegisterPage">
+    x:DataType="viewmodels:UserViewModel"
+    x:Class="Diabeticare.Views.RegisterPage"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
              
     <ContentPage.BindingContext>
-        <viewmodels:RegisterViewModel/>
+        <viewmodels:UserViewModel/>
     </ContentPage.BindingContext>
 
     <StackLayout Orientation="Vertical">

@@ -5,13 +5,15 @@
     xmlns:xct="http://xamarin.com/schemas/2020/toolkit" 
     xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
     xmlns:model="clr-namespace:Diabeticare.Models"
-    x:DataType="viewmodels:LoginViewModel"
+    x:DataType="viewmodels:UserViewModel"
     x:Class="Diabeticare.Views.LoginPage"
-    x:Name="UserLoginPage">
+    x:Name="UserLoginPage"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
 
     <!-- Setting BindingContext for page -->
     <ContentPage.BindingContext>
-        <viewmodels:LoginViewModel/>
+        <viewmodels:UserViewModel/>
     </ContentPage.BindingContext>
 
     <!-- Converter used for extracting the item selected by the user -->

@@ -68,7 +68,7 @@ namespace Diabeticare
         public App()
         {
             InitializeComponent();
-            MainPage = new AppShell();
+            MainPage = new LoginShell();
         }
 
         protected override void OnStart()
