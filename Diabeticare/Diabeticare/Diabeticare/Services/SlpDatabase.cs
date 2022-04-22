@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
 using SQLite;
 using Diabeticare.Models;
 
@@ -56,7 +55,5 @@ namespace Diabeticare.Services
         {
             await slpDatabase.DeleteAsync<Sleep>(id);
         }
-
-
     }
 }

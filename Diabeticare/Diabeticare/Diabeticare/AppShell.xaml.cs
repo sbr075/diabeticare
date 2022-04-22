@@ -16,6 +16,12 @@ namespace Diabeticare
              * Note: Pages are not loaded if you do not do this
             */
 
+            // Default page
+            Routing.RegisterRoute("DefaultPage", typeof(DefaultPage));
+
+            // User pages
+            Routing.RegisterRoute("LoginPage", typeof(LoginPage));
+
             // BGL pages
             Routing.RegisterRoute("EditBglPage", typeof(EditBglPage));
             Routing.RegisterRoute("AddBglDataPage", typeof(AddBglDataPage));

@@ -30,9 +30,13 @@
     </Shell.Resources>
 
     <TabBar>
-        <ShellContent Title="Home"
+        <ShellContent Title="Register"
                       Icon="icon_feed.png"
                       ContentTemplate="{DataTemplate views:RegisterPage}"/>
+
+        <ShellContent Title="Login"
+                      Icon="icon_feed.png"
+                      ContentTemplate="{DataTemplate views:LoginPage}"/>
 
         <ShellContent Title="Statistics"
                       Icon="icon_feed.png"
@@ -41,10 +45,7 @@
         <ShellContent Title="Exercise"
                       Icon="icon_feed.png"
                       ContentTemplate="{DataTemplate views:DefaultPage}"/>
-        
-        <ShellContent Title="Diet"
-                      Icon="icon_feed.png"
-                      ContentTemplate="{DataTemplate views:DefaultPage}"/>
+
     </TabBar>
 
 </Shell>

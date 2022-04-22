@@ -10,24 +10,42 @@ namespace Diabeticare.Services
 {
     public class ApiServices
     {
-        private static readonly HttpClient HttpClient;
+        private readonly static HttpClient HttpClient;
+        private static string api_token;
 
         static ApiServices()
         {
             HttpClient = new HttpClient();
         }
 
-        public async Task RegisterAsync(string username, string email, string password, string confirmPassword)
+        private async Task<string> FetchToken()
         {
-            // Make own function eventually
             Uri get_uri = new Uri("http://10.0.2.2:8000/get_token");
             HttpResponseMessage get_response = await HttpClient.GetAsync(get_uri);
-            get_response.EnsureSuccessStatusCode();
             string responseBody = await get_response.Content.ReadAsStringAsync();
 
-            JObject json = JObject.Parse(responseBody);
-            var token = json["CSRF-Token"];
-            // END
+            return (string) JObject.Parse(responseBody)["X-CSRFToken"];
+        }
+
+        private HttpRequestMessage createHttpRequestMessage(HttpMethod method, string url, string content, string api_token)
+        {
+            return new HttpRequestMessage
+            {
+                Method = method,
+                RequestUri = new Uri(url),
+                Headers =
+                {
+                    { "X-Version", "1" },
+                    { "X-CSRFToken", $"{api_token}"},
+                    { HttpRequestHeader.ContentType.ToString(), "application/json" }
+                },
+                Content = new StringContent(content)
+            };
+        }
+
+        public async Task<HttpResponseMessage> RegisterAsync(string username, string email, string password, string confirmPassword)
+        {
+            api_token = await FetchToken();
 
             var model = new RegisterBindingModel
             {
@@ -37,25 +55,32 @@ namespace Diabeticare.Services
                 ConfirmPassword = confirmPassword
             };
 
-            var httpRequestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("http://10.0.2.2:8000/u/register"),
-                Headers =
-                {
-                    { "X-Version", "1" },
-                    { "X-CSRFToken", $"{token}"},
-                    { HttpRequestHeader.ContentType.ToString(), "application/json" }
-                },
-                Content = new StringContent(JsonConvert.SerializeObject(model))
-            };
+            string url = "http://10.0.2.2:8000/u/register";
+            string content = JsonConvert.SerializeObject(model);
 
-            var response = await HttpClient.SendAsync(httpRequestMessage);
+            var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, api_token);
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            return response;
         }
 
-        private class jsonresponse
+        public async Task<HttpResponseMessage> LoginAsync(string username, string password)
         {
-            string token { get; set; }
-        };
+            api_token = await FetchToken();
+
+            var model = new LoginBindingModel
+            {
+                Username = username,
+                Password = password
+            };
+
+            string url = "http://10.0.2.2:8000/u/login";
+            string content = JsonConvert.SerializeObject(model);
+
+            var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, api_token);
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            return response;
+        }
     }
 }
