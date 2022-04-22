@@ -48,7 +48,7 @@ def logout():
 	X-CSRFToken: current valid token
 	"""
     if request.method == "POST":
-        data = request.get_json()
+        data = json.loads(request.data)
         log_data = {
             "username": data["Username"]
         }
