@@ -3,7 +3,6 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import InputRequired, EqualTo, Length, ValidationError
 
 from diabeticare.users.models import User
-from passlib.hash import sha512_crypt
 
 def validateLogin(form, field):
     username = form.username.data
@@ -13,7 +12,7 @@ def validateLogin(form, field):
     if not user:
         raise ValidationError("Username or password is incorrect.")
     
-    if not sha512_crypt.verify(password, user.hash_pwd):
+    if password != user.hash_pwd:
         raise ValidationError("Username or password is incorrect.")
 
 

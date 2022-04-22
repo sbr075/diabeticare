@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from passlib.hash import sha512_crypt
+from werkzeug.datastructures import MultiDict
 
 from diabeticare import db
 from diabeticare.users import bp
@@ -8,6 +8,8 @@ from diabeticare.users.models import User
 from diabeticare.main.views import validate_token, update_token, nullify_token
 
 import logging
+import json
+
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s.%(msecs)03d] %(name)s:%(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger("USER")
 
@@ -19,19 +21,23 @@ def login():
     password:    users password
 	"""
     if request.method == "POST":
-        data = request.get_json()
+        data = json.loads(request.data)
+        log_data = {
+            "username": data["Username"],
+            "password": data["Password"],
+        }
 
-        login_form = LoginForm(obj=data)
+        login_form = LoginForm(MultiDict(log_data))
         if login_form.validate():
             user = User.query.filter_by(username=login_form.username.data).first()
             new_token = update_token(user)
 
-            return jsonify({"RESPONSE": "Successfully logged in", "CSRF-Token": new_token})
+            return jsonify({"X-CSRFToken": new_token})
         
         else:
-            return jsonify({"RESPONSE": login_form.errors})
+            return jsonify(login_form.errors), 401
     
-    return jsonify({"RESPONSE": "Invalid request"})
+    return jsonify({"RESPONSE": "Invalid request"}), 405
 
 
 @bp.route("/logout", methods=["POST"])
@@ -43,9 +49,11 @@ def logout():
 	"""
     if request.method == "POST":
         data = request.get_json()
-        logger.info(data)
+        log_data = {
+            "username": data["Username"]
+        }
 
-        logout_form = LogoutForm(obj=data)
+        logout_form = LogoutForm(MultiDict(log_data))
         if logout_form.validate():
             user = User.query.filter_by(username=logout_form.username.data).first()
             token = request.headers["X-CSRFToken"]
@@ -57,9 +65,9 @@ def logout():
             return jsonify({"RESPONSE": "Successfully logged out"})
 
         else:
-            return jsonify({"RESPONSE": logout_form.errors})
+            return jsonify(logout_form.errors), 401
 
-    return jsonify({"RESPONSE": "Invalid request"})
+    return jsonify({"RESPONSE": "Invalid request"}), 405
 
 
 @bp.route("/register", methods=["POST"])
@@ -71,13 +79,19 @@ def register():
     password: users password
     confirm:  same as password
 	"""
+    
     if request.method == "POST":
-        data = request.get_json()
+        data = json.loads(request.data)
+        reg_data = {
+            "username": data["Username"],
+            "email": data["Email"],
+            "password": data["Password"],
+            "confirm": data["ConfirmPassword"]
+        }
 
-        reg_form = RegistrationForm(obj=data)
+        reg_form = RegistrationForm(MultiDict(reg_data))
         if reg_form.validate():
-            hash_pwd = sha512_crypt.hash(reg_form.password.data)
-            user = User(username=reg_form.username.data, email=reg_form.email.data, hash_pwd=hash_pwd)
+            user = User(username=reg_form.username.data, email=reg_form.email.data, hash_pwd=reg_form.password.data)
 
             db.session.add(user)
             db.session.commit()
@@ -85,6 +99,6 @@ def register():
             return jsonify({"RESPONSE": "Account successfully created!"})
         
         else:
-            return jsonify({"RESPONSE": reg_form.errors})
+            return jsonify(reg_form.errors), 401
     
-    return jsonify({"RESPONSE": "Invalid request"})
+    return jsonify({"RESPONSE": "Invalid request"}), 405

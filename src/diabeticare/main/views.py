@@ -9,7 +9,7 @@ from diabeticare.main import bp
 @bp.route("/get_token", methods=["GET"])
 def get_token():
     if request.method == "GET":
-        return jsonify({"RESPONSE": "CSRF-Token successfully generated", "CSRF-Token": generate_csrf()})
+        return jsonify({"RESPONSE": "X-CSRFToken generated", "X-CSRFToken": generate_csrf()})
     
     return jsonify({"RESPONSE": "Invalid request"})
 

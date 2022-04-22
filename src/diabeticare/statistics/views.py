@@ -64,7 +64,7 @@ def bgl_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"RESPONSE": "Request complete", "CSRF-Token": new_token})
+			return jsonify({"RESPONSE": "Request complete", "X-CSRFToken": new_token})
 
 		else:
 			return jsonify({"RESPONSE": bgl_form.errors})
@@ -105,7 +105,7 @@ def bgl_get():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": results, "X-CSRFToken": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -149,7 +149,7 @@ def bgl_del():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": "Item deleted", "X-CSRFToken": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -205,7 +205,7 @@ def sleep_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"RESPONSE": "Request complete", "CSRF-Token": new_token})
+			return jsonify({"RESPONSE": "Request complete", "X-CSRFToken": new_token})
 
 		else:
 			return jsonify({"RESPONSE": sleep_form.errors})
@@ -246,7 +246,7 @@ def sleep_get():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": results, "X-CSRFToken": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -290,7 +290,7 @@ def sleep_del():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": "Item deleted", "X-CSRFToken": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -346,7 +346,7 @@ def ci_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"RESPONSE": "Request complete", "CSRF-Token": new_token})
+			return jsonify({"RESPONSE": "Request complete", "X-CSRFToken": new_token})
 
 		else:
 			return jsonify({"RESPONSE": ci_form.errors})			
@@ -387,7 +387,7 @@ def ci_get():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": results, "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": results, "X-CSRFToken": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})
 
@@ -430,6 +430,6 @@ def ci_del():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": "Item deleted", "CSRF-Token": new_token})
+		return jsonify({"RESPONSE": "Item deleted", "X-CSRFToken": new_token})
 
 	return jsonify({"RESPONSE": "Invalid request"})

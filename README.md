@@ -15,6 +15,13 @@ Using pgAdmin to manage postgresql server
 1. Go to https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 2. Setup database
 
+### How to migrate database changes
+1. Run 'cd src' in your terminal
+2. Run 'sh diabeticare/migrate.sh' in your terminal
+
+### Run as HTTPs
+1. Run 'flask run --port=8000' in your terminal
+
 ### Dependencies 
 - Python (>=3.10.2)
 - Flask (>=2.02)
@@ -37,3 +44,4 @@ Using pgAdmin to manage postgresql server
   - Used for postgresql
 - passlib (>=1.7.4)
 - python-dotenv (>=0.19.2)
+- pyOpenSSL (>=22.0.0)
