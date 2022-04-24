@@ -1,3 +1,4 @@
+import json
 from flask import request, jsonify
 from werkzeug.datastructures import MultiDict
 
@@ -30,26 +31,26 @@ def bgl_set():
 	"""
 
 	if request.method == "POST":
-		data = request.get_json()
+		data = json.loads(request.data)
 		username   = data["username"]
 		timestamp  = data["timestamp"]
 
 		value      = data["value"]
-		note       = data["note"] if "note" in data else None
-		identifier = data["identifier"] if "identifier" in data else None
+		note       = data["note"]
+		identifier = data["identifier"] if data["note"] >= 0 else None
 		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 
 		bgl_form = BGLForm(MultiDict({"measurement": value, "date": timestamp, "note": note}))
 		if bgl_form.validate():
 			if identifier:
 				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier).first()
 				if not entry:
-					return jsonify({"RESPONSE": "Invalid paramaters"})
+					return jsonify({"ERROR": "Invalid paramaters"})
 				
 				entry.measurement = value
 				entry.note = note
@@ -64,12 +65,12 @@ def bgl_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"RESPONSE": "Request complete", "X-CSRFToken": new_token})
+			return jsonify({"X-CSRFToken": new_token})
 
 		else:
-			return jsonify({"RESPONSE": bgl_form.errors})
+			return jsonify({"ERROR": bgl_form.errors}), 401
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/bgl/get", methods=["GET"])
@@ -93,7 +94,7 @@ def bgl_get():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		entries = BGL.query.filter(BGL.user_id==user.id, BGL.date>=timestamp).all()
 		if entries:
@@ -105,9 +106,9 @@ def bgl_get():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": results, "X-CSRFToken": new_token})
+		return jsonify({"RESULTS": results, "X-CSRFToken": new_token})
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/bgl/del", methods=["POST"])
@@ -131,13 +132,13 @@ def bgl_del():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		entries = []
 		for identifier in identifiers:
 			entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
 			if not entry.first():
-				return jsonify({"RESPONSE": "Invalid paramaters"})
+				return jsonify({"ERROR": "Invalid paramaters"})
 			
 			entries.append(entry)
 		
@@ -149,9 +150,9 @@ def bgl_del():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": "Item deleted", "X-CSRFToken": new_token})
+		return jsonify({"X-CSRFToken": new_token})
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/sleep/set", methods=["POST"])
@@ -176,21 +177,21 @@ def sleep_set():
 
 		start	   = data["start"]
 		stop       = data["stop"]
-		note       = data["note"] if "note" in data else None
-		identifier = data["identifier"] if "identifier" in data else None
+		note       = data["note"]
+		identifier = data["identifier"] if data["note"] >= 0 else None
 		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		sleep_form = SleepForm(MultiDict({"start": start, "stop": stop, "note": note}))
 		if sleep_form.validate():
 			if identifier:
 				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier).first()
 				if not entry:
-					return jsonify({"RESPONSE": "Invalid paramaters"})
+					return jsonify({"ERROR": "Invalid paramaters"})
 				
 				entry.start = start
 				entry.stop  = stop
@@ -205,12 +206,12 @@ def sleep_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"RESPONSE": "Request complete", "X-CSRFToken": new_token})
+			return jsonify({"X-CSRFToken": new_token})
 
 		else:
-			return jsonify({"RESPONSE": sleep_form.errors})
+			return jsonify({"ERROR": sleep_form.errors}), 401
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/sleep/get", methods=["GET"])
@@ -234,7 +235,7 @@ def sleep_get():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		entries = Sleep.query.filter(Sleep.user_id==user.id, Sleep.start>=timestamp).all()
 		if entries:
@@ -246,9 +247,9 @@ def sleep_get():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": results, "X-CSRFToken": new_token})
+		return jsonify({"RESULTS": results, "X-CSRFToken": new_token})
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/sleep/del", methods=["POST"])
@@ -272,13 +273,13 @@ def sleep_del():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		entries = []
 		for identifier in identifiers:
 			entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
 			if not entry.first():
-				return jsonify({"RESPONSE": "Invalid paramaters"})
+				return jsonify({"ERROR": "Invalid paramaters"})
 			
 			entries.append(entry)
 		
@@ -290,9 +291,9 @@ def sleep_del():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": "Item deleted", "X-CSRFToken": new_token})
+		return jsonify({"X-CSRFToken": new_token})
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/ci/set", methods=["POST"])
@@ -317,21 +318,21 @@ def ci_set():
 		timestamp  = data["timestamp"]
 
 		value      = data["value"]
-		note       = data["note"] if "note" in data else None
-		identifier = data["identifier"] if "identifier" in data else None
+		note       = data["note"]
+		identifier = data["identifier"] if data["note"] >= 0 else None
 		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		ci_form = CIForm(MultiDict({"carbohydrates": value, "date": timestamp, "note": note}))
 		if ci_form.validate():
 			if identifier:
 				entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier).first()
 				if not entry:
-					return jsonify({"RESPONSE": "Invalid paramaters"})
+					return jsonify({"ERROR": "Invalid paramaters"})
 				
 				entry.carbohydrates = value
 				entry.date = timestamp
@@ -346,12 +347,12 @@ def ci_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"RESPONSE": "Request complete", "X-CSRFToken": new_token})
+			return jsonify({"X-CSRFToken": new_token})
 
 		else:
-			return jsonify({"RESPONSE": ci_form.errors})			
+			return jsonify({"ERROR": ci_form.errors}), 401			
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/ci/get", methods=["GET"])
@@ -375,7 +376,7 @@ def ci_get():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		entries = CI.query.filter(CI.user_id==user.id, CI.date>=timestamp).all()
 		if entries:
@@ -387,9 +388,9 @@ def ci_get():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": results, "X-CSRFToken": new_token})
+		return jsonify({"RESULTS": results, "X-CSRFToken": new_token})
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/ci/del", methods=["POST"])
@@ -413,13 +414,13 @@ def ci_del():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"RESPONSE": "Invalid token"})
+			return jsonify({"ERROR": "Invalid token"}), 403
 		
 		entries = []
 		for identifier in identifiers:
 			entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
 			if not entry.first():
-				return jsonify({"RESPONSE": "Invalid paramaters"})
+				return jsonify({"ERROR": "Invalid paramaters"})
 			
 			entries.append(entry)
 		
@@ -430,6 +431,6 @@ def ci_del():
 		# Update user token
 		new_token = update_token(user)
 
-		return jsonify({"RESPONSE": "Item deleted", "X-CSRFToken": new_token})
+		return jsonify({"X-CSRFToken": new_token})
 
-	return jsonify({"RESPONSE": "Invalid request"})
+	return jsonify({"ERROR": "Invalid request"}), 405

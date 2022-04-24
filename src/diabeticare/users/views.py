@@ -22,12 +22,8 @@ def login():
 	"""
     if request.method == "POST":
         data = json.loads(request.data)
-        log_data = {
-            "username": data["Username"],
-            "password": data["Password"],
-        }
 
-        login_form = LoginForm(MultiDict(log_data))
+        login_form = LoginForm(MultiDict(data))
         if login_form.validate():
             user = User.query.filter_by(username=login_form.username.data).first()
             new_token = update_token(user)
@@ -37,7 +33,7 @@ def login():
         else:
             return jsonify(login_form.errors), 401
     
-    return jsonify({"RESPONSE": "Invalid request"}), 405
+    return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/logout", methods=["POST"])
@@ -49,17 +45,14 @@ def logout():
 	"""
     if request.method == "POST":
         data = json.loads(request.data)
-        log_data = {
-            "username": data["Username"]
-        }
 
-        logout_form = LogoutForm(MultiDict(log_data))
+        logout_form = LogoutForm(MultiDict(data))
         if logout_form.validate():
             user = User.query.filter_by(username=logout_form.username.data).first()
             token = request.headers["X-CSRFToken"]
 
             if not validate_token(user, token):
-                return jsonify({"RESPONSE": "Invalid token"})
+                return jsonify({"ERROR": "Invalid token"}), 403
 
             nullify_token(user)
             return jsonify({"RESPONSE": "Successfully logged out"})
@@ -67,7 +60,7 @@ def logout():
         else:
             return jsonify(logout_form.errors), 401
 
-    return jsonify({"RESPONSE": "Invalid request"}), 405
+    return jsonify({"ERROR": "Invalid request"}), 405
 
 
 @bp.route("/register", methods=["POST"])
@@ -82,14 +75,8 @@ def register():
     
     if request.method == "POST":
         data = json.loads(request.data)
-        reg_data = {
-            "username": data["Username"],
-            "email": data["Email"],
-            "password": data["Password"],
-            "confirm": data["ConfirmPassword"]
-        }
 
-        reg_form = RegistrationForm(MultiDict(reg_data))
+        reg_form = RegistrationForm(MultiDict(data))
         if reg_form.validate():
             user = User(username=reg_form.username.data, email=reg_form.email.data, hash_pwd=reg_form.password.data)
 
@@ -101,4 +88,4 @@ def register():
         else:
             return jsonify(reg_form.errors), 401
     
-    return jsonify({"RESPONSE": "Invalid request"}), 405
+    return jsonify({"ERROR": "Invalid request"}), 405
