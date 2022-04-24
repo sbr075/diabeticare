@@ -36,8 +36,16 @@
         <Entry Text="{Binding Password}"
                Placeholder="Password"
                IsPassword="True"/>
-        <CheckBox IsChecked="{Binding IsChecked}" 
-                  Color="Green"/>
+
+        <StackLayout Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding IsChecked}" 
+                      Color="Green"
+                      VerticalOptions="Center"/>
+
+            <Label Text="Remember me?"
+                   VerticalOptions="Center"/>
+        </StackLayout>
+        
         <Button Command="{Binding LoginCommand}"
             Text="Login"/>
 

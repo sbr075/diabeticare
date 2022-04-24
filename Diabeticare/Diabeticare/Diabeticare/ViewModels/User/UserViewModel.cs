@@ -8,7 +8,6 @@ using MvvmHelpers.Commands;
 using Xamarin.Forms;
 using Newtonsoft.Json.Linq;
 using MvvmHelpers;
-using System.Windows.Input;
 
 namespace Diabeticare.ViewModels
 {
@@ -77,8 +76,8 @@ namespace Diabeticare.ViewModels
                 await App.Udatabase.AddUserEntryAsync(username, email);
 
                 // Add to server
-                HttpResponseMessage response = await App.apiServices.RegisterAsync(username, email, passwordHash, confirmPasswordHash);
-                if (response.IsSuccessStatusCode)
+                bool success = await App.apiServices.RegisterAsync(username, email, passwordHash, confirmPasswordHash);
+                if (success)
                 {
                     await Shell.Current.GoToAsync(nameof(LoginPage));
                 }
@@ -96,20 +95,12 @@ namespace Diabeticare.ViewModels
         // LOGIN
         private async Task _Login(string username, string password)
         {
-            HttpResponseMessage response = await App.apiServices.LoginAsync(username, password);
-            if (response.IsSuccessStatusCode)
+            bool success = await App.apiServices.LoginAsync(username, password);
+            if (success)
             {
-                App.user = await App.Udatabase.GetUserEntryAsync(username);
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var token = (string)JObject.Parse(responseBody)["X-CSRFToken"];
-
                 // If user choose to remember password
                 if (IsChecked)
                     await App.Udatabase.UpdateUserEntryAsync(App.user, password, IsChecked);
-
-                // Update token in database for user
-                await App.Udatabase.UpdateUserTokenAsync(App.user, token);
 
                 // Redirect user to default page
                 App.Current.MainPage = new AppShell();
@@ -117,6 +108,7 @@ namespace Diabeticare.ViewModels
             else
             {
                 await App.Current.MainPage.DisplayAlert("Alert", "Invalid Credentials", "Ok");
+                await LoadUserEntries();
             }
         }
 
@@ -168,7 +160,7 @@ namespace Diabeticare.ViewModels
         public async Task Logout()
         {
             // Tell server user logs out
-            await App.apiServices.LogoutAsync(App.user.Username, App.user.Token);
+            await App.apiServices.LogoutAsync();
 
             // Set user to null (logged out)
             App.user = null;
@@ -180,6 +172,8 @@ namespace Diabeticare.ViewModels
         // HELPER FUNCTIONS
         private static string ComputeSHA256Hash(string input)
         {
+            // Computes the SHA256 hash of the input and returns it as a string
+
             byte[] data = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
 
             var sBuilder = new StringBuilder();
