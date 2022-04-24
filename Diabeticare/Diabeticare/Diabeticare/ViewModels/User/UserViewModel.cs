@@ -76,14 +76,14 @@ namespace Diabeticare.ViewModels
                 await App.Udatabase.AddUserEntryAsync(username, email);
 
                 // Add to server
-                bool success = await App.apiServices.RegisterAsync(username, email, passwordHash, confirmPasswordHash);
-                if (success)
+                (int code, string message) = await App.apiServices.RegisterAsync(username, email, passwordHash, confirmPasswordHash);
+                if (code == 1)
                 {
                     await Shell.Current.GoToAsync(nameof(LoginPage));
                 }
                 else
                 {
-                    await App.Current.MainPage.DisplayAlert("Alert", "Invalid Credentials", "Ok");
+                    await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
                 }
             }
             else
@@ -95,8 +95,8 @@ namespace Diabeticare.ViewModels
         // LOGIN
         private async Task _Login(string username, string password)
         {
-            bool success = await App.apiServices.LoginAsync(username, password);
-            if (success)
+            (int code, string message) = await App.apiServices.LoginAsync(username, password);
+            if (code == 1)
             {
                 // If user choose to remember password
                 if (IsChecked)
@@ -107,7 +107,7 @@ namespace Diabeticare.ViewModels
             }
             else
             {
-                await App.Current.MainPage.DisplayAlert("Alert", "Invalid Credentials", "Ok");
+                await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
                 await LoadUserEntries();
             }
         }

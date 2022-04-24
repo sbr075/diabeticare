@@ -23,7 +23,7 @@ namespace Diabeticare.Services
         {
             /*
              * Sends a GET request to the server for a randomly generated CSRF token
-             * Returns the CSRF token as a string
+             * Returns the CSRF token as a string, or null if connection to server failed
              * 
              * Return
              *  token: string
@@ -38,10 +38,7 @@ namespace Diabeticare.Services
 
                 return (string)JObject.Parse(responseBody)["X-CSRFToken"];
             }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            catch { return null; }
         }
 
         private async Task UpdateToken(HttpResponseMessage response)
@@ -96,7 +93,7 @@ namespace Diabeticare.Services
             };
         }
 
-        public async Task<bool> RegisterAsync(string username, string email, string password, string confirm)
+        public async Task<(int, string)> RegisterAsync(string username, string email, string password, string confirm)
         {
             /*
              * Sends a POST request to the server to register a new user
@@ -112,19 +109,22 @@ namespace Diabeticare.Services
              *      Users password again
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              * 
              * Note
              * - Cannot send register request if user is already signed in
              */
 
             if (App.user != null)
-                return false;
+                return (0, "You are already logged in");
 
             try
             {
                 string token = await FetchToken();
+                if (token == null)
+                    return (0, "Failed to contact server");
 
                 var data = new
                 {
@@ -140,13 +140,13 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully registered user") : (0, "Invalid input");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
                 
         }
 
-        public async Task<bool> LoginAsync(string username, string password)
+        public async Task<(int, string)> LoginAsync(string username, string password)
         {
             /*
              * Sends a POST request to log in the user
@@ -163,19 +163,22 @@ namespace Diabeticare.Services
              *      Users password again
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send login request if user is already signed in
              */
 
             if (App.user != null)
-                return false;
+                return (0, "You are already logged in");
             
             try
             {
                 string token = await FetchToken();
+                if (token == null)
+                    return (0, "Failed to contact server");
 
                 var data = new
                 {
@@ -197,22 +200,27 @@ namespace Diabeticare.Services
                     await UpdateToken(response);
                 }
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully logged in") : (0, "Invalid credentials");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> LogoutAsync()
+        public async Task<(int, string)> LogoutAsync()
         {
             /*
              * Sends a POST request to log out the user
+             * 
+             * Return
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              * 
              * Note
              * - Cannot send logout request if user is not logged in
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
@@ -227,23 +235,21 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, url, content, App.user.Token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully logged out") : (0, "Session timed out");
             }
-            catch { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> AddOrUpdateBGLAsync(string username, int value, int timestamp, string note = null, int identifier = -1)
+        public async Task<(int, string)> AddOrUpdateBGLAsync(float value, long timestamp, string note = null, int identifier = -1)
         {
             /*
              * Sends a POST request to add or update bgl entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
-             *  value: int
+             *  value: float
              *      BGL value
-             *  timestamp: int
+             *  timestamp: long
              *      [Unix timestamp] Time user registered the value
              *  note: string (optional)
              *      A custom note for the entry
@@ -251,21 +257,22 @@ namespace Diabeticare.Services
              *      ID of existing entry for updating
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     value = value,
                     timestamp = timestamp,
                     note = note,
@@ -283,39 +290,38 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> FetchBGLAsync(string username, int timestamp)
+        public async Task<(int, string)> FetchBGLAsync(long timestamp)
         {
             /*
              * Sends a GET request to fetch all entries after timestamp
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
              *  timestamp: int
              *      [Unix timestamp] Time user registered the value
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     timestamp = timestamp
                 };
 
@@ -330,27 +336,25 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> DeleteBGLAsync(string username, int identifier)
+        public async Task<(int, string)> DeleteBGLAsync(int identifier)
         {
             /*
              * Sends a POST request to delete specified entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
              *  identifier: int
              *      ID to identify the entry (locally/server side)
              *      
-             * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
@@ -359,13 +363,13 @@ namespace Diabeticare.Services
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     identifier = identifier
                 };
 
@@ -380,23 +384,21 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> AddOrUpdateSleepAsync(string username, int start, int stop, string note = null, int identifier = -1)
+        public async Task<(int, string)> AddOrUpdateSleepAsync(long start, long stop, string note = null, int identifier = -1)
         {
             /*
              * Sends a POST request to add or update sleep entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
-             *  start: int
+             *  start: long
              *      [Unix timestamp] Time user went to sleep
-             *  stop: int
+             *  stop: long
              *      [Unix timestamp] Time user woke up
              *  timestamp: int
              *       [Unix timestamp] Time user registered the value
@@ -406,21 +408,22 @@ namespace Diabeticare.Services
              *      ID of existing entry for updating
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     start = start,
                     stop = stop,
                     note = note,
@@ -438,39 +441,38 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> FetchSleepAsync(string username, int timestamp)
+        public async Task<(int, string)> FetchSleepAsync(long timestamp)
         {
             /*
              * Sends a GET request to fetch all entries after timestamp
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
              *  timestamp: int
              *      [Unix timestamp] Time user registered the value
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     timestamp = timestamp
                 };
 
@@ -485,27 +487,26 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> DeleteSleepAsync(string username, int identifier)
+        public async Task<(int, string)> DeleteSleepAsync(int identifier)
         {
             /*
              * Sends a POST request to delete specified entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
              *  identifier: int
              *      ID to identify the entry (locally/server side)
              *      
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
@@ -514,13 +515,13 @@ namespace Diabeticare.Services
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     identifier = identifier
                 };
 
@@ -535,23 +536,21 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> AddOrUpdateCIAsync(string username, int value, int timestamp, string note = null, int identifier = -1)
+        public async Task<(int, string)> AddOrUpdateCIAsync(float value, long timestamp, string note = null, int identifier = -1)
         {
             /*
              * Sends a POST request to add or update carbohydrate entry entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
-             *  value: int
+             *  value: float
              *      BGL value
-             *  timestamp: int
+             *  timestamp: long
              *      [Unix timestamp] Time user registered the value
              *  note: string (optional)
              *      A custom note for the entry
@@ -559,21 +558,22 @@ namespace Diabeticare.Services
              *      ID of existing entry for updating
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     value = value,
                     timestamp = timestamp,
                     note = note,
@@ -591,39 +591,38 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> FetchCIAsync(string username, int timestamp)
+        public async Task<(int, string)> FetchCIAsync(long timestamp)
         {
             /*
              * Sends a GET request to fetch all entries after timestamp
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
              *  timestamp: int
              *      [Unix timestamp] Time user registered the value
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     timestamp = timestamp
                 };
 
@@ -638,27 +637,26 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<bool> DeleteCIAsync(string username, int identifier)
+        public async Task<(int, string)> DeleteCIAsync(int identifier)
         {
             /*
              * Sends a POST request to delete specified entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  username: string
-             *      Users name
              *  identifier: int
              *      ID to identify the entry (locally/server side)
              *      
              * 
              * Return
-             *  Success: bool
-             *      Whether the request succeeded or not
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
              *
              * Note
              * - Cannot send request if user is not logged in
@@ -667,13 +665,13 @@ namespace Diabeticare.Services
              */
 
             if (App.user == null)
-                return false;
+                return (0, "You are not signed in");
 
             try
             {
                 var data = new
                 {
-                    username = username,
+                    username = App.user.Username,
                     identifier = identifier
                 };
 
@@ -688,9 +686,9 @@ namespace Diabeticare.Services
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return response.IsSuccessStatusCode;
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
             }
-            catch (Exception ex) { return false; }
+            catch { return (0, "Failed to contact server"); }
         }
     }
 }

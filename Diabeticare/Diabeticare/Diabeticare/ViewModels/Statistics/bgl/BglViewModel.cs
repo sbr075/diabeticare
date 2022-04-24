@@ -48,7 +48,18 @@ namespace Diabeticare.ViewModels
             var measurement = float.Parse(BglEntry);
             var date = DateTime.Now;
             var time = BglTime;
-            await App.Bdatabase.AddBglEntryAsync(measurement, date, time);
+
+            long unixTimestamp = ((DateTimeOffset)date).ToUnixTimeSeconds();
+
+            // Asks server to add entry
+            (int code, string message) = await App.apiServices.AddOrUpdateBGLAsync(measurement, unixTimestamp);
+
+            if (code == 1)
+               await App.Bdatabase.AddBglEntryAsync(measurement, date, time);
+                
+            else
+                await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
+
             await Shell.Current.GoToAsync("..");
         }
 
@@ -79,7 +90,15 @@ namespace Diabeticare.ViewModels
         // Delete specified BGL entry
         async Task DeleteBgl(Bgl bgl)
         {
-            await App.Bdatabase.DeleteBglEntryAsync(bgl.ID);
+            // Asks server to delete entry
+            (int code, string message) = await App.apiServices.DeleteBGLAsync(bgl.ID);
+
+            if (code == 1)
+                await App.Bdatabase.DeleteBglEntryAsync(bgl.ID);
+
+            else
+                await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
+
             await ViewRefresh();
         }
 
