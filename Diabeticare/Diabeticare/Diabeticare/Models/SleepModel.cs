@@ -7,6 +7,7 @@ namespace Diabeticare.Models
 {
     public class SleepModel
     {
+<<<<<<< HEAD
         /*
         public Sleep()
         {
@@ -19,5 +20,12 @@ namespace Diabeticare.Models
         public int ServerID { get; set; }
         public DateTime SleepStart { get; set; }
         public DateTime SleepEnd { get; set; }
+=======
+        [PrimaryKey, AutoIncrement] public int ID { get; set; }
+        public DateTime SleepStart { get; set; }
+        public DateTime SleepEnd { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+>>>>>>> a5b6c1855a678a217245ed1422ab1dd5951f4ef7
     }
 }
