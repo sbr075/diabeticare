@@ -43,7 +43,7 @@ namespace Diabeticare.Services
             await bglDatabase.InsertAsync(bgl);
         }
 
-        public Task<int> UpdateBglEntryAsync(Bgl bglEntry, float newValue, DateTime newTime, int server_id)
+        public Task<int> UpdateBglEntryAsync(BglModel bglEntry, float newValue, DateTime newTime, int server_id)
         {
             if (bglEntry.ID == 0)
                 return null;

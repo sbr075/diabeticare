@@ -41,7 +41,7 @@ namespace Diabeticare.Services
         }
 
 
-        public Task<int> UpdateSlpEntryAsync(Sleep slpEntry, DateTime newSleepStart, DateTime newSleepEnd, int server_id)
+        public Task<int> UpdateSlpEntryAsync(SleepModel slpEntry, DateTime newSleepStart, DateTime newSleepEnd, int server_id)
         {
             if (slpEntry.ID == 0)
                 return null;

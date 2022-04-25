@@ -36,7 +36,6 @@ namespace Diabeticare.ViewModels
         // Commands
         public AsyncCommand RegisterCommand { get; }
         public AsyncCommand LoginCommand { get; }
-        public AsyncCommand LogoutCommand { get; }
         public AsyncCommand<object> SelectedUserCommand { get; }
         public AsyncCommand<UserModel> DeleteUserCommand { get; }
         public AsyncCommand DisplayEntries { get; }
@@ -53,7 +52,6 @@ namespace Diabeticare.ViewModels
             // Commands
             RegisterCommand = new AsyncCommand(Register);
             LoginCommand = new AsyncCommand(Login);
-            LogoutCommand = new AsyncCommand(Logout);
             SelectedUserCommand = new AsyncCommand<object>(SelectedEntry);
             DeleteUserCommand = new AsyncCommand<UserModel>(DeleteUser);
             DisplayEntries = new AsyncCommand(LoadUserEntries);
@@ -153,19 +151,6 @@ namespace Diabeticare.ViewModels
             var userEntries = await App.Udatabase.GetUserEntriesAsync();
             UsrEntries.AddRange(userEntries);
             IsBusy = false;
-        }
-
-        // LOGOUT
-        public async Task Logout()
-        {
-            // Tell server user logs out
-            await App.apiServices.LogoutAsync();
-
-            // Set user to null (logged out)
-            App.user = null;
-
-            // Redirect to login page
-            App.Current.MainPage = new LoginShell();
         }
 
         // HELPER FUNCTIONS

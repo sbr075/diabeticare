@@ -73,8 +73,14 @@ namespace Diabeticare.ViewModels
 
         public async void Logout()
         {
-            // Move code here
-            await App.Current.MainPage.DisplayAlert("Notice", "You have been logged out.", "OK");
+            // Tell server user logs out
+            await App.apiServices.LogoutAsync();
+
+            // Set user to null (logged out)
+            App.user = null;
+
+            // Redirect to login page
+            App.Current.MainPage = new LoginShell();
         }
     }
 }

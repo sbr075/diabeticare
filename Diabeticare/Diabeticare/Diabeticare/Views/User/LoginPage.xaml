@@ -69,7 +69,7 @@
 
             <!-- Setting datatemplate for ItemsSource -->
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="model:User">
+                <DataTemplate x:DataType="model:UserModel">
                     <ViewCell>
                         <!-- Menu options that appear when a user long clicks an item -->
                         <ViewCell.ContextActions>
