@@ -21,6 +21,9 @@
                 <Label Text="Change time" HorizontalOptions="Center"/>
                 <TimePicker x:Name="timeSelector" Format="HH:mm" HorizontalOptions="Center" FontSize="Medium"/>
 
+                <Label Text="Change date" HorizontalOptions="Center"/>
+                <DatePicker x:Name="dateSelector"/>
+
                 <Button Text="Cancel" Clicked="CancelUpdate"/>
                 <Button Text="Save" Clicked="SaveUpdatedBglEntry"/>
             </StackLayout>

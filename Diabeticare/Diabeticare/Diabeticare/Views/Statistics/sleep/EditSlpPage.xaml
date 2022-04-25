@@ -70,9 +70,6 @@
                                 <Label VerticalOptions="Center"
                                        FontSize="Small"
                                        Text="{Binding SleepEnd, StringFormat='Wake-up: {0:MMMM dd, HH:mm}'}"/>
-                                <Label VerticalOptions="Center"
-                                       FontSize="Micro"
-                                       Text="{Binding CreatedAt, StringFormat='Created: {0:MMMM dd, yyyy}'}"/>
                             </StackLayout>
                         </Frame>
                     </Grid>

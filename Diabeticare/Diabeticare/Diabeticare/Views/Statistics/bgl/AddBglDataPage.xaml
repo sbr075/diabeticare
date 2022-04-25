@@ -23,23 +23,19 @@
             <StackLayout>
                 
                 <!-- Change max length later -->
-                <Entry 
-                Text="{Binding BglEntry, Mode=TwoWay}"
-                MaxLength="4" 
-                Placeholder="BGL measurement" 
-                Keyboard="Numeric"
-                HorizontalTextAlignment="Center">
-                    <!--
-                <Entry.Behaviors>
-                    <xct:EventToCommandBehavior 
-                        EventName="Completed"
-                        Command="{Binding CheckBglEntry}"/>
-                </Entry.Behaviors>
-                -->
+                <Entry Text="{Binding BglEntry, Mode=TwoWay}"
+                       MaxLength="4" 
+                       Placeholder="BGL measurement" 
+                       Keyboard="Numeric"
+                       HorizontalTextAlignment="Center">
                 </Entry>
-                
-                <TimePicker Time="{Binding BglTime, Mode=TwoWay}" Format="HH:mm" HorizontalOptions="Center" FontSize="Medium"/>
-                
+
+                <Label Text="Time of measurment"/>
+                <TimePicker Time="{Binding BglTime, Mode=TwoWay}" Format="HH:mm" />
+
+                <Label Text="Date of measurment"/>
+                <DatePicker Date="{Binding BglDate, Mode=TwoWay}"/>
+
                 <Label 
                     Text="NB: Målinger registreres i mmol/L" 
                     HorizontalOptions="Center" 

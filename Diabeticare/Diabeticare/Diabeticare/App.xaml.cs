@@ -1,18 +1,33 @@
-﻿using Diabeticare.Views;
-using System;
+﻿using System;
 using Xamarin.Forms;
 using System.IO;
-using Xamarin.Forms.Xaml;
 using Diabeticare.Services;
+using Diabeticare.Models;
 
 namespace Diabeticare
 {
     public partial class App : Application
     {
+        public static UserModel user;
+
+        static ApiServices apiservices;
+        static UserDatabase userDatabase;
         static SlpDatabase slpDatabase;
         static BglDatabase bglDatabase;
 
         // Create the database connection as a singleton.
+        public static UserDatabase Udatabase
+        {
+            get
+            {
+                if (userDatabase == null)
+                {
+                    userDatabase = new UserDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userEntries.db3"));
+                }
+                return userDatabase;
+            }
+        }
+
         public static SlpDatabase Sdatabase
         {
             get
@@ -38,15 +53,27 @@ namespace Diabeticare
             }
         }
 
+        public static ApiServices apiServices
+        {
+            get
+            {
+                if (apiservices == null)
+                {
+                    apiservices = new ApiServices();
+                }
+                return apiservices;
+            }
+        }
+
         public App()
         {
             InitializeComponent();
-            MainPage = new AppShell();
+            MainPage = new LoginShell();
         }
 
         protected override void OnStart()
         {
-
+            
         }
 
         protected override void OnSleep()

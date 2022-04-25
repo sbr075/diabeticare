@@ -45,7 +45,17 @@ namespace Diabeticare.Views
 
             DateTime updatedStart = dateStart.Date.Add(timeStart.Time);
             DateTime updatedEnd = dateEnd.Date.Add(timeEnd.Time);
-            await App.Sdatabase.UpdateSlpEntryAsync(slpEntry, updatedStart, updatedEnd);
+
+            (int code, string message, int server_id) = await App.apiServices.AddOrUpdateSleepAsync(updatedStart, updatedEnd, slpEntry.ServerID);
+            if (code == 1)
+            {
+                await App.Sdatabase.UpdateSlpEntryAsync(slpEntry, updatedStart, updatedEnd, server_id);
+            }
+            else
+            {
+                await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
+            }
+
             await Shell.Current.GoToAsync("..");
         }
         private async void CancelUpdate(object sender, EventArgs e)

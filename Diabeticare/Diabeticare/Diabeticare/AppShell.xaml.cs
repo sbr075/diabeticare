@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Diabeticare.Views;
+﻿using Diabeticare.Views;
 using Xamarin.Forms;
 
 namespace Diabeticare
 {
-    public partial class AppShell : Xamarin.Forms.Shell
+    public partial class AppShell : Shell
     {
         public AppShell()
         {
@@ -15,6 +13,12 @@ namespace Diabeticare
              * Registering routes that are not visible in the navigation bar.
              * Note: Pages are not loaded if you do not do this
             */
+
+            // Default page
+            Routing.RegisterRoute("DefaultPage", typeof(DefaultPage));
+
+            // Default statistics page
+            Routing.RegisterRoute("StatisticsTabPage", typeof(StatisticsTabPage));
 
             //General pages
             Routing.RegisterRoute("InfoPage", typeof(InfoPage));
