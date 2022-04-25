@@ -1,13 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Diabeticare.Views.DefaultPage"
-             BackgroundColor="RoyalBlue">
-    <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Diabeticare Home Page"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
-    </ContentPage.Content>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Diabeticare.Views.DefaultPage"
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
+    BackgroundColor="White">
+
+    <ContentPage.BindingContext>
+        <viewmodels:ViewModelBase/>
+    </ContentPage.BindingContext>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary" IconImageSource="icon_about.png" Command="{Binding InfoCommand}"></ToolbarItem>
+        <ToolbarItem Text="Settings" Order="Secondary" Command="{Binding SettingsCommand}"> </ToolbarItem>
+        <ToolbarItem Text="About" Order="Secondary" Command="{Binding AboutCommand}"></ToolbarItem>
+        <ToolbarItem Text="Sign Out" Order="Secondary" Command="{Binding LogoutCommand}"></ToolbarItem>
+    </ContentPage.ToolbarItems>
+    
+    <StackLayout VerticalOptions="Start" Padding="10">
+        <Label 
+            Text="Home Page"
+            FontSize="Large"
+            VerticalOptions="CenterAndExpand" 
+            HorizontalOptions="CenterAndExpand" />
+    </StackLayout>
+
 </ContentPage>

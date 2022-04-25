@@ -15,7 +15,7 @@ namespace Diabeticare.Views
     public partial class SlpEntryPage : ContentPage
     {
         public string SlpID { get; set; }
-        Sleep slpEntry;
+        SleepModel slpEntry;
         public SlpEntryPage()
         {
             InitializeComponent();

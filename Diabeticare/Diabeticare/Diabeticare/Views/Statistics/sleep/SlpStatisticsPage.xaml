@@ -14,6 +14,7 @@
                 x:Name="today"
                 Text="I Dag" 
                 HorizontalOptions="Center"
+                CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
                 Clicked="GenDayChart"/>
 
@@ -21,6 +22,7 @@
                 x:Name="week" 
                 Text="1 UKE" 
                 HorizontalOptions="Center"
+                CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
                 Clicked="GenWeekChart"/>
 
@@ -28,6 +30,7 @@
                 x:Name="month" 
                 Text="1 MÅNED"
                 HorizontalOptions="Center"
+                CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
                 Clicked="GenMonthChart"/>
         </StackLayout>
@@ -40,7 +43,7 @@
                 Text="Statistics Page"
                 HorizontalOptions="Center"/>
 
-            <Frame CornerRadius="10" HasShadow="True" BorderColor="RoyalBlue">
+            <Frame CornerRadius="10" HasShadow="True" BorderColor="Black">
                 <microcharts:ChartView x:Name="SlpChart" HeightRequest="200" HorizontalOptions="Fill"/>
             </Frame>
 

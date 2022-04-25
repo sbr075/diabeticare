@@ -32,12 +32,12 @@ namespace Diabeticare.Views
         // Generate sleep chart for current day
         private async void GenDayChart(object sender, EventArgs e)
         {
-            LabelMid.Text = "Sleep schedule (today)";
+            LabelMid.Text = "Sleep Schedule - Today";
             ChartDescription.Text = "Your sleep schedule today.";
             ChartEntries.Clear(); // Empty list before adding new data
             
             // Get list of sleep entries from database
-            List<Sleep> SlpEntries = (List<Sleep>)await App.Sdatabase.GetSlpEntriesAsync();
+            List<SleepModel> SlpEntries = (List<SleepModel>)await App.Sdatabase.GetSlpEntriesAsync();
 
             TimeSpan sleepTime = new TimeSpan(0, 0, 0);
             for (int i = SlpEntries.Count - 1; i >= 0; i--)
@@ -78,7 +78,7 @@ namespace Diabeticare.Views
         // Generate sleep chart for the last 7 days
         private void GenWeekChart(object sender, EventArgs e)
         {
-            LabelMid.Text = "Sleep schedule (7 days)";
+            LabelMid.Text = "Sleep Schedule - 7 Days";
             ChartDescription.Text = "Your sleep schedule the last 7 days.";
             int GoBackDays = 6;
             string LabelFormat = "MMMM dd";
@@ -93,7 +93,7 @@ namespace Diabeticare.Views
         // Generate sleep chart for the last 30 days
         private void GenMonthChart(object sender, EventArgs e)
         {
-            LabelMid.Text = "Sleep schedule (30 days)";
+            LabelMid.Text = "Sleep Schedule - 30 Days";
             ChartDescription.Text = "Your sleep schedule the last 30 days.";
             int GoBackDays = 29;
             string LabelFormat = "MM/dd";
@@ -124,7 +124,7 @@ namespace Diabeticare.Views
             chartEntries.Clear();
 
             // Get list of entries from database
-            List<Sleep> slpEntries = (List<Sleep>)await App.Sdatabase.GetSlpEntriesAsync();
+            List<SleepModel> slpEntries = (List<SleepModel>)await App.Sdatabase.GetSlpEntriesAsync();
 
             // Set date to N days ago
             DateTime nDaysAgo = DateTime.Today.AddDays(-days);

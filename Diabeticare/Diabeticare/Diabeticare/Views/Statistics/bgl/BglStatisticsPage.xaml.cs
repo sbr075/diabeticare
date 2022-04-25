@@ -36,7 +36,7 @@ namespace Diabeticare.Views
         // Generate BGL chart for today
         private async void GenDayChart(object sender, EventArgs e)
         {
-            LabelMid.Text = "BGL chart today";
+            LabelMid.Text = "BGL Chart - Today";
             ChartDescription.Text = "Your BGL measurements for today.";
             ChartEntries.Clear(); // Empty list before adding new data
 
@@ -44,7 +44,7 @@ namespace Diabeticare.Views
             int maxDayChartEntries = 10;
 
             // Get list of entries from database
-            List<Bgl> BglEntries = (List<Bgl>)await App.Bdatabase.GetBglEntriesAsync();
+            List<BglModel> BglEntries = (List<BglModel>)await App.Bdatabase.GetBglEntriesAsync();
 
             // Iterating through entries and removing those that were not registered today
             // Note: Iterating backwards to avoid index shifting issues when removing elements
@@ -81,7 +81,7 @@ namespace Diabeticare.Views
         // Generate BGL chart for last 7 days
         private void GenWeekChart(object sender, EventArgs e)
         {
-            LabelMid.Text = "BGL chart last 7 days";
+            LabelMid.Text = "BGL Chart - 7 Days";
             ChartDescription.Text = "Your average BGL the last 7 days.";
             int GoBackDays = 6;
             string LabelFormat = "MMMM dd";
@@ -97,7 +97,7 @@ namespace Diabeticare.Views
         // Generate BGL chart for last 30 days
         private void GenMonthChart(object sender, EventArgs e)
         {
-            LabelMid.Text = "BGL chart last 30 days";
+            LabelMid.Text = "BGL Chart - 30 Days";
             ChartDescription.Text = "Your average BGL the last 30 days.";
             int GoBackDays = 29;
             string LabelFormat = "MM/dd";
@@ -128,7 +128,7 @@ namespace Diabeticare.Views
             chartEntries.Clear();
 
             // Get list of entries from database
-            List<Bgl> bglEntries = (List<Bgl>)await App.Bdatabase.GetBglEntriesAsync();
+            List<BglModel> bglEntries = (List<BglModel>)await App.Bdatabase.GetBglEntriesAsync();
 
             // Set date to N days ago
             DateTime nDaysAgo = DateTime.Today.AddDays(-days);

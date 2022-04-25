@@ -30,7 +30,7 @@
                     <Label Text="Start" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <Label Text="End" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <DatePicker Date="{Binding SlpStart, Mode=TwoWay}" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center"/>
-                    <DatePicker Date="{Binding SlpEnd, Mode=TwoWay}" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <DatePicker Date="{Binding SlpEnd, Mode=TwoWay}" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" />
                 </Grid>
                 
                 <Label Text="Sleep Time" HorizontalOptions="Center" FontSize="Medium"/>

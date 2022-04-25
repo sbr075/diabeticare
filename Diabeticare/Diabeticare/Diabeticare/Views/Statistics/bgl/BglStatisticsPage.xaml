@@ -6,6 +6,7 @@
     xmlns:views="clr-namespace:Diabeticare.Views" 
     x:DataType="views:BglStatisticsPage"
     x:Class="Diabeticare.Views.BglStatisticsPage"
+    xmlns:font="clr-namespace:Diabeticare.Resources.Helpers"
     x:Name="StatPage">
 
     <StackLayout>
@@ -16,20 +17,23 @@
                 x:Name="today"
                 Text="I Dag" 
                 HorizontalOptions="Center"
+                CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
                 Clicked="GenDayChart"/>
 
             <Button
                 x:Name="week" 
-                Text="1 UKE" 
+                Text="1 Week" 
                 HorizontalOptions="Center"
+                CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
                 Clicked="GenWeekChart"/>
 
             <Button 
                 x:Name="month" 
-                Text="1 MÅNED"
+                Text="1 Month"
                 HorizontalOptions="Center"
+                CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
                 Clicked="GenMonthChart"/>
         </StackLayout>
@@ -42,7 +46,7 @@
                 Text="Statistics Page"
                 HorizontalOptions="Center"/>
 
-            <Frame CornerRadius="10" HasShadow="True" BorderColor="PaleVioletRed">
+            <Frame CornerRadius="10" HasShadow="True" BorderColor="Black">
                 <microcharts:ChartView x:Name="BglChart" HeightRequest="200" HorizontalOptions="Fill"/>
             </Frame>
             
@@ -53,6 +57,7 @@
 
         <!-- Bottom button layout -->
         <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="Center" Padding="5">
+
             <Button 
                 x:Name="editData"
                 Text="Edit Data"

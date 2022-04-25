@@ -15,7 +15,7 @@ namespace Diabeticare.Views
     public partial class BglEntryPage : ContentPage
     {
         public string BglID { get; set; }
-        Bgl bglEntry;
+        BglModel bglEntry;
         public BglEntryPage()
         {
             InitializeComponent();

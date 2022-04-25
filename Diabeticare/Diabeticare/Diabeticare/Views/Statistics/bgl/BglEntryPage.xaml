@@ -19,7 +19,7 @@
                     HorizontalTextAlignment="Center">
                 </Entry>
                 <Label Text="Change time" HorizontalOptions="Center"/>
-                <TimePicker x:Name="timeSelector" Format="HH:mm"/>
+                <TimePicker x:Name="timeSelector" Format="HH:mm" HorizontalOptions="Center" FontSize="Medium"/>
 
                 <Button Text="Cancel" Clicked="CancelUpdate"/>
                 <Button Text="Save" Clicked="SaveUpdatedBglEntry"/>

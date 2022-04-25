@@ -38,7 +38,7 @@
                 -->
                 </Entry>
                 
-                <TimePicker Time="{Binding BglTime, Mode=TwoWay}" Format="HH:mm" />
+                <TimePicker Time="{Binding BglTime, Mode=TwoWay}" Format="HH:mm" HorizontalOptions="Center" FontSize="Medium"/>
                 
                 <Label 
                     Text="NB: Målinger registreres i mmol/L" 

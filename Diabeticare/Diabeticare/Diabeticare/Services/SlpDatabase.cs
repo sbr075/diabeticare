@@ -14,25 +14,25 @@ namespace Diabeticare.Services
         public SlpDatabase(string dbPath)
         {
             slpDatabase = new SQLiteAsyncConnection(dbPath);
-            slpDatabase.CreateTableAsync<Sleep>().Wait();
+            slpDatabase.CreateTableAsync<SleepModel>().Wait();
         }
 
-        public async Task<IEnumerable<Sleep>> GetSlpEntriesAsync()
+        public async Task<IEnumerable<SleepModel>> GetSlpEntriesAsync()
         {
             // Returns all sleep entries
-            var slpEntries = await slpDatabase.Table<Sleep>().ToListAsync();
+            var slpEntries = await slpDatabase.Table<SleepModel>().ToListAsync();
             return slpEntries;
         }
 
-        public async Task<Sleep> GetSlpEntryAsync(int id)
+        public async Task<SleepModel> GetSlpEntryAsync(int id)
         {
-            var slp = await slpDatabase.Table<Sleep>().FirstOrDefaultAsync(slpEntry => slpEntry.ID == id);
+            var slp = await slpDatabase.Table<SleepModel>().FirstOrDefaultAsync(slpEntry => slpEntry.ID == id);
             return slp;
         }
 
         public async Task AddSlpEntryAsync(DateTime sleepStart, DateTime sleepEnd, DateTime createdAt)
         {
-            var slpEntry = new Sleep
+            var slpEntry = new SleepModel
             {
                 SleepStart = sleepStart,
                 SleepEnd = sleepEnd,
@@ -42,7 +42,7 @@ namespace Diabeticare.Services
         }
 
 
-        public Task<int> UpdateSlpEntryAsync(Sleep slpEntry, DateTime newSleepStart, DateTime newSleepEnd)
+        public Task<int> UpdateSlpEntryAsync(SleepModel slpEntry, DateTime newSleepStart, DateTime newSleepEnd)
         {
             if (slpEntry.ID == 0)
                 return null;
@@ -54,7 +54,7 @@ namespace Diabeticare.Services
 
         public async Task DeleteSlpEntryAsync(int id)
         {
-            await slpDatabase.DeleteAsync<Sleep>(id);
+            await slpDatabase.DeleteAsync<SleepModel>(id);
         }
 
 

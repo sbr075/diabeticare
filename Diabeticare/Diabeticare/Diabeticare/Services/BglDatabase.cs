@@ -16,24 +16,24 @@ namespace Diabeticare.Services
         public BglDatabase(string dbPath)
         {
             bglDatabase = new SQLiteAsyncConnection(dbPath);
-            bglDatabase.CreateTableAsync<Bgl>().Wait();
+            bglDatabase.CreateTableAsync<BglModel>().Wait();
         }
 
-        public async Task<IEnumerable<Bgl>> GetBglEntriesAsync()
+        public async Task<IEnumerable<BglModel>> GetBglEntriesAsync()
         {
-            var bglEntries = await bglDatabase.Table<Bgl>().ToListAsync();
+            var bglEntries = await bglDatabase.Table<BglModel>().ToListAsync();
             return bglEntries;
         }
 
-        public async Task<Bgl> GetBglEntryAsync(int id)
+        public async Task<BglModel> GetBglEntryAsync(int id)
         {
-            var bgl = await bglDatabase.Table<Bgl>().FirstOrDefaultAsync(bglEntry => bglEntry.ID == id);
+            var bgl = await bglDatabase.Table<BglModel>().FirstOrDefaultAsync(bglEntry => bglEntry.ID == id);
             return bgl;
         }
 
         public async Task AddBglEntryAsync(float bglMeasurement, DateTime createdAt, TimeSpan bglTime)
         {
-            var bgl = new Bgl
+            var bgl = new BglModel
             {
                 BGLmeasurement = bglMeasurement,
                 CreatedAt = createdAt,
@@ -43,7 +43,7 @@ namespace Diabeticare.Services
             await bglDatabase.InsertAsync(bgl);
         }
 
-        public Task<int> UpdateBglEntryAsync(Bgl bglEntry, float newValue, TimeSpan newTime)
+        public Task<int> UpdateBglEntryAsync(BglModel bglEntry, float newValue, TimeSpan newTime)
         {
             if (bglEntry.ID == 0)
                 return null;
@@ -55,7 +55,7 @@ namespace Diabeticare.Services
 
         public async Task DeleteBglEntryAsync(int id)
         {
-            await bglDatabase.DeleteAsync<Bgl>(id);
+            await bglDatabase.DeleteAsync<BglModel>(id);
         }
 
 

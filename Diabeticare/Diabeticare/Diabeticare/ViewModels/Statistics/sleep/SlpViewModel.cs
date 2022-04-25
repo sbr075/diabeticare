@@ -16,20 +16,20 @@ namespace Diabeticare.ViewModels
     {
 
         // Data collection of sleep entries
-        public ObservableRangeCollection<Sleep> SlpEntries { get; set; }
+        public ObservableRangeCollection<SleepModel> SlpEntries { get; set; }
 
         public Command AddSlpCommand { get; }
         public AsyncCommand RefreshCommand { get; }
-        public AsyncCommand<Sleep> DeleteSlpCommand { get; }
+        public AsyncCommand<SleepModel> DeleteSlpCommand { get; }
         public AsyncCommand<object> SelectedSlpCommand { get; }
         public AsyncCommand DisplayEntries { get; }
         public SlpViewModel()
         {
             
-            SlpEntries = new ObservableRangeCollection<Sleep>();
+            SlpEntries = new ObservableRangeCollection<SleepModel>();
             AddSlpCommand = new Command(AddSlp);
             RefreshCommand = new AsyncCommand(ViewRefresh);
-            DeleteSlpCommand = new AsyncCommand<Sleep>(DeleteSlp);
+            DeleteSlpCommand = new AsyncCommand<SleepModel>(DeleteSlp);
             SelectedSlpCommand = new AsyncCommand<object>(SelectedEntry);
             DisplayEntries = new AsyncCommand(LoadSlpEntries);
             SlpStart = DateTime.Today.AddDays(-1);
@@ -64,7 +64,7 @@ namespace Diabeticare.ViewModels
         }
 
         // Delete specified sleep entry
-        async Task DeleteSlp(Sleep slp)
+        async Task DeleteSlp(SleepModel slp)
         {
             await App.Sdatabase.DeleteSlpEntryAsync(slp.ID);
             await ViewRefresh();
@@ -73,7 +73,7 @@ namespace Diabeticare.ViewModels
         async Task SelectedEntry(object arg)
         {
 
-            Sleep slp = arg as Sleep;
+            SleepModel slp = arg as SleepModel;
             if (slp == null) return;
 
             SelectedSlp = null; // Deselect item
@@ -91,8 +91,8 @@ namespace Diabeticare.ViewModels
             IsBusy = false;
         }
 
-        Sleep selectedSlp;
-        public Sleep SelectedSlp
+        SleepModel selectedSlp;
+        public SleepModel SelectedSlp
         {
             get => selectedSlp;
             set => SetProperty(ref selectedSlp, value);

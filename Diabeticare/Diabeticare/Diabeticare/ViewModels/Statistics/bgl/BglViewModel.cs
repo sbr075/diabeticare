@@ -16,11 +16,11 @@ namespace Diabeticare.ViewModels
     public class BglViewModel : ViewModelBase
     {
         // Data collection of BGL entries
-        public ObservableRangeCollection<Bgl> BglEntries { get; set; }
+        public ObservableRangeCollection<BglModel> BglEntries { get; set; }
 
         public Command AddBglCommand { get; }
         public AsyncCommand RefreshCommand { get; }
-        public AsyncCommand<Bgl> DeleteBglCommand { get; }
+        public AsyncCommand<BglModel> DeleteBglCommand { get; }
         public AsyncCommand<object> SelectedBglCommand { get; }
         public AsyncCommand DisplayEntries { get; }
         public AsyncCommand LoadMoreCommand { get; }
@@ -30,10 +30,10 @@ namespace Diabeticare.ViewModels
 
         public BglViewModel()
         {
-            BglEntries = new ObservableRangeCollection<Bgl>();
+            BglEntries = new ObservableRangeCollection<BglModel>();
             AddBglCommand = new Command(AddBgl);
             RefreshCommand = new AsyncCommand(ViewRefresh);
-            DeleteBglCommand = new AsyncCommand<Bgl>(DeleteBgl);
+            DeleteBglCommand = new AsyncCommand<BglModel>(DeleteBgl);
             SelectedBglCommand = new AsyncCommand<object>(SelectedEntry);
             DisplayEntries = new AsyncCommand(LoadBglEntries);
             BglTime = DateTime.Now.TimeOfDay;
@@ -52,8 +52,8 @@ namespace Diabeticare.ViewModels
             await Shell.Current.GoToAsync("..");
         }
 
-        Bgl selectedBgl;
-        public Bgl SelectedBgl
+        BglModel selectedBgl;
+        public BglModel SelectedBgl
         {
             get => selectedBgl;
             set => SetProperty(ref selectedBgl, value);
@@ -77,7 +77,7 @@ namespace Diabeticare.ViewModels
         }
 
         // Delete specified BGL entry
-        async Task DeleteBgl(Bgl bgl)
+        async Task DeleteBgl(BglModel bgl)
         {
             await App.Bdatabase.DeleteBglEntryAsync(bgl.ID);
             await ViewRefresh();
@@ -85,7 +85,7 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedEntry(object arg)
         {
-            Bgl bgl = arg as Bgl;
+            BglModel bgl = arg as BglModel;
             if (bgl == null) return;
 
             SelectedBgl = null; // Deselect item
