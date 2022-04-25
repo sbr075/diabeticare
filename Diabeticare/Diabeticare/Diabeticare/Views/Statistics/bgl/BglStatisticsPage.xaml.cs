@@ -47,11 +47,11 @@ namespace Diabeticare.Views
             // Iterating through entries and removing those that were not registered today
             // Note: Iterating backwards to avoid index shifting issues when removing elements
             for (int i = BglEntries.Count - 1; i >= 0; i--)
-                if (BglEntries[i].CreatedAt < DateTime.Today) 
+                if (BglEntries[i].TimeOfMeasurment < DateTime.Today) 
                     BglEntries.RemoveAt(i);
             
             // Sort entries based on BGLtime
-            BglEntries = BglEntries.OrderBy(bglEntry => bglEntry.BGLtime).ToList();
+            BglEntries = BglEntries.OrderBy(bglEntry => bglEntry.TimeOfMeasurment.TimeOfDay).ToList();
 
             // Limiting max number of entries in the chart.
             while (BglEntries.Count > maxDayChartEntries)
@@ -61,7 +61,7 @@ namespace Diabeticare.Views
             for (int i = 0; i < BglEntries.Count; i++)
             {
                 // Change timespan format to only show hours:minutes
-                string timeStamp = BglEntries[i].BGLtime.ToString(@"hh\:mm");
+                string timeStamp = BglEntries[i].TimeOfMeasurment.TimeOfDay.ToString(@"hh\:mm");
 
                 // Generate new chart entry and add it to ChartEntries list
                 ChartEntries.Add(new ChartEntry(BglEntries[i].BGLmeasurement)
@@ -139,7 +139,7 @@ namespace Diabeticare.Views
                 for (int i = 0; i < bglEntries.Count; i++)
                 {
                     // Check if the BGL entries were registered on the current day/iteration
-                    if (bglEntries[i].CreatedAt.Date == day.Date)
+                    if (bglEntries[i].TimeOfMeasurment.Date == day.Date)
                     {
                         sum += bglEntries[i].BGLmeasurement;
                         num_measurements++;

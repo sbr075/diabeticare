@@ -72,13 +72,12 @@ namespace Diabeticare.ViewModels
                 string passwordHash = ComputeSHA256Hash(password);
                 string confirmPasswordHash = ComputeSHA256Hash(confirmPassword);
 
-                // Add locally
-                await App.Udatabase.AddUserEntryAsync(username, email);
-
                 // Add to server
                 (int code, string message) = await App.apiServices.RegisterAsync(username, email, passwordHash, confirmPasswordHash);
                 if (code == 1)
                 {
+                    // Add locally
+                    await App.Udatabase.AddUserEntryAsync(username, email);
                     await Shell.Current.GoToAsync(nameof(LoginPage));
                 }
                 else

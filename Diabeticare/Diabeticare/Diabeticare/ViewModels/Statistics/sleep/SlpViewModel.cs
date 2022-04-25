@@ -46,19 +46,14 @@ namespace Diabeticare.ViewModels
                 await App.Current.MainPage.DisplayAlert("Warning", "Invalid sleep entry.", "OK");
                 return;
             }
-            var start = SlpStart.Add(SlpTimeStart);
-            var end = SlpEnd.Add(SlpTimeEnd);
-            var created = DateTime.Now;
-
-
-            long unixStart = ((DateTimeOffset)start).ToUnixTimeSeconds();
-            long unixEnd = ((DateTimeOffset)end).ToUnixTimeSeconds();
+            DateTime start = SlpStart.Date.Add(SlpTimeStart);
+            DateTime end = SlpEnd.Date.Add(SlpTimeEnd);
 
             // Asks server to add entry
-            (int code, string message) = await App.apiServices.AddOrUpdateSleepAsync(unixStart, unixEnd);
+            (int code, string message, int server_id) = await App.apiServices.AddOrUpdateSleepAsync(start, end);
 
             if (code == 1)
-                await App.Sdatabase.AddSlpEntryAsync(start, end, created);
+                await App.Sdatabase.AddSlpEntryAsync(start, end, server_id);
 
             else
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
@@ -80,7 +75,7 @@ namespace Diabeticare.ViewModels
         async Task DeleteSlp(Sleep slp)
         {
             // Asks server to delete entry
-            (int code, string message) = await App.apiServices.DeleteSleepAsync(slp.ID);
+            (int code, string message) = await App.apiServices.DeleteSleepAsync(slp.ServerID);
 
             if (code == 1)
                 await App.Sdatabase.DeleteSlpEntryAsync(slp.ID);

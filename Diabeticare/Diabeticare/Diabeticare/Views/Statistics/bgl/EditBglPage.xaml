@@ -68,10 +68,10 @@
                                        Text="{Binding BGLmeasurement, StringFormat='BGL: {0:F1}'}"/>
                                 <Label VerticalOptions="Center"
                                        FontSize="Small"
-                                       Text="{Binding BGLtime, StringFormat='Time: {0:hh\\:mm}'}"/>
+                                       Text="{Binding TimeOfMeasurment.TimeOfDay, StringFormat='Time: {0:hh\\:mm}'}"/>
                                 <Label VerticalOptions="Center"
                                        FontSize="Micro"
-                                       Text="{Binding CreatedAt, StringFormat='Created: {0:MMMM dd, yyyy}'}"/>
+                                       Text="{Binding TimeOfMeasurment.Date, StringFormat='Created: {0:MMMM dd, yyyy}'}"/>
                             </StackLayout>
                         </Frame>
                     </Grid>

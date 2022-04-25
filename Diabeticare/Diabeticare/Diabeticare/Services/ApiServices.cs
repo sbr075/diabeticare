@@ -240,7 +240,7 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string)> AddOrUpdateBGLAsync(float value, long timestamp, string note = null, int identifier = -1)
+        public async Task<(int, string, int)> AddOrUpdateBGLAsync(float value, DateTime time, int identifier = -1)
         {
             /*
              * Sends a POST request to add or update bgl entry
@@ -266,16 +266,17 @@ namespace Diabeticare.Services
              */
 
             if (App.user == null)
-                return (0, "You are not signed in");
+                return (0, "You are not signed in", -1);
 
             try
             {
+                long unixTime = ((DateTimeOffset)time).ToUnixTimeSeconds();
+
                 var data = new
                 {
                     username = App.user.Username,
                     value = value,
-                    timestamp = timestamp,
-                    note = note,
+                    timestamp = unixTime,
                     identifier = identifier
                 };
 
@@ -286,13 +287,16 @@ namespace Diabeticare.Services
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
+                string responseBody = await response.Content.ReadAsStringAsync();
+                int server_id = (int)JObject.Parse(responseBody)["SERVERID"];
+
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry") : (0, "Session timed out");
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", server_id) : (0, "Session timed out", -1);
             }
-            catch { return (0, "Failed to contact server"); }
+            catch { return (0, "Failed to contact server", -1); }
         }
 
         public async Task<(int, string)> FetchBGLAsync(long timestamp)
@@ -389,7 +393,7 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string)> AddOrUpdateSleepAsync(long start, long stop, string note = null, int identifier = -1)
+        public async Task<(int, string, int)> AddOrUpdateSleepAsync(DateTime start, DateTime stop, int identifier = -1)
         {
             /*
              * Sends a POST request to add or update sleep entry
@@ -402,8 +406,6 @@ namespace Diabeticare.Services
              *      [Unix timestamp] Time user woke up
              *  timestamp: int
              *       [Unix timestamp] Time user registered the value
-             *  note: string (optional)
-             *      A custom note for the entry
              *  identifier: int (optional)
              *      ID of existing entry for updating
              * 
@@ -417,16 +419,18 @@ namespace Diabeticare.Services
              */
 
             if (App.user == null)
-                return (0, "You are not signed in");
+                return (0, "You are not signed in", -1);
 
             try
             {
+                long unixStart = ((DateTimeOffset)start).ToUnixTimeSeconds();
+                long unixStop = ((DateTimeOffset)stop).ToUnixTimeSeconds();
+
                 var data = new
                 {
                     username = App.user.Username,
-                    start = start,
-                    stop = stop,
-                    note = note,
+                    start = unixStart,
+                    stop = unixStop,
                     identifier = identifier
                 };
 
@@ -437,13 +441,16 @@ namespace Diabeticare.Services
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
+                string responseBody = await response.Content.ReadAsStringAsync();
+                int server_id = (int)JObject.Parse(responseBody)["SERVERID"];
+
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry") : (0, "Session timed out");
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", server_id) : (0, "Session timed out", -1);
             }
-            catch { return (0, "Failed to contact server"); }
+            catch { return (0, "Failed to contact server", -1); }
         }
 
         public async Task<(int, string)> FetchSleepAsync(long timestamp)
@@ -541,7 +548,7 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string)> AddOrUpdateCIAsync(float value, long timestamp, string note = null, int identifier = -1)
+        public async Task<(int, string, int)> AddOrUpdateCIAsync(float value, long timestamp, string note = null, int identifier = -1)
         {
             /*
              * Sends a POST request to add or update carbohydrate entry entry
@@ -567,7 +574,7 @@ namespace Diabeticare.Services
              */
 
             if (App.user == null)
-                return (0, "You are not signed in");
+                return (0, "You are not signed in", -1);
 
             try
             {
@@ -587,13 +594,16 @@ namespace Diabeticare.Services
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
+                string responseBody = await response.Content.ReadAsStringAsync();
+                int server_id = (int)JObject.Parse(responseBody)["SERVERID"];
+
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry") : (0, "Session timed out");
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", -1) : (0, "Session timed out", -1);
             }
-            catch { return (0, "Failed to contact server"); }
+            catch { return (0, "Failed to contact server", -1); }
         }
 
         public async Task<(int, string)> FetchCIAsync(long timestamp)

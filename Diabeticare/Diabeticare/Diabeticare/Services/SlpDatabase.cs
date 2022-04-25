@@ -29,23 +29,24 @@ namespace Diabeticare.Services
             return slp;
         }
 
-        public async Task AddSlpEntryAsync(DateTime sleepStart, DateTime sleepEnd, DateTime createdAt)
+        public async Task AddSlpEntryAsync(DateTime sleepStart, DateTime sleepEnd, int server_id)
         {
             var slpEntry = new Sleep
             {
+                ServerID = server_id,
                 SleepStart = sleepStart,
                 SleepEnd = sleepEnd,
-                CreatedAt = createdAt
             };
             await slpDatabase.InsertAsync(slpEntry);
         }
 
 
-        public Task<int> UpdateSlpEntryAsync(Sleep slpEntry, DateTime newSleepStart, DateTime newSleepEnd)
+        public Task<int> UpdateSlpEntryAsync(Sleep slpEntry, DateTime newSleepStart, DateTime newSleepEnd, int server_id)
         {
             if (slpEntry.ID == 0)
                 return null;
 
+            slpEntry.ServerID = server_id;
             slpEntry.SleepStart = newSleepStart;
             slpEntry.SleepEnd = newSleepEnd;
             return slpDatabase.UpdateAsync(slpEntry);

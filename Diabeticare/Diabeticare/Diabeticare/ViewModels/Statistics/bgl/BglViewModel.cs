@@ -25,9 +25,6 @@ namespace Diabeticare.ViewModels
         public AsyncCommand DisplayEntries { get; }
         public AsyncCommand LoadMoreCommand { get; }
 
-        public string BglEntry { get; set; }
-        //public TimeSpan BglTime { get; set; }
-
         public BglViewModel()
         {
             BglEntries = new ObservableRangeCollection<Bgl>();
@@ -36,31 +33,9 @@ namespace Diabeticare.ViewModels
             DeleteBglCommand = new AsyncCommand<Bgl>(DeleteBgl);
             SelectedBglCommand = new AsyncCommand<object>(SelectedEntry);
             DisplayEntries = new AsyncCommand(LoadBglEntries);
+
+            BglDate = DateTime.Now;
             BglTime = DateTime.Now.TimeOfDay;
-        }
-
-        // Creates a new BGL entry
-        public async void AddBgl()
-        {
-            // TODO: display text if the entry field is empty
-            if (BglEntry == null)
-                return;
-            var measurement = float.Parse(BglEntry);
-            var date = DateTime.Now;
-            var time = BglTime;
-
-            long unixTimestamp = ((DateTimeOffset)date).ToUnixTimeSeconds();
-
-            // Asks server to add entry
-            (int code, string message) = await App.apiServices.AddOrUpdateBGLAsync(measurement, unixTimestamp);
-
-            if (code == 1)
-               await App.Bdatabase.AddBglEntryAsync(measurement, date, time);
-                
-            else
-                await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
-
-            await Shell.Current.GoToAsync("..");
         }
 
         Bgl selectedBgl;
@@ -70,11 +45,49 @@ namespace Diabeticare.ViewModels
             set => SetProperty(ref selectedBgl, value);
         }
 
+        string bglEntry;
+        public string BglEntry
+        {
+            get => bglEntry;
+            set => SetProperty(ref bglEntry, value);
+        }
+
+
         TimeSpan bglTime;
         public TimeSpan BglTime
         {
             get => bglTime;
             set => SetProperty(ref bglTime, value);
+        }
+
+        DateTime bglDate;
+        public DateTime BglDate
+        {
+            get => bglDate;
+            set => SetProperty(ref bglDate, value);
+        }
+
+        // Creates a new BGL entry
+        public async void AddBgl()
+        {
+            // TODO: display text if the entry field is empty
+            if (BglEntry == null)
+                return;
+
+            var measurement = float.Parse(BglEntry);
+
+            DateTime timeOfMeasurment = BglDate.Date.Add(BglTime);
+
+            // Asks server to add entry
+            (int code, string message, int server_id) = await App.apiServices.AddOrUpdateBGLAsync(measurement, timeOfMeasurment);
+
+            if (code == 1)
+                await App.Bdatabase.AddBglEntryAsync(measurement, timeOfMeasurment, server_id);
+
+            else
+                await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
+
+            await Shell.Current.GoToAsync("..");
         }
 
         // Refresh the bgl listview
@@ -91,7 +104,7 @@ namespace Diabeticare.ViewModels
         async Task DeleteBgl(Bgl bgl)
         {
             // Asks server to delete entry
-            (int code, string message) = await App.apiServices.DeleteBGLAsync(bgl.ID);
+            (int code, string message) = await App.apiServices.DeleteBGLAsync(bgl.ServerID);
 
             if (code == 1)
                 await App.Bdatabase.DeleteBglEntryAsync(bgl.ID);

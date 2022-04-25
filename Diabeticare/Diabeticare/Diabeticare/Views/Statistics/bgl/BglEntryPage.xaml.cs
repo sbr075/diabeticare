@@ -25,12 +25,12 @@ namespace Diabeticare.Views
         {
             base.OnAppearing();
             int.TryParse(BglID, out var pRes);
-            BindingContext = await App.Bdatabase.GetBglEntryAsync(pRes);
-            
+
             // Change this later
             bglEntry = await App.Bdatabase.GetBglEntryAsync(pRes);
             entryField.Text = $"{bglEntry.BGLmeasurement}";
-            timeSelector.Time = bglEntry.BGLtime;
+            timeSelector.Time = bglEntry.TimeOfMeasurment.TimeOfDay;
+            dateSelector.Date = bglEntry.TimeOfMeasurment.Date;
         }
 
         private async void SaveUpdatedBglEntry(object sender, EventArgs e)
@@ -40,7 +40,20 @@ namespace Diabeticare.Views
                 await DisplayAlert("Warning", "BGL field cannot be empty.", "OK");
                 return;
             }
-            await App.Bdatabase.UpdateBglEntryAsync(bglEntry, float.Parse(entryField.Text), timeSelector.Time);
+
+            var measurement = float.Parse(entryField.Text);
+            DateTime timeOfMeasurment = dateSelector.Date.Add(timeSelector.Time);
+
+            (int code, string message, int server_id) = await App.apiServices.AddOrUpdateBGLAsync(measurement, timeOfMeasurment, bglEntry.ServerID);
+            if (code == 1)
+            {
+                await App.Bdatabase.UpdateBglEntryAsync(bglEntry, float.Parse(entryField.Text), timeOfMeasurment, server_id);
+            }
+            else
+            {
+                await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
+            }
+            
             await Shell.Current.GoToAsync("..");
         }
         private async void CancelUpdate(object sender, EventArgs e)

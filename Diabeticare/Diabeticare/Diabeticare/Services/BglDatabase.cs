@@ -34,31 +34,28 @@ namespace Diabeticare.Services
             return bgl;
         }
 
-        public async Task AddBglEntryAsync(float bglMeasurement, DateTime createdAt, TimeSpan bglTime)
+        public async Task AddBglEntryAsync(float bglMeasurement, DateTime timeOfMeasurment, int server_id)
         {
-            // Push to server
-
             // Push to local
             var bgl = new Bgl
             {
+                ServerID = server_id,
                 BGLmeasurement = bglMeasurement,
-                CreatedAt = createdAt,
-                BGLtime = bglTime
+                TimeOfMeasurment = timeOfMeasurment
             };
 
             await bglDatabase.InsertAsync(bgl);
         }
 
-        public Task<int> UpdateBglEntryAsync(Bgl bglEntry, float newValue, TimeSpan newTime)
+        public Task<int> UpdateBglEntryAsync(Bgl bglEntry, float newValue, DateTime newTime, int server_id)
         {
             if (bglEntry.ID == 0)
                 return null;
-               
-            // Push update to server
-               
+
             // Push update to local
+            bglEntry.ServerID = server_id;
             bglEntry.BGLmeasurement = newValue;
-            bglEntry.BGLtime = newTime;
+            bglEntry.TimeOfMeasurment = newTime;
             return bglDatabase.UpdateAsync(bglEntry);
         }
 

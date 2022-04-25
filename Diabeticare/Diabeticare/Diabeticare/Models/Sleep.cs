@@ -16,11 +16,8 @@ namespace Diabeticare.Models
         */
 
         [PrimaryKey, AutoIncrement] public int ID { get; set; }
+        public int ServerID { get; set; }
         public DateTime SleepStart { get; set; }
         public DateTime SleepEnd { get; set; }
-        public DateTime CreatedAt { get; set; }
-
     }
-
-
 }
