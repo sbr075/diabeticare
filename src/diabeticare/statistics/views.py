@@ -26,7 +26,6 @@ def bgl_set():
 
 		value:		value of entry
 		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
-		note:       (optional) note written by user (max 256 characters)
 		identifier: (optional) used to overwrite existing entry
 	"""
 
@@ -36,8 +35,7 @@ def bgl_set():
 		timestamp  = data["timestamp"]
 
 		value      = data["value"]
-		note       = data["note"]
-		identifier = data["identifier"] if data["note"] >= 0 else None
+		identifier = data["identifier"] if data["identifier"] >= 0 else None
 		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
@@ -45,7 +43,7 @@ def bgl_set():
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 
-		bgl_form = BGLForm(MultiDict({"measurement": value, "date": timestamp, "note": note}))
+		bgl_form = BGLForm(MultiDict({"measurement": value, "timestamp": timestamp}))
 		if bgl_form.validate():
 			if identifier:
 				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier).first()
@@ -53,11 +51,10 @@ def bgl_set():
 					return jsonify({"ERROR": "Invalid paramaters"})
 				
 				entry.measurement = value
-				entry.note = note
-				entry.date = timestamp
-			
+				entry.timestamp = timestamp
+
 			else:
-				entry = BGL(user_id=user.id, measurement=value, note=note, date=timestamp)
+				entry = BGL(user_id=user.id, measurement=value, timestamp=timestamp)
 				db.session.add(entry)
 			
 			db.session.commit()
@@ -65,7 +62,7 @@ def bgl_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"X-CSRFToken": new_token})
+			return jsonify({"X-CSRFToken": new_token, "SERVERID": entry.id})
 
 		else:
 			return jsonify({"ERROR": bgl_form.errors}), 401
@@ -86,7 +83,7 @@ def bgl_get():
 	"""
 	
 	if request.method == "GET":
-		data = request.get_json()
+		data = json.loads(request.data)
 		username  = data["username"]
 		timestamp = data["timestamp"]
 		token      = request.headers["X-CSRFToken"]
@@ -96,7 +93,7 @@ def bgl_get():
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		entries = BGL.query.filter(BGL.user_id==user.id, BGL.date>=timestamp).all()
+		entries = BGL.query.filter(BGL.user_id==user.id, BGL.timestamp>=timestamp).all()
 		if entries:
 			bgl_schema = BGLSchema(many=True)
 			results = bgl_schema.dump(entries)
@@ -120,30 +117,25 @@ def bgl_del():
 	
 	content/data (json format)
 		username:   name of user
-		identifier(s): ids of entries (LIST)
+		identifier: id of entry
 	"""
 
 	if request.method == "POST":
-		data = request.get_json()
-		username    = data["username"]
-		identifiers = data["identifiers"]
-		token       = request.headers["X-CSRFToken"]
+		data = json.loads(request.data)
+		username   = data["username"]
+		identifier = data["identifier"]
+		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		entries = []
-		for identifier in identifiers:
-			entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
-			if not entry.first():
-				return jsonify({"ERROR": "Invalid paramaters"})
-			
-			entries.append(entry)
-		
-		for entry in entries:
-			entry.delete()
+		entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
+		if not entry.first():
+			return jsonify({"ERROR": "Invalid paramaters"})
+
+		entry.delete()
 
 		db.session.commit()
 
@@ -167,18 +159,16 @@ def sleep_set():
 
 		start:		time when user went to sleep (UNIXTIMESTAMP)
 		stop:		time when user woke up  	 (UNIXTIMESTAMP)
-		note:       (optional) note written by user (max 256 characters)
 		identifier: (optional) used to overwrite existing entry
 	"""
 
 	if request.method == "POST":
-		data = request.get_json()
+		data = json.loads(request.data)
 		username   = data["username"]
 
 		start	   = data["start"]
 		stop       = data["stop"]
-		note       = data["note"]
-		identifier = data["identifier"] if data["note"] >= 0 else None
+		identifier = data["identifier"] if data["identifier"] >= 0 else None
 		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
@@ -186,7 +176,7 @@ def sleep_set():
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		sleep_form = SleepForm(MultiDict({"start": start, "stop": stop, "note": note}))
+		sleep_form = SleepForm(MultiDict({"start": start, "stop": stop}))
 		if sleep_form.validate():
 			if identifier:
 				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier).first()
@@ -195,10 +185,9 @@ def sleep_set():
 				
 				entry.start = start
 				entry.stop  = stop
-				entry.note  = note
 			
 			else:
-				entry = Sleep(user_id=user.id, start=start, stop=stop, note=note)
+				entry = Sleep(user_id=user.id, start=start, stop=stop)
 				db.session.add(entry)
 			
 			db.session.commit()
@@ -206,7 +195,7 @@ def sleep_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"X-CSRFToken": new_token})
+			return jsonify({"X-CSRFToken": new_token, "SERVERID": entry.id})
 
 		else:
 			return jsonify({"ERROR": sleep_form.errors}), 401
@@ -227,7 +216,7 @@ def sleep_get():
 	"""
 
 	if request.method == "GET":
-		data = request.get_json()
+		data = json.loads(request.data)
 		username  = data["username"]
 		timestamp = data["timestamp"]
 		token      = request.headers["X-CSRFToken"]
@@ -261,31 +250,25 @@ def sleep_del():
 	
 	content/data (json format)
 		username:   name of user
-		identifier(s): id of entry
+		identifier: id of entry
 	"""
 
 	if request.method == "POST":
-		data = request.get_json()
-		username    = data["username"]
-		identifiers = data["identifiers"]
-		token       = request.headers["X-CSRFToken"]
+		data = json.loads(request.data)
+		username   = data["username"]
+		identifier = data["identifier"]
+		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		entries = []
-		for identifier in identifiers:
-			entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
-			if not entry.first():
-				return jsonify({"ERROR": "Invalid paramaters"})
+		entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
+		if not entry.first():
+			return jsonify({"ERROR": "Invalid paramaters"})
 			
-			entries.append(entry)
-		
-		for entry in entries:
-			entry.delete()
-
+		entry.delete()
 		db.session.commit()
 
 		# Update user token
@@ -308,18 +291,16 @@ def ci_set():
 
 		value:		value of entry
 		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
-		note:       (optional) note written by user (max 256 characters)
 		identifier: (optional) used to overwrite existing entry
 	"""
 
 	if request.method == "POST":
-		data = request.get_json()
+		data = json.loads(request.data)
 		username   = data["username"]
 		timestamp  = data["timestamp"]
 
 		value      = data["value"]
-		note       = data["note"]
-		identifier = data["identifier"] if data["note"] >= 0 else None
+		identifier = data["identifier"] if data["identifier"] >= 0 else None
 		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
@@ -327,7 +308,7 @@ def ci_set():
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		ci_form = CIForm(MultiDict({"carbohydrates": value, "date": timestamp, "note": note}))
+		ci_form = CIForm(MultiDict({"carbohydrates": value, "timestamp": timestamp}))
 		if ci_form.validate():
 			if identifier:
 				entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier).first()
@@ -335,11 +316,10 @@ def ci_set():
 					return jsonify({"ERROR": "Invalid paramaters"})
 				
 				entry.carbohydrates = value
-				entry.date = timestamp
-				entry.note = note
+				entry.timestamp = timestamp
 
 			else:
-				entry = CI(user_id=user.id, carbohydrates=value, date=timestamp, note=note)
+				entry = CI(user_id=user.id, carbohydrates=value, timestamp=timestamp)
 				db.session.add(entry)
 
 			db.session.commit()
@@ -347,7 +327,7 @@ def ci_set():
 			# Update user token
 			new_token = update_token(user)
 
-			return jsonify({"X-CSRFToken": new_token})
+			return jsonify({"X-CSRFToken": new_token, "SERVERID": entry.id})
 
 		else:
 			return jsonify({"ERROR": ci_form.errors}), 401			
@@ -368,7 +348,7 @@ def ci_get():
 	"""
 
 	if request.method == "GET":
-		data = request.get_json()
+		data = json.loads(request.data)
 		username  = data["username"]
 		timestamp = data["timestamp"]
 		token      = request.headers["X-CSRFToken"]
@@ -378,7 +358,7 @@ def ci_get():
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		entries = CI.query.filter(CI.user_id==user.id, CI.date>=timestamp).all()
+		entries = CI.query.filter(CI.user_id==user.id, CI.timestamp>=timestamp).all()
 		if entries:
 			ci_schema = CISchema(many=True)
 			results = ci_schema.dump(entries)
@@ -402,30 +382,25 @@ def ci_del():
 	
 	content/data (json format)
 		username:   name of user
-		identifier(s): id of entry
+		identifier: id of entry
 	"""
 
 	if request.method == "POST":
-		data = request.get_json()
-		username    = data["username"]
-		identifiers = data["identifiers"]
-		token       = request.headers["X-CSRFToken"]
+		data = json.loads(request.data)
+		username   = data["username"]
+		identifier = data["identifier"]
+		token      = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
+
+		entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
+		if not entry.first():
+			return jsonify({"ERROR": "Invalid paramaters"})
 		
-		entries = []
-		for identifier in identifiers:
-			entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
-			if not entry.first():
-				return jsonify({"ERROR": "Invalid paramaters"})
-			
-			entries.append(entry)
-		
-		for entry in entries:
-			entry.delete()
+		entry.delete()
 		db.session.commit()
 
 		# Update user token
