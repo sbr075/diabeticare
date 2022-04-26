@@ -23,7 +23,7 @@
 
             <Button
                 x:Name="week" 
-                Text="1 Week" 
+                Text="1 WEEK" 
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -31,7 +31,7 @@
 
             <Button 
                 x:Name="month" 
-                Text="1 Month"
+                Text="1 MONTH"
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"

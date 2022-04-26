@@ -5,13 +5,12 @@ using Xamarin.Forms.Xaml;
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AddCarbDataPage : ContentPage
+    public partial class CarbEntriesPage : ContentPage
     {
-        public AddCarbDataPage()
+        public CarbEntriesPage()
         {
             InitializeComponent();
             BindingContext = new CarbViewModel();
         }
-
     }
 }

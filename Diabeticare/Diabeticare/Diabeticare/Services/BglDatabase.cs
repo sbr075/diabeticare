@@ -20,8 +20,6 @@ namespace Diabeticare.Services
         public async Task<IEnumerable<BglModel>> GetBglEntriesAsync()
         {
             var bglEntries = await bglDatabase.Table<BglModel>().ToListAsync();
-
-            // Compare entries, and sync server database
             return bglEntries;
         }
 

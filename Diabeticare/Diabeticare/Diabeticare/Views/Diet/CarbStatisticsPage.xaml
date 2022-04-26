@@ -2,97 +2,74 @@
 <ContentPage 
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:Diabeticare.Views"
-    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels" 
-    xmlns:xct="http://xamarin.com/schemas/2020/toolkit" 
-    xmlns:model="clr-namespace:Diabeticare.Models"
+    xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms" 
+    xmlns:views="clr-namespace:Diabeticare.Views" 
+    x:DataType="views:CarbStatisticsPage"
     x:Class="Diabeticare.Views.CarbStatisticsPage"
-    x:Name="CarbStatPage">
-    
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Order="Primary" IconImageSource="icon_feed.png" Clicked="Create_Carb_Data"></ToolbarItem>
-    </ContentPage.ToolbarItems>
-    
-    <!-- Setting BindingContext for page -->
-    <ContentPage.BindingContext>
-        <viewmodels:CarbViewModel/>
-    </ContentPage.BindingContext>
+    xmlns:font="clr-namespace:Diabeticare.Resources.Helpers"
+    x:Name="StatPage">
 
-    <!-- Converter used for extracting the item selected by the user -->
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <xct:ItemSelectedEventArgsConverter x:Key="ItemSelectedEventArgsConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
+    <StackLayout>
 
-    <!-- Converting page events to ViewModel commands.-->
-    <ContentPage.Behaviors>
-        <xct:EventToCommandBehavior 
-                EventName="Appearing"
-                Command="{Binding DisplayEntries}"/>
-    </ContentPage.Behaviors>
+        <!-- Top button layout -->
+        <StackLayout Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Center" Padding="5">
+            <Button 
+                x:Name="today"
+                Text="TODAY" 
+                HorizontalOptions="Center"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenDayChart"/>
 
-    <!-- ListView that displays carb entries stored in the SQLite database -->
-    <ListView
-        SelectedItem="{Binding SelectedCarb, Mode=TwoWay}"
-        IsRefreshing="{Binding IsBusy, Mode=OneWay}"
-        RefreshCommand="{Binding RefreshCommand}"
-        ItemsSource="{Binding CarbEntries}"
-        RefreshControlColor="RoyalBlue"
-        CachingStrategy="RecycleElement"
-        BackgroundColor="Transparent"
-        IsPullToRefreshEnabled="True"
-        SeparatorVisibility="None"
-        HasUnevenRows="True">
+            <Button
+                x:Name="week" 
+                Text="1 WEEK" 
+                HorizontalOptions="Center"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenWeekChart"/>
 
-        <!-- Used for invoking commands through listview events -->
-        <ListView.Behaviors>
-            <xct:EventToCommandBehavior 
-                EventName="ItemSelected"
-                Command="{Binding SelectedCarbCommand}"
-                EventArgsConverter="{StaticResource ItemSelectedEventArgsConverter}"/>
-        </ListView.Behaviors>
+            <Button 
+                x:Name="month" 
+                Text="1 MONTH"
+                HorizontalOptions="Center"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenMonthChart"/>
+        </StackLayout>
+        <!-- Chart layout -->
+        <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="5">
+            <Label
+                x:Name="LabelMid"
+                TextColor="Black"
+                FontSize="Large"
+                Text="Statistics Page"
+                HorizontalOptions="Center"/>
 
-        <!-- Setting datatemplate for ItemsSource -->
-        <ListView.ItemTemplate>
-            <DataTemplate x:DataType="model:CarbohydrateModel">
-                <ViewCell>
-                    <!-- Menu options that appear when a user long clicks an item -->
-                    <ViewCell.ContextActions>
-                        <MenuItem Text="Delete"
-                                  Command="{Binding Source={x:Reference CarbStatPage}, Path=BindingContext.DeleteCarbCommand}"
-                                  CommandParameter="{Binding .}"/>
-                    </ViewCell.ContextActions>
-                    <!-- Formatting for the displayed carb entries -->
-                    <Grid Padding="10">
-                        <Frame CornerRadius="10" HasShadow="True">
-                            <StackLayout>
-                                <Label VerticalOptions="Center"
-                                       FontSize="Medium"
-                                       Text="{Binding Carbohydrates}"/>
-                                <Label VerticalOptions="Center"
-                                       FontSize="Small"
-                                       Text="{Binding FoodName}"/>
-                                <Label VerticalOptions="Center"
-                                       FontSize="Micro"
-                                       Text="{Binding DateOfInput.Date, StringFormat='Created: {0:MMMM dd, yyyy}'}"/>
-                            </StackLayout>
-                        </Frame>
-                    </Grid>
-                </ViewCell>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-        <!-- Header for the page -->
-        <ListView.Header>
-            <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Label Text="Carbohydrate Data" FontSize="Large" TextColor="Black"/>
-            </StackLayout>
-        </ListView.Header>
-        <!-- Footer for the page -->
-        <ListView.Footer>
-            <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-            </StackLayout>
-        </ListView.Footer>
-    </ListView>
+            <Frame CornerRadius="10" HasShadow="True" BorderColor="Black">
+                <microcharts:ChartView x:Name="CarbChart" HeightRequest="200" HorizontalOptions="Fill"/>
+            </Frame>
 
+
+            <Label x:Name="ChartDescription" Text="" FontSize="Small" HorizontalOptions="Center"/>
+        </StackLayout>
+
+
+        <!-- Bottom button layout -->
+        <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="Center" Padding="5">
+            <Button 
+                x:Name="viewData"
+                Text="View Data"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="ViewCarbEntries"/>
+
+            <Button
+                x:Name="enterData" 
+                Text="Add Data" 
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="CreateCarbEntry"/>
+        </StackLayout>
+    </StackLayout>
 </ContentPage>

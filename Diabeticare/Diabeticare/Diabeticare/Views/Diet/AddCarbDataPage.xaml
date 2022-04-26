@@ -5,11 +5,6 @@
     xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
     x:Class="Diabeticare.Views.AddCarbDataPage"
     Shell.PresentationMode="Modal">
-    
-    <!-- Setting BindingContext for page -->
-    <ContentPage.BindingContext>
-        <viewmodels:CarbViewModel/>
-    </ContentPage.BindingContext>
 
     <StackLayout Padding="10">
         <Label 

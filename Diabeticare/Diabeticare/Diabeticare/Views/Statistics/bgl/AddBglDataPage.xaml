@@ -32,13 +32,13 @@
                 <DatePicker Date="{Binding BglDate, Mode=TwoWay}"/>
 
                 <Label 
-                    Text="NB: Målinger registreres i mmol/L" 
+                    Text="NB: Measurments are in mmol/L" 
                     HorizontalOptions="Center" 
                     FontSize="Micro"/>
             </StackLayout>
         </Frame>
         <Button
-            Text="Legg til måling" 
+            Text="Add" 
             VerticalOptions="End"
             IsEnabled="True"
             BackgroundColor="{StaticResource Primary}"

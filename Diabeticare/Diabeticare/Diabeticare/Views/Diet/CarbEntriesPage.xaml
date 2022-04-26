@@ -4,8 +4,8 @@
              xmlns:xct="http://xamarin.com/schemas/2020/toolkit" 
              xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
              xmlns:model="clr-namespace:Diabeticare.Models"
-             x:DataType="viewmodels:BglViewModel"
-             x:Class="Diabeticare.Views.BglEntriesPage">
+             x:DataType="viewmodels:CarbViewModel"
+             x:Class="Diabeticare.Views.CarbEntriesPage">
 
     <!-- Converter used for extracting the item selected by the user -->
     <ContentPage.Resources>
@@ -21,10 +21,10 @@
                 Command="{Binding DisplayGroupsCommand}"/>
     </ContentPage.Behaviors>
 
-    <ListView SelectedItem="{Binding SelectedBglGroup, Mode=TwoWay}"
+    <ListView SelectedItem="{Binding SelectedCarbGroup, Mode=TwoWay}"
               IsRefreshing="{Binding IsBusy, Mode=OneWay}"
               RefreshCommand="{Binding RefreshCommand}"
-              ItemsSource="{Binding BglGroups}"
+              ItemsSource="{Binding CarbGroups}"
               RefreshControlColor="RoyalBlue"
               CachingStrategy="RecycleElement"
               BackgroundColor="Transparent"
@@ -36,7 +36,7 @@
         <ListView.Behaviors>
             <xct:EventToCommandBehavior 
                 EventName="ItemSelected"
-                Command="{Binding SelectedBglGroupCommand}"
+                Command="{Binding SelectedCarbGroupCommand}"
                 EventArgsConverter="{StaticResource ItemSelectedEventArgsConverter}"/>
         </ListView.Behaviors>
 
@@ -54,7 +54,7 @@
                                        Text="{Binding GroupDate, StringFormat='{0:MMMM dd, yyyy}'}"/>
                                 <Label VerticalOptions="Center"
                                        FontSize="Small"
-                                       Text="{Binding GroupAvg, StringFormat='Average blood sugar: {0:0.00}'}"/>
+                                       Text="{Binding GroupAvg, StringFormat='Toal carbohydrates: {0:0.00}'}"/>
                             </StackLayout>
                         </Frame>
                     </Grid>
@@ -65,7 +65,7 @@
         <!-- Header for the page -->
         <ListView.Header>
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Label Text="BGL Data" FontSize="Large" TextColor="Black"/>
+                <Label Text="Carbohydrate Data" FontSize="Large" TextColor="Black"/>
             </StackLayout>
         </ListView.Header>
         <!-- Footer for the page -->

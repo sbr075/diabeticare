@@ -20,7 +20,7 @@
 
             <Button
                 x:Name="week" 
-                Text="1 UKE" 
+                Text="1 WEEK" 
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -28,7 +28,7 @@
 
             <Button 
                 x:Name="month" 
-                Text="1 MÅNED"
+                Text="1 MONTH"
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -55,18 +55,18 @@
         <!-- Bottom button layout -->
         <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="Center" Padding="5">
             <Button 
-                x:Name="editData"
-                Text="Edit Data"
+                x:Name="viewData"
+                Text="View Data"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
-                Clicked="Edit_SLP_Data"/>
+                Clicked="ViewSLPEntries"/>
 
             <Button
                 x:Name="enterData" 
                 Text="Add Data" 
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
-                Clicked="Create_SLP_Data"/>
+                Clicked="CreateSLPEntry"/>
         </StackLayout>
 
     </StackLayout>

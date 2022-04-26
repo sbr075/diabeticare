@@ -2,13 +2,9 @@
 using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Forms;
 using Command = MvvmHelpers.Commands.Command;
-using Xamarin.CommunityToolkit.Extensions;
 using Diabeticare.Views;
 
 
@@ -18,7 +14,7 @@ namespace Diabeticare.ViewModels
     {
         // Data collection of BGL entries
         public ObservableRangeCollection<BglModel> BglEntries { get; set; }
-        public ObservableRangeCollection<BglGroupModel> BglGroups { get; set; }
+        public ObservableRangeCollection<GroupModel> BglGroups { get; set; }
 
         public Command AddBglCommand { get; }
         public AsyncCommand RefreshCommand { get; }
@@ -29,10 +25,10 @@ namespace Diabeticare.ViewModels
         public AsyncCommand DisplayEntriesCommand { get; }
         public AsyncCommand LoadMoreCommand { get; }
 
-        public BglViewModel(int month=0)
+        public BglViewModel(int day=0)
         {
             BglEntries = new ObservableRangeCollection<BglModel>();
-            BglGroups = new ObservableRangeCollection<BglGroupModel>();
+            BglGroups = new ObservableRangeCollection<GroupModel>();
 
             AddBglCommand = new Command(AddBgl);
             RefreshCommand = new AsyncCommand(ViewRefresh);
@@ -44,11 +40,11 @@ namespace Diabeticare.ViewModels
 
             BglDate = DateTime.Now;
             BglTime = DateTime.Now.TimeOfDay;
-            Month = month;
+            Day = day;
         }
 
-        BglGroupModel selectedBglGroup;
-        public BglGroupModel SelectedBglGroup
+        GroupModel selectedBglGroup;
+        public GroupModel SelectedBglGroup
         {
             get => selectedBglGroup;
             set => SetProperty(ref selectedBglGroup, value);
@@ -83,11 +79,11 @@ namespace Diabeticare.ViewModels
             set => SetProperty(ref bglDate, value);
         }
 
-        int month;
-        public int Month
+        int day;
+        public int Day
         {
-            get => month;
-            set => SetProperty(ref month, value);
+            get => day;
+            set => SetProperty(ref day, value);
         }
 
         // Creates a new BGL entry
@@ -140,12 +136,12 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedGroup(object arg)
         {
-            BglGroupModel bglGroup = arg as BglGroupModel;
+            GroupModel bglGroup = arg as GroupModel;
             if (bglGroup == null) return;
 
             SelectedBglGroup = null;
             BglGroups.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
-            await App.Current.MainPage.Navigation.PushAsync(new EditBglPage(bglGroup.GroupDate.Month));
+            await App.Current.MainPage.Navigation.PushAsync(new EditBglPage(bglGroup.GroupDate.Day));
         }
 
         async Task SelectedEntry(object arg)
@@ -163,13 +159,13 @@ namespace Diabeticare.ViewModels
             IsBusy = true;
             BglGroups.Clear();
             var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
-            var distinctDates = bglEntries.Select(ent => ent.TimeOfMeasurment.Date).Distinct();
-            foreach (var date in distinctDates)
+            var distinctDays = bglEntries.Select(ent => ent.TimeOfMeasurment.Date.Day).Distinct().OrderByDescending(ent => ent);
+            foreach (var day in distinctDays)
             {
-                var allGroupBgl = bglEntries.Where(ent => ent.TimeOfMeasurment.Date == date);
+                var allGroupBgl = bglEntries.Where(ent => ent.TimeOfMeasurment.Date.Day == day);
                 var avgGroupBgl = allGroupBgl.Select(ent => ent.BGLmeasurement).Average();
 
-                BglGroups.Add(new BglGroupModel { GroupDate=date, GroupAvgBgl=avgGroupBgl });
+                BglGroups.Add(new GroupModel { GroupDate=new DateTime(DateTime.Now.Year, DateTime.Now.Month, day), GroupAvg=avgGroupBgl });
             }
 
             IsBusy = false;
@@ -181,7 +177,7 @@ namespace Diabeticare.ViewModels
             IsBusy = true;
             BglEntries.Clear();
             var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
-            bglEntries = bglEntries.Where(ent => ent.TimeOfMeasurment.Month == Month);
+            bglEntries = bglEntries.Where(ent => ent.TimeOfMeasurment.Day == Day);
             BglEntries.AddRange(bglEntries.Reverse());
             IsBusy = false;
         }

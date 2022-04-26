@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SkiaSharp;
 using Microcharts;
 using Xamarin.Forms;
@@ -106,13 +103,13 @@ namespace Diabeticare.Views
         }
 
         // GoTo EditSlpPage
-        async void Edit_SLP_Data(object sender, EventArgs e)
+        async void ViewSLPEntries(object sender, EventArgs e)
         {
-            await App.Current.MainPage.Navigation.PushAsync(new EditSlpPage());
+            await App.Current.MainPage.Navigation.PushAsync(new SlpEntriesPage());
         }
 
         // GoTo AddSlpDataPage
-        private async void Create_SLP_Data(object sender, EventArgs e)
+        private async void CreateSLPEntry(object sender, EventArgs e)
         {
             await App.Current.MainPage.Navigation.PushAsync(new AddSlpDataPage());
         }

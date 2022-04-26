@@ -1,8 +1,5 @@
 ﻿using MvvmHelpers;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Xamarin.Forms;
 using Diabeticare.Models;
 using MvvmHelpers.Commands;
 using Command = MvvmHelpers.Commands.Command;
@@ -17,24 +14,82 @@ namespace Diabeticare.ViewModels
 
         // Data collection of sleep entries
         public ObservableRangeCollection<SleepModel> SlpEntries { get; set; }
+        public ObservableRangeCollection<GroupModel> SlpGroups { get; set; }
 
         public Command AddSlpCommand { get; }
         public AsyncCommand RefreshCommand { get; }
         public AsyncCommand<SleepModel> DeleteSlpCommand { get; }
+        public AsyncCommand<object> SelectedSlpGroupCommand { get; }
         public AsyncCommand<object> SelectedSlpCommand { get; }
-        public AsyncCommand DisplayEntries { get; }
-        public SlpViewModel()
+        public AsyncCommand DisplayGroupsCommand { get; }
+        public AsyncCommand DisplayEntriesCommand { get; }
+        public SlpViewModel(int month=0)
         {
             
             SlpEntries = new ObservableRangeCollection<SleepModel>();
+            SlpGroups = new ObservableRangeCollection<GroupModel>();
+
             AddSlpCommand = new Command(AddSlp);
             RefreshCommand = new AsyncCommand(ViewRefresh);
             DeleteSlpCommand = new AsyncCommand<SleepModel>(DeleteSlp);
+            SelectedSlpGroupCommand = new AsyncCommand<object>(SelectedGroup);
             SelectedSlpCommand = new AsyncCommand<object>(SelectedEntry);
-            DisplayEntries = new AsyncCommand(LoadSlpEntries);
+            DisplayGroupsCommand = new AsyncCommand(LoadSlpGroups);
+            DisplayEntriesCommand = new AsyncCommand(LoadSlpEntries);
+
             SlpStart = DateTime.Today.AddDays(-1);
             SlpEnd = DateTime.Today;
             slpTimeEnd = DateTime.Now.TimeOfDay;
+            Month = month;
+        }
+
+        GroupModel selectedSlpGroup;
+        public GroupModel SelectedSlpGroup
+        {
+            get => selectedSlpGroup;
+            set => SetProperty(ref selectedSlpGroup, value);
+        }
+
+        SleepModel selectedSlp;
+        public SleepModel SelectedSlp
+        {
+            get => selectedSlp;
+            set => SetProperty(ref selectedSlp, value);
+        }
+
+        DateTime slpStart;
+        public DateTime SlpStart
+        {
+            get => slpStart;
+            set => SetProperty(ref slpStart, value);
+        }
+
+        DateTime slpEnd;
+        public DateTime SlpEnd
+        {
+            get => slpEnd;
+            set => SetProperty(ref slpEnd, value);
+        }
+
+        TimeSpan slpTimeStart;
+        public TimeSpan SlpTimeStart
+        {
+            get => slpTimeStart;
+            set => SetProperty(ref slpTimeStart, value);
+        }
+
+        TimeSpan slpTimeEnd;
+        public TimeSpan SlpTimeEnd
+        {
+            get => slpTimeEnd;
+            set => SetProperty(ref slpTimeEnd, value);
+        }
+
+        int month;
+        public int Month
+        {
+            get => month;
+            set => SetProperty(ref month, value);
         }
 
         // Creates a new sleep entry
@@ -46,6 +101,7 @@ namespace Diabeticare.ViewModels
                 await App.Current.MainPage.DisplayAlert("Warning", "Invalid sleep entry.", "OK");
                 return;
             }
+
             DateTime start = SlpStart.Date.Add(SlpTimeStart);
             DateTime end = SlpEnd.Date.Add(SlpTimeEnd);
 
@@ -86,6 +142,16 @@ namespace Diabeticare.ViewModels
             await ViewRefresh();
         }
 
+        async Task SelectedGroup(object arg)
+        {
+            GroupModel slpGroup = arg as GroupModel;
+            if (slpGroup == null) return;
+
+            SelectedSlpGroup = null;
+            SlpGroups.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
+            await App.Current.MainPage.Navigation.PushAsync(new EditSlpPage(slpGroup.GroupDate.Month));
+        }
+
         async Task SelectedEntry(object arg)
         {
 
@@ -94,8 +160,24 @@ namespace Diabeticare.ViewModels
 
             SelectedSlp = null; // Deselect item
             SlpEntries.Clear(); // Temp fix to not load listview twice after coming back from SlpEntryPage
-            var route = $"{nameof(SlpEntryPage)}?SlpID={slp.ID}";
-            await Shell.Current.GoToAsync(route);
+            await App.Current.MainPage.Navigation.PushAsync(new SlpEntryPage(slp.ID));
+        }
+
+        async Task LoadSlpGroups()
+        {
+            IsBusy = true;
+            SlpGroups.Clear();
+            var bglEntries = await App.Sdatabase.GetSlpEntriesAsync();
+            var distinctDates = bglEntries.Select(ent => ent.SleepStart.Date).Distinct().OrderByDescending(ent => ent.Date);
+            foreach (var date in distinctDates)
+            {
+                var allGroupBgl = bglEntries.Where(ent => ent.SleepStart.Date == date);
+                var avgGroupBgl = (float) allGroupBgl.Select(ent => (ent.SleepEnd - ent.SleepStart).Hours).Average();
+
+                SlpGroups.Add(new GroupModel { GroupDate = date, GroupAvg = avgGroupBgl });
+            }
+
+            IsBusy = false;
         }
 
         // Loads sleep entries
@@ -106,41 +188,6 @@ namespace Diabeticare.ViewModels
             var slpEntries = await App.Sdatabase.GetSlpEntriesAsync();
             SlpEntries.AddRange(slpEntries.Reverse());
             IsBusy = false;
-        }
-
-        SleepModel selectedSlp;
-        public SleepModel SelectedSlp
-        {
-            get => selectedSlp;
-            set => SetProperty(ref selectedSlp, value);
-        }
-
-        DateTime slpStart;
-        public DateTime SlpStart
-        {
-            get => slpStart;
-            set => SetProperty(ref slpStart, value);
-        }
-
-        DateTime slpEnd;
-        public DateTime SlpEnd
-        {
-            get => slpEnd;
-            set => SetProperty(ref slpEnd, value);
-        }
-        
-        TimeSpan slpTimeStart;
-        public TimeSpan SlpTimeStart
-        {
-            get => slpTimeStart;
-            set => SetProperty(ref slpTimeStart, value);
-        }
-
-        TimeSpan slpTimeEnd;
-        public TimeSpan SlpTimeEnd
-        {
-            get => slpTimeEnd;
-            set => SetProperty(ref slpTimeEnd, value);
         }
     }
 }

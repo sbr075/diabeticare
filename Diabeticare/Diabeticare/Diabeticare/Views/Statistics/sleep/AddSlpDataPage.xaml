@@ -6,11 +6,6 @@
     x:DataType="viewmodels:SlpViewModel"
     x:Class="Diabeticare.Views.AddSlpDataPage">
     
-    <!-- Setting BindingContext for page -->
-    <ContentPage.BindingContext>
-        <viewmodels:SlpViewModel/>
-    </ContentPage.BindingContext>
-
     <StackLayout Padding="10">
         <Label 
             VerticalOptions="Start" 
@@ -49,7 +44,7 @@
         </Frame>
         
         <Button
-            Text="Legg til data" 
+            Text="Add" 
             VerticalOptions="End"
             IsEnabled="True"
             BackgroundColor="{StaticResource Primary}"

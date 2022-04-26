@@ -2,9 +2,9 @@
 
 namespace Diabeticare.Models
 {
-    public class BglGroupModel
+    public class GroupModel
     {
         public DateTime GroupDate { get; set; }
-        public float GroupAvgBgl { get; set; }
+        public float GroupAvg { get; set; }
     }
 }

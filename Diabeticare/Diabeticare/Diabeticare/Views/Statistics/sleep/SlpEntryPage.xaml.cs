@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Diabeticare.Models;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -10,24 +6,21 @@ using Xamarin.Forms.Xaml;
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-
-    [QueryProperty(nameof(SlpID), nameof(SlpID))] // Used for passing selected sleep-entry ID to a different page during navigation
     public partial class SlpEntryPage : ContentPage
     {
-        public string SlpID { get; set; }
+        public int SlpID { get; set; }
         SleepModel slpEntry;
-        public SlpEntryPage()
+        public SlpEntryPage(int slpID)
         {
             InitializeComponent();
+            SlpID = slpID;
         }
 
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            int.TryParse(SlpID, out var pRes);
-            BindingContext = await App.Sdatabase.GetSlpEntryAsync(pRes);
 
-            slpEntry = await App.Sdatabase.GetSlpEntryAsync(pRes);
+            slpEntry = await App.Sdatabase.GetSlpEntryAsync(SlpID);
             dateStart.Date = slpEntry.SleepStart;
             dateEnd.Date = slpEntry.SleepEnd;
             timeStart.Time = slpEntry.SleepStart.TimeOfDay;

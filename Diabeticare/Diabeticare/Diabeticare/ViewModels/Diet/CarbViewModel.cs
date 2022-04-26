@@ -15,23 +15,46 @@ namespace Diabeticare.ViewModels
     public class CarbViewModel : ViewModelBase
     {
         public ObservableRangeCollection<CarbohydrateModel> CarbEntries { get; set; }
+        public ObservableRangeCollection<GroupModel> CarbGroups { get; set; }
         public Command AddCarbCommand { get; }
         public AsyncCommand RefreshCommand { get; }
         public AsyncCommand<CarbohydrateModel> DeleteCarbCommand { get; }
+        public AsyncCommand<object> SelectedCarbGroupCommand { get; }
         public AsyncCommand<object> SelectedCarbCommand { get; }
+        public AsyncCommand DisplayGroupsCommand { get; }
         public AsyncCommand DisplayEntries { get; }
 
 
-        public CarbViewModel()
+        public CarbViewModel(int day=0)
         {
             CarbEntries = new ObservableRangeCollection<CarbohydrateModel>();
+            CarbGroups = new ObservableRangeCollection<GroupModel>();
+
             AddCarbCommand = new Command(AddCarb);
             RefreshCommand = new AsyncCommand(ViewRefresh);
             DeleteCarbCommand = new AsyncCommand<CarbohydrateModel>(DeleteCarb);
+            SelectedCarbGroupCommand = new AsyncCommand<object>(SelectedGroup);
             SelectedCarbCommand = new AsyncCommand<object>(SelectedEntry);
+            DisplayGroupsCommand = new AsyncCommand(LoadCarbGroups);
             DisplayEntries = new AsyncCommand(LoadCarbEntries);
+
             carbTime = DateTime.Now.TimeOfDay;
             carbDate = DateTime.Now.Date;
+            Day = day;
+        }
+
+        GroupModel selectedCarbGroup;
+        public GroupModel SelectedCarbGroup
+        {
+            get => selectedCarbGroup;
+            set => SetProperty(ref selectedCarbGroup, value);
+        }
+
+        CarbohydrateModel selectedCarb;
+        public CarbohydrateModel SelectedCarb
+        {
+            get => selectedCarb;
+            set => SetProperty(ref selectedCarb, value);
         }
 
         string carbEntry;
@@ -62,11 +85,11 @@ namespace Diabeticare.ViewModels
             set => SetProperty(ref carbDate, value);
         }
 
-        CarbohydrateModel selectedCarb;
-        public CarbohydrateModel SelectedCarb
+        int day;
+        public int Day
         {
-            get => selectedCarb;
-            set => SetProperty(ref selectedCarb, value);
+            get => day;
+            set => SetProperty(ref day, value);
         }
 
         public async void AddCarb()
@@ -113,6 +136,16 @@ namespace Diabeticare.ViewModels
             await ViewRefresh();
         }
 
+        async Task SelectedGroup(object arg)
+        {
+            GroupModel carbGroup = arg as GroupModel;
+            if (carbGroup == null) return;
+
+            SelectedCarbGroup = null;
+            CarbGroups.Clear(); // Temp fix to not load listview twice after coming back from CarbEntryPage
+            await App.Current.MainPage.Navigation.PushAsync(new EditCarbPage(carbGroup.GroupDate.Day));
+        }
+
         async Task SelectedEntry(object arg)
         {
             CarbohydrateModel carb = arg as CarbohydrateModel;
@@ -121,6 +154,24 @@ namespace Diabeticare.ViewModels
             SelectedCarb = null; // Deselect item
             CarbEntries.Clear();
             await App.Current.MainPage.Navigation.PushAsync(new CarbEntryPage(carb.ID));
+        }
+
+        async Task LoadCarbGroups()
+        {
+            IsBusy = true;
+            CarbGroups.Clear();
+            var carbEntries = await App.Cdatabase.GetCarbEntriesAsync();
+            var distinctDates = carbEntries.Select(ent => ent.DateOfInput.Date).Distinct().OrderByDescending(ent => ent.Date);
+
+            foreach (var date in distinctDates)
+            {
+                var allGroupCarb = carbEntries.Where(ent => ent.DateOfInput.Date.Day == date.Day);
+                var avgGroupCarb = allGroupCarb.Select(ent => ent.Carbohydrates).Sum();
+
+                CarbGroups.Add(new GroupModel { GroupDate = date, GroupAvg = avgGroupCarb });
+            }
+
+            IsBusy = false;
         }
 
         // Loads carb entries

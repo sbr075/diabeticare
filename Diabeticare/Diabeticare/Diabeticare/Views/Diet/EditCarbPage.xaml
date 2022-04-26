@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage 
-    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns="http://xamarin.com/schemas/2014/forms" 
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
-    xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels" 
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit" 
     xmlns:model="clr-namespace:Diabeticare.Models"
-    x:DataType="viewmodels:SlpViewModel"
-    x:Class="Diabeticare.Views.EditSlpPage"
-    x:Name="SlpDataPage">
+    x:Class="Diabeticare.Views.EditCarbPage"
+    x:DataType="viewmodels:CarbViewModel"
+    x:Name="CarbDataPage">
 
     <!-- Converter used for extracting the item selected by the user -->
     <ContentPage.Resources>
@@ -15,21 +15,20 @@
             <xct:ItemSelectedEventArgsConverter x:Key="ItemSelectedEventArgsConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    
+
     <!-- Converting page events to ViewModel commands.-->
     <ContentPage.Behaviors>
         <xct:EventToCommandBehavior 
                 EventName="Appearing"
-                Command="{Binding DisplayEntriesCommand}"/>
+                Command="{Binding DisplayEntries}"/>
     </ContentPage.Behaviors>
 
-
-    <!-- ListView that displays sleep entries stored in the SQLite database -->
+    <!-- ListView that displays carb entries stored in the SQLite database -->
     <ListView
-        SelectedItem="{Binding SelectedSlp, Mode=TwoWay}"
+        SelectedItem="{Binding SelectedCarb, Mode=TwoWay}"
         IsRefreshing="{Binding IsBusy, Mode=OneWay}"
         RefreshCommand="{Binding RefreshCommand}"
-        ItemsSource="{Binding SlpEntries}"
+        ItemsSource="{Binding CarbEntries}"
         RefreshControlColor="RoyalBlue"
         CachingStrategy="RecycleElement"
         BackgroundColor="Transparent"
@@ -41,30 +40,33 @@
         <ListView.Behaviors>
             <xct:EventToCommandBehavior 
                 EventName="ItemSelected"
-                Command="{Binding SelectedSlpCommand}"
+                Command="{Binding SelectedCarbCommand}"
                 EventArgsConverter="{StaticResource ItemSelectedEventArgsConverter}"/>
         </ListView.Behaviors>
 
         <!-- Setting datatemplate for ItemsSource -->
         <ListView.ItemTemplate>
-            <DataTemplate x:DataType="model:SleepModel">
+            <DataTemplate x:DataType="model:CarbohydrateModel">
                 <ViewCell>
                     <!-- Menu options that appear when a user long clicks an item -->
                     <ViewCell.ContextActions>
                         <MenuItem Text="Delete"
-                                  Command="{Binding Source={x:Reference SlpDataPage}, Path=BindingContext.DeleteSlpCommand}"
+                                  Command="{Binding Source={x:Reference CarbDataPage}, Path=BindingContext.DeleteCarbCommand}"
                                   CommandParameter="{Binding .}"/>
                     </ViewCell.ContextActions>
-                    <!-- Formatting for the displayed sleep entries -->
+                    <!-- Formatting for the displayed carb entries -->
                     <Grid Padding="10">
                         <Frame CornerRadius="10" HasShadow="True">
                             <StackLayout>
                                 <Label VerticalOptions="Center"
-                                       FontSize="Small"
-                                       Text="{Binding SleepStart, StringFormat='Bedtime: {0:MMMM dd, HH:mm}'}"/>
+                                       FontSize="Medium"
+                                       Text="{Binding Carbohydrates}"/>
                                 <Label VerticalOptions="Center"
                                        FontSize="Small"
-                                       Text="{Binding SleepEnd, StringFormat='Wake-up: {0:MMMM dd, HH:mm}'}"/>
+                                       Text="{Binding FoodName}"/>
+                                <Label VerticalOptions="Center"
+                                       FontSize="Micro"
+                                       Text="{Binding DateOfInput.Date, StringFormat='Created: {0:MMMM dd, yyyy}'}"/>
                             </StackLayout>
                         </Frame>
                     </Grid>
@@ -74,14 +76,14 @@
         <!-- Header for the page -->
         <ListView.Header>
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Label Text="Sleep Data" FontSize="Large" TextColor="Black"/>
+                <Label Text="Carbohydrate Data" FontSize="Large" TextColor="Black"/>
             </StackLayout>
         </ListView.Header>
         <!-- Footer for the page -->
         <ListView.Footer>
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Button Text="Load More"/>
             </StackLayout>
         </ListView.Footer>
     </ListView>
+
 </ContentPage>

@@ -5,12 +5,12 @@ using Diabeticare.ViewModels;
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class EditBglPage : ContentPage
+    public partial class SlpEntriesPage : ContentPage
     {
-        public EditBglPage(int day)
+        public SlpEntriesPage()
         {
             InitializeComponent();
-            BindingContext = new BglViewModel(day);
+            BindingContext = new SlpViewModel();
         }
     }
 }
