@@ -37,10 +37,10 @@
                 </Entry>
 
                 <Label Text="Time of meal"/>
-                <TimePicker Time="{Binding CarbTime, Mode=TwoWay}" Format="HH:mm" />
+                <TimePicker Time="{Binding CarbTime, Mode=TwoWay}" Format="HH:mm" HorizontalOptions="Center"/>
 
                 <Label Text="Date of meal"/>
-                <DatePicker Date="{Binding CarbDate, Mode=TwoWay}"/>
+                <DatePicker Date="{Binding CarbDate, Mode=TwoWay}" HorizontalOptions="Center"/>
             </StackLayout>
         </Frame>
         

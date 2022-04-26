@@ -102,6 +102,7 @@ namespace Diabeticare.ViewModels
         async Task LoadSlpEntries()
         {
             IsBusy = true;
+            SlpEntries.Clear();
             var slpEntries = await App.Sdatabase.GetSlpEntriesAsync();
             SlpEntries.AddRange(slpEntries.Reverse());
             IsBusy = false;

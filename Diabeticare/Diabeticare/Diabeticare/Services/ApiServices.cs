@@ -27,8 +27,8 @@ namespace Diabeticare.Services
              * Arguments
              *  method: HttpMethod
              *      The request method (GET, POST, etc.)
-             *  url: string
-             *      The url to forward the request to
+             *  path: string
+             *      Specific resource to access
              *  content: string
              *      Message content
              *  token: string
@@ -138,6 +138,7 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "u/register", content, token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
                 return (response.IsSuccessStatusCode) ? (1, "Successfully registered user") : (0, "Invalid input");
             }
             catch { return (0, "Failed to contact server"); }
@@ -234,7 +235,7 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string, int)> AddOrUpdateBGLAsync(float value, DateTime time, int identifier = -1)
+        public async Task<(int, string, int)> AddOrUpdateBGLAsync(float value, DateTime time, int server_id = -1)
         {
             /*
              * Sends a POST request to add or update bgl entry
@@ -243,18 +244,16 @@ namespace Diabeticare.Services
              * Arguments
              *  value: float
              *      BGL value
-             *  timestamp: long
-             *      [Unix timestamp] Time user registered the value
-             *  note: string (optional)
-             *      A custom note for the entry
-             *  identifier: int (optional)
-             *      ID of existing entry for updating
+             *  time: DateTime
+             *      Date and time of input
+             *  server_id: int
+             *      ID to identify the entry (server side)
              * 
              * Return
-             * code, message, server_id: int, string, int
+             * code, message, s_id: int, string, int
              *      code: 0 -> fail | 1 -> success
              *      message: message from server
-             *      server_id: primary id in server database
+             *      s_id: primary id in server database
              *
              * Note
              * - Cannot send request if user is not logged in
@@ -272,7 +271,7 @@ namespace Diabeticare.Services
                     username = App.user.Username,
                     value = value,
                     timestamp = unixTime,
-                    identifier = identifier
+                    server_id = server_id
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -281,26 +280,26 @@ namespace Diabeticare.Services
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                int server_id = (int)JObject.Parse(responseBody)["SERVERID"];
+                int s_id = (int)JObject.Parse(responseBody)["SERVERID"];
 
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", server_id) : (0, "Session timed out", -1);
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", s_id) : (0, "Session timed out", -1);
             }
             catch { return (0, "Failed to contact server", -1); }
         }
 
-        public async Task<(int, string)> FetchBGLAsync(long timestamp)
+        public async Task<(int, string)> FetchBGLAsync(DateTime time)
         {
             /*
              * Sends a GET request to fetch all entries after timestamp
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  timestamp: int
-             *      [Unix timestamp] Time user registered the value
+             *  time: DateTime
+             *      Date and time of input
              * 
              * Return
              * code, message: int, string
@@ -316,10 +315,12 @@ namespace Diabeticare.Services
 
             try
             {
+                long unixTime = ((DateTimeOffset)time).ToUnixTimeSeconds();
+
                 var data = new
                 {
                     username = App.user.Username,
-                    timestamp = timestamp
+                    timestamp = unixTime
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -336,15 +337,15 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string)> DeleteBGLAsync(int identifier)
+        public async Task<(int, string)> DeleteBGLAsync(int server_id)
         {
             /*
              * Sends a POST request to delete specified entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  identifier: int
-             *      ID to identify the entry (locally/server side)
+             *  server_id: int
+             *      ID to identify the entry (server side)
              *      
              * Return
              * code, message: int, string
@@ -365,7 +366,7 @@ namespace Diabeticare.Services
                 var data = new
                 {
                     username = App.user.Username,
-                    identifier = identifier
+                    identifier = server_id
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -382,27 +383,25 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string, int)> AddOrUpdateSleepAsync(DateTime start, DateTime stop, int identifier = -1)
+        public async Task<(int, string, int)> AddOrUpdateSleepAsync(DateTime start, DateTime stop, int server_id = -1)
         {
             /*
              * Sends a POST request to add or update sleep entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  start: long
-             *      [Unix timestamp] Time user went to sleep
-             *  stop: long
-             *      [Unix timestamp] Time user woke up
-             *  timestamp: int
-             *       [Unix timestamp] Time user registered the value
-             *  identifier: int (optional)
-             *      ID of existing entry for updating
+             *  start: DateTime
+             *      Date and time when user went to sleep
+             *  stop: DateTime
+             *      Date and time when user woke up
+             *  server_id: int
+             *      ID to identify the entry (server side)
              * 
              * Return
-             * code, message, server_id: int, string, int
+             * code, message, s_id: int, string, int
              *      code: 0 -> fail | 1 -> success
              *      message: message from server
-             *      server_id: primary id in server database
+             *      s_id: primary id in server database
              *
              * Note
              * - Cannot send request if user is not logged in
@@ -421,7 +420,7 @@ namespace Diabeticare.Services
                     username = App.user.Username,
                     start = unixStart,
                     stop = unixStop,
-                    identifier = identifier
+                    server_id = server_id
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -430,26 +429,26 @@ namespace Diabeticare.Services
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                int server_id = (int)JObject.Parse(responseBody)["SERVERID"];
+                int s_id = (int)JObject.Parse(responseBody)["SERVERID"];
 
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", server_id) : (0, "Session timed out", -1);
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", s_id) : (0, "Session timed out", -1);
             }
             catch { return (0, "Failed to contact server", -1); }
         }
 
-        public async Task<(int, string)> FetchSleepAsync(long timestamp)
+        public async Task<(int, string)> FetchSleepAsync(DateTime time)
         {
             /*
              * Sends a GET request to fetch all entries after timestamp
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  timestamp: int
-             *      [Unix timestamp] Time user registered the value
+             *  time: DateTime
+             *      Date and time of input
              * 
              * Return
              * code, message: int, string
@@ -465,10 +464,12 @@ namespace Diabeticare.Services
 
             try
             {
+                long unixTime = ((DateTimeOffset)time).ToUnixTimeSeconds();
+
                 var data = new
                 {
                     username = App.user.Username,
-                    timestamp = timestamp
+                    timestamp = unixTime
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -485,17 +486,16 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string)> DeleteSleepAsync(int identifier)
+        public async Task<(int, string)> DeleteSleepAsync(int server_id)
         {
             /*
              * Sends a POST request to delete specified entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  identifier: int
-             *      ID to identify the entry (locally/server side)
+             *  server_id: int
+             *      ID to identify the entry (server side)
              *      
-             * 
              * Return
              * code, message: int, string
              *      code: 0 -> fail | 1 -> success
@@ -515,7 +515,7 @@ namespace Diabeticare.Services
                 var data = new
                 {
                     username = App.user.Username,
-                    identifier = identifier
+                    identifier = server_id
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -532,7 +532,7 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string, int)> AddOrUpdateCIAsync(float value, string name, DateTime time, int identifier = -1)
+        public async Task<(int, string, int)> AddOrUpdateCIAsync(float value, string name, DateTime time, int server_id = -1)
         {
             /*
              * Sends a POST request to add or update carbohydrate entry entry
@@ -541,18 +541,18 @@ namespace Diabeticare.Services
              * Arguments
              *  value: float
              *      BGL value
-             *  timestamp: long
-             *      [Unix timestamp] Time user registered the value
-             *  note: string (optional)
-             *      A custom note for the entry
-             *  identifier: int (optional)
-             *      ID of existing entry for updating
+             *  name: string
+             *      Name of food/drink
+             *  time: DateTime
+             *      Date and time of input
+             *  server_id: int
+             *      ID to identify the entry (server side)
              * 
              * Return
-             * code, message, server_id: int, string, int
+             * code, message, s_id: int, string, int
              *      code: 0 -> fail | 1 -> success
              *      message: message from server
-             *      server_id: primary id in server database
+             *      s_id: entrys id in server database
              *
              * Note
              * - Cannot send request if user is not logged in
@@ -572,7 +572,7 @@ namespace Diabeticare.Services
                     value = value,
                     name = name,
                     timestamp = unixTime,
-                    identifier = identifier
+                    server_id = server_id
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -581,26 +581,26 @@ namespace Diabeticare.Services
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                int server_id = (int)JObject.Parse(responseBody)["SERVERID"];
+                int s_id = (int)JObject.Parse(responseBody)["SERVERID"];
 
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", -1) : (0, "Session timed out", -1);
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", s_id) : (0, "Session timed out", -1);
             }
             catch { return (0, "Failed to contact server", -1); }
         }
 
-        public async Task<(int, string)> FetchCIAsync(long timestamp)
+        public async Task<(int, string)> FetchCIAsync(DateTime time)
         {
             /*
              * Sends a GET request to fetch all entries after timestamp
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  timestamp: int
-             *      [Unix timestamp] Time user registered the value
+             *  time: DateTime
+             *      Date and time of input
              * 
              * Return
              * code, message: int, string
@@ -616,10 +616,12 @@ namespace Diabeticare.Services
 
             try
             {
+                long unixTime = ((DateTimeOffset)time).ToUnixTimeSeconds();
+
                 var data = new
                 {
                     username = App.user.Username,
-                    timestamp = timestamp
+                    timestamp = unixTime
                 };
                 string content = JsonConvert.SerializeObject(data);
 
@@ -636,17 +638,16 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
-        public async Task<(int, string)> DeleteCIAsync(int identifier)
+        public async Task<(int, string)> DeleteCIAsync(int server_id)
         {
             /*
              * Sends a POST request to delete specified entry
              * On succesful request the users token is updated
              * 
              * Arguments
-             *  identifier: int
+             *  server_id: int
              *      ID to identify the entry (server side)
              *      
-             * 
              * Return
              * code, message: int, string
              *      code: 0 -> fail | 1 -> success
@@ -666,7 +667,7 @@ namespace Diabeticare.Services
                 var data = new
                 {
                     username = App.user.Username,
-                    identifier = identifier
+                    identifier = server_id
                 };
                 string content = JsonConvert.SerializeObject(data);
 

@@ -81,18 +81,18 @@ namespace Diabeticare
         public App()
         {
             InitializeComponent();
-            //MainPage = new LoginShell();
-            MainPage = new AppShell();
+            MainPage = new LoginShell();
             server_addr = "10.0.2.2:5000";
         }
 
         protected override void OnStart()
         {
-            
         }
 
         protected override void OnSleep()
         {
+            // dirty hack
+            App.user = null;
         }
 
         protected override void OnResume()

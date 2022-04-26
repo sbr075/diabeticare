@@ -130,6 +130,7 @@ namespace Diabeticare.ViewModels
         async Task LoadBglEntries()
         {
             IsBusy = true;
+            BglEntries.Clear();
             var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
             BglEntries.AddRange(bglEntries.Reverse());
             IsBusy = false;

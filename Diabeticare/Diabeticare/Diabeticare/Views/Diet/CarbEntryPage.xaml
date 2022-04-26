@@ -29,7 +29,7 @@
                 <TimePicker x:Name="timeSelector" Format="HH:mm" HorizontalOptions="Center" FontSize="Medium"/>
 
                 <Label Text="Change date" HorizontalOptions="Center"/>
-                <DatePicker x:Name="dateSelector"/>
+                <DatePicker x:Name="dateSelector" HorizontalOptions="Center"/>
 
                 <Button Text="Cancel" Clicked="CancelUpdate"/>
                 <Button Text="Save" Clicked="SaveUpdatedCarbEntry"/>

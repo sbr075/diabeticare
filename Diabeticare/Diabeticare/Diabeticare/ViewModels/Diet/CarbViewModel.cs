@@ -128,6 +128,7 @@ namespace Diabeticare.ViewModels
         async Task LoadCarbEntries()
         {
             IsBusy = true;
+            CarbEntries.Clear();
             var carbEntries = await App.Cdatabase.GetCarbEntriesAsync();
             CarbEntries.AddRange(carbEntries.Reverse());
             IsBusy = false;

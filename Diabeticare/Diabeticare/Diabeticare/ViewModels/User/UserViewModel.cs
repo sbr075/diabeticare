@@ -1,13 +1,12 @@
 ﻿using System.Text;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using Diabeticare.Views;
 using Diabeticare.Models;
 using MvvmHelpers.Commands;
 using Xamarin.Forms;
-using Newtonsoft.Json.Linq;
 using MvvmHelpers;
+using System.Linq;
 
 namespace Diabeticare.ViewModels
 {
@@ -58,8 +57,45 @@ namespace Diabeticare.ViewModels
         }
 
         // REGISTER
+        private async Task<(bool, string)> validatePassword(string username, string password)
+        {
+            /*
+             * Password requirements:
+             * 1. Must atleast be eight (8) characters long
+             * 2. Must contain atleast one (1) upper case letter
+             * 3. Must contain atleast one (1) lower case letter
+             * 4. Must contain atleast one (1) special character
+             * 5. Must contain atleast one (1) number
+             * 6. Password cannot contain username
+             */
+
+            // Check password length
+            if (password.Length < 8)
+                return (false, "Password needs to be atleast 8 characters long");
+
+            if (password.Contains(username))
+                return (false, "Password cannot contain username");
+
+            // Check if password contains one special character
+            if (password.All(char.IsLetterOrDigit))
+                return (false, "Password needs to contain atleast 1 special character");
+
+            // Check if password is only digits
+            if (password.All(char.IsDigit))
+                return (false, "Password needs to contain atleast 1 letter");
+
+            // Check if passwor is only letters
+            if (password.All(char.IsLetter))
+                return (false, "Password needs to contain atleast 1 number");
+
+            return (true, "Passowrd valid");
+        }
+
         public async Task Register()
         {
+            if (Username == null || Email == null || Password == null || ConfirmPassword == null)
+                return;
+
             string username = Username;
             string email = Email;
             string password = Password;
@@ -67,6 +103,14 @@ namespace Diabeticare.ViewModels
 
             if (password.Equals(confirmPassword))
             {
+                // Validate that passwords are complex enough
+                (bool is_complex, string error_msg) = await validatePassword(username, password); 
+                if (is_complex == false)
+                {
+                    await App.Current.MainPage.DisplayAlert("Alert", error_msg, "Ok");
+                    return;
+                }
+
                 string passwordHash = ComputeSHA256Hash(password);
                 string confirmPasswordHash = ComputeSHA256Hash(confirmPassword);
 
