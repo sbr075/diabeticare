@@ -1,33 +1,26 @@
 ﻿using Diabeticare.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    [QueryProperty(nameof(BglID), nameof(BglID))] // Used for passing selected BGL ID to a different page during navigation
     public partial class BglEntryPage : ContentPage
     {
-        public string BglID { get; set; }
+        public int BglID { get; set; }
         BglModel bglEntry;
-        public BglEntryPage()
+        public BglEntryPage(int bglID)
         {
             InitializeComponent();
-            
+            BglID = bglID;
         }
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            int.TryParse(BglID, out var pRes);
 
             // Change this later
-            bglEntry = await App.Bdatabase.GetBglEntryAsync(pRes);
+            bglEntry = await App.Bdatabase.GetBglEntryAsync(BglID);
             entryField.Text = $"{bglEntry.BGLmeasurement}";
             timeSelector.Time = bglEntry.TimeOfMeasurment.TimeOfDay;
             dateSelector.Date = bglEntry.TimeOfMeasurment.Date;
@@ -53,12 +46,12 @@ namespace Diabeticare.Views
             {
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
             }
-            
-            await Shell.Current.GoToAsync("..");
+
+            await App.Current.MainPage.Navigation.PopAsync();
         }
         private async void CancelUpdate(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
         
     }

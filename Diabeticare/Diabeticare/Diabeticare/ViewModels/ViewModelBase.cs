@@ -33,22 +33,22 @@ namespace Diabeticare.ViewModels
 
         public async void GoBackOnePage()
         {
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
 
         public async void DisplayInfo()
         {
-            await Shell.Current.GoToAsync(nameof(InfoPage));
+            await App.Current.MainPage.Navigation.PushAsync(new InfoPage());
         }
 
         public async void DisplaySettings()
         {
-            await Shell.Current.GoToAsync(nameof(SettingsPage));
+            await App.Current.MainPage.Navigation.PushAsync(new SettingsPage());
         }
 
         public async void DisplayAbout()
         {
-            await Shell.Current.GoToAsync(nameof(AboutPage));
+            await App.Current.MainPage.Navigation.PushAsync(new AboutPage());
         }
 
         public async void DeleteAccount()

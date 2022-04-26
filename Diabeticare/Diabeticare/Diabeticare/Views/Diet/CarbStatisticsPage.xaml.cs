@@ -20,7 +20,7 @@ namespace Diabeticare.Views
         // Go to AddCarbDataPage
         private async void Create_Carb_Data(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(AddCarbDataPage));
+            await App.Current.MainPage.Navigation.PushAsync(new AddCarbDataPage());
         }
     }
 }

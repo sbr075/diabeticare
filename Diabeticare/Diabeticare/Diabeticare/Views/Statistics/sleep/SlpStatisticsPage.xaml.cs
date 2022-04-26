@@ -108,13 +108,13 @@ namespace Diabeticare.Views
         // GoTo EditSlpPage
         async void Edit_SLP_Data(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(EditSlpPage));
+            await App.Current.MainPage.Navigation.PushAsync(new EditSlpPage());
         }
 
         // GoTo AddSlpDataPage
         private async void Create_SLP_Data(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(AddSlpDataPage));
+            await App.Current.MainPage.Navigation.PushAsync(new AddSlpDataPage());
         }
 
         // Creates chart entries for sleep entries the last N days

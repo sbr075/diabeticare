@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Diabeticare.Models;
-using Diabeticare.ViewModels;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Diabeticare.ViewModels;
 
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EditBglPage : ContentPage
     {
-        public EditBglPage()
+        public EditBglPage(int month)
         {
             InitializeComponent();
+            BindingContext = new BglViewModel(month);
         }
     }
 }

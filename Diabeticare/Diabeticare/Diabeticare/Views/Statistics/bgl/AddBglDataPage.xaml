@@ -7,11 +7,6 @@
     x:DataType="viewmodels:BglViewModel"
     x:Class="Diabeticare.Views.AddBglDataPage">
     
-    <!-- Setting BindingContext for page -->
-    <ContentPage.BindingContext>
-        <viewmodels:BglViewModel/>
-    </ContentPage.BindingContext>
-    
     <StackLayout Padding="10">
         <Label 
             VerticalOptions="Start" 

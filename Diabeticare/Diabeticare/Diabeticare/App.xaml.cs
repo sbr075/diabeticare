@@ -3,6 +3,7 @@ using Xamarin.Forms;
 using System.IO;
 using Diabeticare.Services;
 using Diabeticare.Models;
+using Diabeticare.Views;
 
 namespace Diabeticare
 {
@@ -81,7 +82,8 @@ namespace Diabeticare
         public App()
         {
             InitializeComponent();
-            MainPage = new LoginShell();
+            MainPage = new NavigationPage(new LoginPage()); ;
+
             server_addr = "10.0.2.2:5000";
         }
 

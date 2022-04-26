@@ -10,23 +10,21 @@ using Xamarin.Forms.Xaml;
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    [QueryProperty(nameof(CarbID), nameof(CarbID))] // Used for passing selected carb ID to a different page during navigation
     public partial class CarbEntryPage : ContentPage
     {
-
-        public string CarbID { get; set; }
+        public int CarbID { get; set; }
         CarbohydrateModel carbEntry;
-        public CarbEntryPage()
+        public CarbEntryPage(int carbID)
         {
             InitializeComponent();
+            CarbID = carbID;
         }
 
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            int.TryParse(CarbID, out var pRes);
 
-            carbEntry = await App.Cdatabase.GetCarbEntryAsync(pRes);
+            carbEntry = await App.Cdatabase.GetCarbEntryAsync(CarbID);
             entryCarb.Text = $"{carbEntry.Carbohydrates}";
             entryFood.Text = carbEntry.FoodName;
             timeSelector.Time = carbEntry.DateOfInput.TimeOfDay;
@@ -54,12 +52,12 @@ namespace Diabeticare.Views
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
             }
 
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
 
         private async void CancelUpdate(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
     }
 }

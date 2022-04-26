@@ -120,7 +120,7 @@ namespace Diabeticare.ViewModels
                 {
                     // Add locally
                     await App.Udatabase.AddUserEntryAsync(username, email);
-                    await Shell.Current.GoToAsync(nameof(LoginPage));
+                    await App.Current.MainPage.Navigation.PushAsync(new LoginPage());
                 }
                 else
                 {

@@ -12,7 +12,7 @@
         <StackLayout Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Center" Padding="5">
             <Button 
                 x:Name="today"
-                Text="I Dag" 
+                Text="TODAY" 
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"

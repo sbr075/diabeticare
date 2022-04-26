@@ -58,7 +58,7 @@ namespace Diabeticare.ViewModels
             else
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
 
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
 
         // Refresh the sleep listview

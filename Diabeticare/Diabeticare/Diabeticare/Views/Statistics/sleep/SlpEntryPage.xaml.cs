@@ -56,11 +56,11 @@ namespace Diabeticare.Views
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
             }
 
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
         private async void CancelUpdate(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
     }
 }

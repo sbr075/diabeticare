@@ -5,9 +5,9 @@ using Xamarin.Forms.Xaml;
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AddBglDataPage : ContentPage
+    public partial class BglEntriesPage : ContentPage
     {
-        public AddBglDataPage()
+        public BglEntriesPage()
         {
             InitializeComponent();
             BindingContext = new BglViewModel();

@@ -26,9 +26,10 @@ namespace Diabeticare
             Routing.RegisterRoute("AboutPage", typeof(AboutPage));
 
             // BGL pages
+            Routing.RegisterRoute("BglEntriesPage", typeof(BglEntriesPage));
+            Routing.RegisterRoute("BglEntryPage", typeof(BglEntryPage));
             Routing.RegisterRoute("EditBglPage", typeof(EditBglPage));
             Routing.RegisterRoute("AddBglDataPage", typeof(AddBglDataPage));
-            Routing.RegisterRoute("BglEntryPage", typeof(BglEntryPage));
 
             // Sleep pages
             Routing.RegisterRoute("AddSlpDataPage", typeof(AddSlpDataPage));

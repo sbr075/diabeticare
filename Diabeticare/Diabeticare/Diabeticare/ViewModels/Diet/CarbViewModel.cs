@@ -87,7 +87,7 @@ namespace Diabeticare.ViewModels
             else
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
 
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
 
         async Task ViewRefresh()
@@ -120,8 +120,7 @@ namespace Diabeticare.ViewModels
 
             SelectedCarb = null; // Deselect item
             CarbEntries.Clear();
-            var route = $"{nameof(CarbEntryPage)}?CarbID={carb.ID}";
-            await Shell.Current.GoToAsync(route);
+            await App.Current.MainPage.Navigation.PushAsync(new CarbEntryPage(carb.ID));
         }
 
         // Loads carb entries

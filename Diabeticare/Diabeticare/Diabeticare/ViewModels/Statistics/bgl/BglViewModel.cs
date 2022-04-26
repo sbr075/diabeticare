@@ -11,31 +11,47 @@ using Command = MvvmHelpers.Commands.Command;
 using Xamarin.CommunityToolkit.Extensions;
 using Diabeticare.Views;
 
+
 namespace Diabeticare.ViewModels
 {
     public class BglViewModel : ViewModelBase
     {
         // Data collection of BGL entries
         public ObservableRangeCollection<BglModel> BglEntries { get; set; }
+        public ObservableRangeCollection<BglGroupModel> BglGroups { get; set; }
 
         public Command AddBglCommand { get; }
         public AsyncCommand RefreshCommand { get; }
         public AsyncCommand<BglModel> DeleteBglCommand { get; }
+        public AsyncCommand<object> SelectedBglGroupCommand { get; }
         public AsyncCommand<object> SelectedBglCommand { get; }
-        public AsyncCommand DisplayEntries { get; }
+        public AsyncCommand DisplayGroupsCommand { get; }
+        public AsyncCommand DisplayEntriesCommand { get; }
         public AsyncCommand LoadMoreCommand { get; }
 
-        public BglViewModel()
+        public BglViewModel(int month=0)
         {
             BglEntries = new ObservableRangeCollection<BglModel>();
+            BglGroups = new ObservableRangeCollection<BglGroupModel>();
+
             AddBglCommand = new Command(AddBgl);
             RefreshCommand = new AsyncCommand(ViewRefresh);
             DeleteBglCommand = new AsyncCommand<BglModel>(DeleteBgl);
+            SelectedBglGroupCommand = new AsyncCommand<object>(SelectedGroup);
             SelectedBglCommand = new AsyncCommand<object>(SelectedEntry);
-            DisplayEntries = new AsyncCommand(LoadBglEntries);
+            DisplayGroupsCommand = new AsyncCommand(LoadBglGroups);
+            DisplayEntriesCommand = new AsyncCommand(LoadBglEntries);
 
             BglDate = DateTime.Now;
             BglTime = DateTime.Now.TimeOfDay;
+            Month = month;
+        }
+
+        BglGroupModel selectedBglGroup;
+        public BglGroupModel SelectedBglGroup
+        {
+            get => selectedBglGroup;
+            set => SetProperty(ref selectedBglGroup, value);
         }
 
         BglModel selectedBgl;
@@ -67,6 +83,13 @@ namespace Diabeticare.ViewModels
             set => SetProperty(ref bglDate, value);
         }
 
+        int month;
+        public int Month
+        {
+            get => month;
+            set => SetProperty(ref month, value);
+        }
+
         // Creates a new BGL entry
         public async void AddBgl()
         {
@@ -87,7 +110,7 @@ namespace Diabeticare.ViewModels
             else
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
 
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
 
         // Refresh the bgl listview
@@ -115,6 +138,16 @@ namespace Diabeticare.ViewModels
             await ViewRefresh();
         }
 
+        async Task SelectedGroup(object arg)
+        {
+            BglGroupModel bglGroup = arg as BglGroupModel;
+            if (bglGroup == null) return;
+
+            SelectedBglGroup = null;
+            BglGroups.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
+            await App.Current.MainPage.Navigation.PushAsync(new EditBglPage(bglGroup.GroupDate.Month));
+        }
+
         async Task SelectedEntry(object arg)
         {
             BglModel bgl = arg as BglModel;
@@ -122,8 +155,24 @@ namespace Diabeticare.ViewModels
 
             SelectedBgl = null; // Deselect item
             BglEntries.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
-            var route = $"{nameof(BglEntryPage)}?BglID={bgl.ID}";
-            await Shell.Current.GoToAsync(route);
+            await App.Current.MainPage.Navigation.PushAsync(new BglEntryPage(bgl.ID));
+        }
+
+        async Task LoadBglGroups()
+        {
+            IsBusy = true;
+            BglGroups.Clear();
+            var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
+            var distinctDates = bglEntries.Select(ent => ent.TimeOfMeasurment.Date).Distinct();
+            foreach (var date in distinctDates)
+            {
+                var allGroupBgl = bglEntries.Where(ent => ent.TimeOfMeasurment.Date == date);
+                var avgGroupBgl = allGroupBgl.Select(ent => ent.BGLmeasurement).Average();
+
+                BglGroups.Add(new BglGroupModel { GroupDate=date, GroupAvgBgl=avgGroupBgl });
+            }
+
+            IsBusy = false;
         }
 
         // Loads BGL entries
@@ -132,6 +181,7 @@ namespace Diabeticare.ViewModels
             IsBusy = true;
             BglEntries.Clear();
             var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
+            bglEntries = bglEntries.Where(ent => ent.TimeOfMeasurment.Month == Month);
             BglEntries.AddRange(bglEntries.Reverse());
             IsBusy = false;
         }

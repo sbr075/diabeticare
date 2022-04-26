@@ -107,16 +107,16 @@ namespace Diabeticare.Views
             BglChart.Chart = new PointChart { Entries = ChartEntries, LabelTextSize = 30, PointAreaAlpha = 200, PointSize = 10, LabelOrientation = Orientation.Vertical, ValueLabelOrientation = Orientation.Horizontal };
         }
 
-        // GoTo EditBglPage
-        async void Edit_BGL_Data(object sender, EventArgs e)
+        // GoTo ViewBglDataPage
+        async void ViewBGLEntries(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(EditBglPage));
+            await App.Current.MainPage.Navigation.PushAsync(new BglEntriesPage());
         }
 
         // GoTo AddBglDataPage
-        private async void Create_BGL_Data(object sender, EventArgs e)
+        private async void CreateBGLEntry(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(AddBglDataPage));
+            await App.Current.MainPage.Navigation.PushAsync(new AddBglDataPage());
         }
 
         // Creates chart entries for BGL measurements the last N days
