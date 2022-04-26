@@ -88,7 +88,6 @@
 
   <ItemGroup>
     <Folder Include="ViewModels\Exercise\" />
-    <Folder Include="ViewModels\Diet\" />
     <Folder Include="Views\Exercise\" />
     <Folder Include="Views\Diet\" />
   </ItemGroup>

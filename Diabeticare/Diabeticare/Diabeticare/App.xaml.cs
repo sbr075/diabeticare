@@ -43,9 +43,33 @@ namespace Diabeticare
         {
             get
             {
+                if (carbDatabase == null)
+                {
+                    carbDatabase = new CarbDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "bglEntries.db3"));
+                }
+                return carbDatabase;
+            }
+        }
+
+        public static CarbDatabase Cdatabase
+        {
+            get
+            {
+                if (carbDatabase == null)
+                {
+                    carbDatabase = new CarbDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "bglEntries.db3"));
+                }
+                return carbDatabase;
+            }
+        }
+
+        public static CarbDatabase Cdatabase
+        {
+            get
+            {
                 if (bglDatabase == null)
                 {
-                    bglDatabase = new BglDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "bglEntries.db3"));
+                    bglDatabase = new BglDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "carbEntries.db3"));
                 }
                 return bglDatabase;
             }
