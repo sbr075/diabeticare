@@ -9,13 +9,10 @@ namespace Diabeticare
     public partial class App : Application
     {
         public static UserModel user;
-
-        static ApiServices apiservices;
-        static UserDatabase userDatabase;
-        static SlpDatabase slpDatabase;
-        static BglDatabase bglDatabase;
+        public static string server_addr;
 
         // Create the database connection as a singleton.
+        static UserDatabase userDatabase;
         public static UserDatabase Udatabase
         {
             get
@@ -28,6 +25,7 @@ namespace Diabeticare
             }
         }
 
+        static SlpDatabase slpDatabase;
         public static SlpDatabase Sdatabase
         {
             get
@@ -40,7 +38,7 @@ namespace Diabeticare
             }
         }
 
-        // Create the database connection as a singleton.
+        static BglDatabase bglDatabase;
         public static BglDatabase Bdatabase
         {
             get
@@ -53,6 +51,7 @@ namespace Diabeticare
             }
         }
 
+        static ApiServices apiservices;
         public static ApiServices apiServices
         {
             get
@@ -69,6 +68,7 @@ namespace Diabeticare
         {
             InitializeComponent();
             MainPage = new LoginShell();
+            server_addr = "10.0.2.2:5000";
         }
 
         protected override void OnStart()
