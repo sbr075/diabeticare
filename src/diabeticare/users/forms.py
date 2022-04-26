@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
-from wtforms.validators import InputRequired, EqualTo, Length, ValidationError
+from wtforms.validators import InputRequired, EqualTo, Length, ValidationError, Email
 
 from diabeticare.users.models import User
 
@@ -38,9 +38,9 @@ class LogoutForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField("Username",           [InputRequired(), Length(min=3, max=20, message="Username must be between 3 and 20 characters long")])
-    email    = StringField("Email",              [InputRequired(), Length(max=80, message="Email cannot be longer than 80 characters")])
-    password = PasswordField("Password",         [InputRequired(), EqualTo("confirm"),    Length(min=8, max=80, message="Password cannot be less than 8 characters")])
-    confirm  = PasswordField("Confirm password", [InputRequired(), EqualTo("password"),   Length(min=8, max=80, message="Password cannot be less than 8 characters")])
+    email    = StringField("Email",              [InputRequired(), Email(), Length(max=80, message="Email cannot be longer than 80 characters")])
+    password = PasswordField("Password",         [InputRequired(), EqualTo("confirm"),  Length(min=8, max=80, message="Password cannot be less than 8 characters")])
+    confirm  = PasswordField("Confirm password", [InputRequired(), EqualTo("password"), Length(min=8, max=80, message="Password cannot be less than 8 characters")])
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()

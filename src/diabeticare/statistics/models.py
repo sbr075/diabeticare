@@ -6,7 +6,7 @@ class BGL(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    measurement = db.Column(db.Float(), nullable=False)
+    measurement = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.Integer, nullable=False)
 
 
@@ -37,12 +37,13 @@ class SleepSchema(ma.SQLAlchemyAutoSchema):
 
 
 class CI(db.Model):
-    __tablename__ = "carbohydrate intake"
+    __tablename__ = "carbohydrates"
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    carbohydrates = db.Column(db.Integer, nullable=False)
+    carbohydrates = db.Column(db.Float, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     timestamp = db.Column(db.Integer, nullable=False)
     
 
@@ -51,4 +52,5 @@ class CISchema(ma.SQLAlchemyAutoSchema):
         model = CI
 
     carbohydrates = ma.auto_field()
+    name = ma.auto_field()
     timestamp = ma.auto_field()

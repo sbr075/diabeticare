@@ -1,4 +1,5 @@
 import json
+from unicodedata import name
 from flask import request, jsonify
 from werkzeug.datastructures import MultiDict
 
@@ -22,21 +23,20 @@ def bgl_set():
 		X-CSRFToken: current valid token
 	
 	content/data (json format)
-		username:   name of user
+		username:  name of user
 
-		value:		value of entry
-		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
-		identifier: (optional) used to overwrite existing entry
+		value:	   value of entry
+		timestamp: time when measurement was taken (UNIXTIMESTAMP)
+		server_id: (optional) used to overwrite existing entry
 	"""
 
 	if request.method == "POST":
 		data = json.loads(request.data)
-		username   = data["username"]
-		timestamp  = data["timestamp"]
-
-		value      = data["value"]
-		identifier = data["identifier"] if data["identifier"] >= 0 else None
-		token      = request.headers["X-CSRFToken"]
+		username  = data["username"]
+		value     = data["value"]
+		timestamp = data["timestamp"]
+		server_id = data["server_id"] if data["server_id"] >= 0 else None
+		token     = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
@@ -45,8 +45,8 @@ def bgl_set():
 
 		bgl_form = BGLForm(MultiDict({"measurement": value, "timestamp": timestamp}))
 		if bgl_form.validate():
-			if identifier:
-				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier).first()
+			if server_id:
+				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==server_id).first()
 				if not entry:
 					return jsonify({"ERROR": "Invalid paramaters"})
 				
@@ -116,22 +116,22 @@ def bgl_del():
 		X-CSRFToken: current valid token
 	
 	content/data (json format)
-		username:   name of user
-		identifier: id of entry
+		username:  name of user
+		server_id: id of entry
 	"""
 
 	if request.method == "POST":
 		data = json.loads(request.data)
-		username   = data["username"]
-		identifier = data["identifier"]
-		token      = request.headers["X-CSRFToken"]
+		username  = data["username"]
+		server_id = data["server_id"]
+		token     = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==identifier)
+		entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==server_id)
 		if not entry.first():
 			return jsonify({"ERROR": "Invalid paramaters"})
 
@@ -155,21 +155,20 @@ def sleep_set():
 		X-CSRFToken: current valid token
 	
 	content/data (json format)
-		username:   name of user
+		username:  name of user
 
-		start:		time when user went to sleep (UNIXTIMESTAMP)
-		stop:		time when user woke up  	 (UNIXTIMESTAMP)
-		identifier: (optional) used to overwrite existing entry
+		start:	   time when user went to sleep (UNIXTIMESTAMP)
+		stop:	   time when user woke up  	 (UNIXTIMESTAMP)
+		server_id: (optional) used to overwrite existing entry
 	"""
 
 	if request.method == "POST":
 		data = json.loads(request.data)
-		username   = data["username"]
-
-		start	   = data["start"]
-		stop       = data["stop"]
-		identifier = data["identifier"] if data["identifier"] >= 0 else None
-		token      = request.headers["X-CSRFToken"]
+		username  = data["username"]
+		start	  = data["start"]
+		stop      = data["stop"]
+		server_id = data["server_id"] if data["server_id"] >= 0 else None
+		token     = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
@@ -178,8 +177,8 @@ def sleep_set():
 		
 		sleep_form = SleepForm(MultiDict({"start": start, "stop": stop}))
 		if sleep_form.validate():
-			if identifier:
-				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier).first()
+			if server_id:
+				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==server_id).first()
 				if not entry:
 					return jsonify({"ERROR": "Invalid paramaters"})
 				
@@ -249,22 +248,22 @@ def sleep_del():
 		X-CSRFToken: current valid token
 	
 	content/data (json format)
-		username:   name of user
-		identifier: id of entry
+		username:  name of user
+		server_id: id of entry
 	"""
 
 	if request.method == "POST":
 		data = json.loads(request.data)
-		username   = data["username"]
-		identifier = data["identifier"]
-		token      = request.headers["X-CSRFToken"]
+		username  = data["username"]
+		server_id = data["server_id"]
+		token     = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==identifier)
+		entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==server_id)
 		if not entry.first():
 			return jsonify({"ERROR": "Invalid paramaters"})
 			
@@ -287,31 +286,31 @@ def ci_set():
 		X-CSRFToken: current valid token
 	
 	content/data (json format)
-		username:   name of user
+		username:  name of user
 
-		value:		value of entry
-		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
-		identifier: (optional) used to overwrite existing entry
+		value:	   value of entry
+		timestamp: time when measurement was taken (UNIXTIMESTAMP)
+		server_id: (optional) used to overwrite existing entry
 	"""
 
 	if request.method == "POST":
 		data = json.loads(request.data)
-		username   = data["username"]
-		timestamp  = data["timestamp"]
-
-		value      = data["value"]
-		identifier = data["identifier"] if data["identifier"] >= 0 else None
-		token      = request.headers["X-CSRFToken"]
+		username  = data["username"]
+		value     = data["value"]
+		name	  = data["name"]
+		timestamp = data["timestamp"]
+		server_id = data["server_id"] if data["server_id"] >= 0 else None
+		token     = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 		
-		ci_form = CIForm(MultiDict({"carbohydrates": value, "timestamp": timestamp}))
+		ci_form = CIForm(MultiDict({"carbohydrates": value, "name": name, "timestamp": timestamp}))
 		if ci_form.validate():
-			if identifier:
-				entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier).first()
+			if server_id:
+				entry = CI.query.filter(CI.user_id==user.id, CI.id==server_id).first()
 				if not entry:
 					return jsonify({"ERROR": "Invalid paramaters"})
 				
@@ -319,7 +318,7 @@ def ci_set():
 				entry.timestamp = timestamp
 
 			else:
-				entry = CI(user_id=user.id, carbohydrates=value, timestamp=timestamp)
+				entry = CI(user_id=user.id, carbohydrates=value, name=name, timestamp=timestamp)
 				db.session.add(entry)
 
 			db.session.commit()
@@ -381,22 +380,22 @@ def ci_del():
 		X-CSRFToken: current valid token
 	
 	content/data (json format)
-		username:   name of user
-		identifier: id of entry
+		username:  name of user
+		server_id: id of entry
 	"""
 
 	if request.method == "POST":
 		data = json.loads(request.data)
-		username   = data["username"]
-		identifier = data["identifier"]
-		token      = request.headers["X-CSRFToken"]
+		username  = data["username"]
+		server_id = data["server_id"]
+		token     = request.headers["X-CSRFToken"]
 
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
 			return jsonify({"ERROR": "Invalid token"}), 403
 
-		entry = CI.query.filter(CI.user_id==user.id, CI.id==identifier)
+		entry = CI.query.filter(CI.user_id==user.id, CI.id==server_id)
 		if not entry.first():
 			return jsonify({"ERROR": "Invalid paramaters"})
 		
