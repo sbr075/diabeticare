@@ -34,6 +34,10 @@ namespace Diabeticare
             Routing.RegisterRoute("AddSlpDataPage", typeof(AddSlpDataPage));
             Routing.RegisterRoute("EditSlpPage", typeof(EditSlpPage));
             Routing.RegisterRoute("SlpEntryPage", typeof(SlpEntryPage));
+
+            // Carbohydrate pages
+            Routing.RegisterRoute("AddCarbDataPage", typeof(AddCarbDataPage));
+            Routing.RegisterRoute("CarbEntryPage", typeof(CarbEntryPage));
         }
 
     }

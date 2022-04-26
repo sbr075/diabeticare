@@ -81,7 +81,8 @@ namespace Diabeticare
         public App()
         {
             InitializeComponent();
-            MainPage = new LoginShell();
+            //MainPage = new LoginShell();
+            MainPage = new AppShell();
             server_addr = "10.0.2.2:5000";
         }
 

@@ -1,23 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage 
     xmlns="http://xamarin.com/schemas/2014/forms"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
-    xmlns:model="clr-namespace:Diabeticare.Models"
-    x:Class="Diabeticare.Views.BglEntryPage"
-    x:DataType="model:BglModel"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Diabeticare.Views.CarbEntryPage"
     Shell.PresentationMode="Modal">
     
     <StackLayout Padding="10">
         <Frame BorderColor="LightSkyBlue">
             <StackLayout>
-                <Label Text="Change BGL value" HorizontalOptions="Center"/>
+                <Label Text="Change carbohydrate entry" HorizontalOptions="Center"/>
                 <Entry
-                    x:Name="entryField"
+                    x:Name="entryCarb"
                     Text=""
-                    MaxLength="4" 
+                    MaxLength="5" 
                     Keyboard="Numeric"
                     HorizontalTextAlignment="Center">
                 </Entry>
+                
+                <Entry
+                    x:Name="entryFood"
+                    Text=""
+                    MaxLength="20" 
+                    Keyboard="Numeric"
+                    HorizontalTextAlignment="Center">
+                </Entry>
+
                 <Label Text="Change time" HorizontalOptions="Center"/>
                 <TimePicker x:Name="timeSelector" Format="HH:mm" HorizontalOptions="Center" FontSize="Medium"/>
 
@@ -25,8 +32,9 @@
                 <DatePicker x:Name="dateSelector"/>
 
                 <Button Text="Cancel" Clicked="CancelUpdate"/>
-                <Button Text="Save" Clicked="SaveUpdatedBglEntry"/>
+                <Button Text="Save" Clicked="SaveUpdatedCarbEntry"/>
             </StackLayout>
         </Frame>
     </StackLayout>
+    
 </ContentPage>
