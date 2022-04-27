@@ -16,7 +16,7 @@ logger = logging.getLogger("STAT")
 
 
 @bp.route("/bgl/set", methods=["POST"])
-def bgl_set():
+def bglSet():
 	"""
 	Request parameters
 	headers
@@ -71,7 +71,7 @@ def bgl_set():
 
 
 @bp.route("/bgl/get", methods=["GET"])
-def bgl_get():
+def bglGet():
 	"""
 	Request parameters
 	headers
@@ -109,7 +109,7 @@ def bgl_get():
 
 
 @bp.route("/bgl/del", methods=["POST"])
-def bgl_del():
+def bglDel():
 	"""
 	Request parameters
 	headers
@@ -148,7 +148,7 @@ def bgl_del():
 
 
 @bp.route("/sleep/set", methods=["POST"])
-def sleep_set():
+def sleepSet():
 	"""
 	Request parameters
 	headers
@@ -203,7 +203,7 @@ def sleep_set():
 
 
 @bp.route("/sleep/get", methods=["GET"])
-def sleep_get():
+def sleepGet():
 	"""
 	Request parameters
 	headers
@@ -241,7 +241,7 @@ def sleep_get():
 
 
 @bp.route("/sleep/del", methods=["POST"])
-def sleep_del():
+def sleepDel():
 	"""
 	Request parameters
 	headers
@@ -279,7 +279,7 @@ def sleep_del():
 
 
 @bp.route("/ci/set", methods=["POST"])
-def ci_set():
+def ciSet():
 	"""
 	Request parameters
 	headers
@@ -335,7 +335,7 @@ def ci_set():
 
 
 @bp.route("/ci/get", methods=["GET"])
-def ci_get():
+def ciGet():
 	"""
 	Request parameters
 	headers
@@ -373,7 +373,7 @@ def ci_get():
 
 
 @bp.route("/ci/del", methods=["POST"])
-def ci_del():
+def ciDel():
 	"""
 	Request parameters
 	headers

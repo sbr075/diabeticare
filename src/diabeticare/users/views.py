@@ -5,6 +5,7 @@ from diabeticare import db
 from diabeticare.users import bp
 from diabeticare.users.forms import RegistrationForm, LoginForm, LogoutForm
 from diabeticare.users.models import User
+from diabeticare.statistics.models import BGL, Sleep, CI
 from diabeticare.main.views import validate_token, update_token, nullify_token
 
 import logging
@@ -87,5 +88,70 @@ def register():
         
         else:
             return jsonify(reg_form.errors), 401
+    
+    return jsonify({"ERROR": "Invalid request"}), 405
+
+def _deleteAllData(user_id):
+    BGL.query.filter(BGL.user_id == user_id).delete()
+    Sleep.query.filter(Sleep.user_id == user_id).delete()
+    CI.query.filter(CI.user_id == user_id).delete()
+    db.session.commit()
+
+@bp.route("/delete-account", methods=["POST"])
+def deleteAccount():
+    """
+	Request parameters
+	username: name of user
+    password: users password
+	"""
+    
+    if request.method == "POST":
+        data = json.loads(request.data)
+
+        confirm_form = LoginForm(MultiDict(data))
+        if confirm_form.validate():
+            user = User.query.filter_by(username=confirm_form.username.data).first()
+            token = request.headers["X-CSRFToken"]
+
+            if not validate_token(user, token):
+                return jsonify({"ERROR": "Invalid token"}), 403
+
+            _deleteAllData(user.id)
+            db.session.delete(user)
+            db.session.commit()
+
+            return jsonify({"RESPONSE": "Account successfully deleted!"})
+        
+        else:
+            return jsonify(confirm_form.errors), 401
+    
+    return jsonify({"ERROR": "Invalid request"}), 405
+
+
+@bp.route("/delete-all-data", methods=["POST"])
+def deleteAllData():
+    """
+	Request parameters
+	username: name of user
+    password: users password
+	"""
+    
+    if request.method == "POST":
+        data = json.loads(request.data)
+
+        confirm_form = LoginForm(MultiDict(data))
+        if confirm_form.validate():
+            user = User.query.filter_by(username=confirm_form.username.data).first()
+            token = request.headers["X-CSRFToken"]
+
+            if not validate_token(user, token):
+                return jsonify({"ERROR": "Invalid token"}), 403
+
+            _deleteAllData(user.id)
+
+            return jsonify({"RESPONSE": "All data successfully deleted!"})
+        
+        else:
+            return jsonify(confirm_form.errors), 401
     
     return jsonify({"ERROR": "Invalid request"}), 405
