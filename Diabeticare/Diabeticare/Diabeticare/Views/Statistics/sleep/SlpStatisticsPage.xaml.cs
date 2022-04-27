@@ -5,6 +5,8 @@ using Microcharts;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Diabeticare.Models;
+using System.Linq;
+using Diabeticare.ViewModels;
 
 namespace Diabeticare.Views
 {
@@ -18,6 +20,7 @@ namespace Diabeticare.Views
         public SlpStatisticsPage()
         {
             InitializeComponent();
+            BindingContext = new SlpViewModel();
         }
         
         protected override void OnAppearing()
@@ -36,22 +39,41 @@ namespace Diabeticare.Views
             // Get list of sleep entries from database
             List<SleepModel> SlpEntries = (List<SleepModel>)await App.Sdatabase.GetSlpEntriesAsync();
 
+            // Exit if there are no entries for today
+            if (SlpEntries.Count == 0) return;
+
             TimeSpan sleepTime = new TimeSpan(0, 0, 0);
             for (int i = SlpEntries.Count - 1; i >= 0; i--)
             {
+                var slpEntry = SlpEntries[i];
                 // Remove sleep entries that are not registered today
-                if (SlpEntries[i].SleepEnd < DateTime.Today)
+                if (slpEntry.SleepEnd < DateTime.Today)
                 {
                     SlpEntries.RemoveAt(i);
                     continue;
                 }
-                
-                // Sum up todays sleep entries
-                sleepTime += SlpEntries[i].SleepEnd.Subtract(SlpEntries[i].SleepStart);
-            }
 
-            // Exit if there are no entries for today
-            if (SlpEntries.Count == 0) return;
+                // If Sleep start and sleep end is not on the same day
+                if (slpEntry.SleepStart.Day != slpEntry.SleepEnd.Day)
+                {
+                    // If current day is looking at sleep start days
+                    if (slpEntry.SleepStart.Day == DateTime.Today.Day)
+                    {
+                        DateTime endOfDay = new DateTime(DateTime.Now.Year, DateTime.Now.Month, slpEntry.SleepStart.Day, 23, 59, 59);
+                        sleepTime += endOfDay - slpEntry.SleepStart;
+                    }
+                    // Current day is looking at sleep end days
+                    else
+                    {
+                        DateTime startOfDay = new DateTime(DateTime.Now.Year, DateTime.Now.Month, slpEntry.SleepEnd.Day);
+                        sleepTime += slpEntry.SleepEnd - startOfDay;
+                    }
+                }
+                else
+                {
+                    sleepTime += (slpEntry.SleepEnd - slpEntry.SleepStart);
+                }
+            }
 
             // Set graph color depending on the amount of sleep
             string graphColor;
@@ -121,47 +143,61 @@ namespace Diabeticare.Views
             chartEntries.Clear();
 
             // Get list of entries from database
-            List<SleepModel> slpEntries = (List<SleepModel>)await App.Sdatabase.GetSlpEntriesAsync();
+            var slpEntries = await App.Sdatabase.GetSlpEntriesAsync();
 
-            // Set date to N days ago
-            DateTime nDaysAgo = DateTime.Today.AddDays(-days);
+            var sleepStartDays = slpEntries.Select(ent => ent.SleepStart.Date.Day);
+            var sleepEndDays = slpEntries.Select(ent => ent.SleepEnd.Date.Day);
 
-            // Iterate through N days
-            for (DateTime day = nDaysAgo; day.Date <= DateTime.Now; day = day.AddDays(1))
+            var sleepAllDays = sleepStartDays.Concat(sleepEndDays);
+            var distinctDays = sleepAllDays.Distinct().OrderBy(ent => ent);
+
+            foreach (var day in distinctDays)
             {
-                TimeSpan sleepTime = new TimeSpan(0, 0, 0);
-                for (int i = 0; i < slpEntries.Count; i++)
+                var allGroupSlp = slpEntries.Where(ent => ent.SleepStart.Day == day || ent.SleepEnd.Day == day);
+
+                TimeSpan totalSleep;
+                foreach (var group in allGroupSlp)
                 {
-                    if(slpEntries[i].SleepEnd.Date == day.Date)
+                    // If Sleep start and sleep end is not on the same day
+                    if (group.SleepStart.Day != group.SleepEnd.Day)
                     {
-                        // Sum up current day's sleep entries
-                        sleepTime += slpEntries[i].SleepEnd.Subtract(slpEntries[i].SleepStart);
+                        // If current day is looking at sleep start days
+                        if (group.SleepStart.Day == day)
+                        {
+                            DateTime endOfDay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, group.SleepStart.Day, 23, 59, 59);
+                            totalSleep += endOfDay - group.SleepStart;
+                        }
+                        // Current day is looking at sleep end days
+                        else
+                        {
+                            DateTime startOfDay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, group.SleepEnd.Day);
+                            totalSleep += group.SleepEnd - startOfDay;
+                        }
+                    }
+                    else
+                    {
+                        totalSleep += (group.SleepEnd - group.SleepStart);
                     }
                 }
-                
-                // Skip to next iteration/day if there are no sleep entries to avoid creating empty chart entries
-                if (sleepTime == TimeSpan.Zero) continue;
 
                 // Change datetime format
                 string dateTime;
-                if (day.Date == DateTime.Today) dateTime = "Today";
-                else dateTime = day.Date.ToString(labelFormat);
+                if (day == DateTime.Today.Day) dateTime = "Today";
+                else dateTime = new DateTime(DateTime.Today.Year, DateTime.Today.Month, day).ToString(labelFormat);
 
                 // Set graph color depending on the amount of sleep
                 string graphColor;
-                if ((float)sleepTime.TotalHours < recommendedSleepMin) graphColor = "#ff1447";
-                else if ((float)sleepTime.TotalHours > recommendedSleepMax) graphColor = "#FFDA00";
+                if ((float)totalSleep.TotalHours < recommendedSleepMin) graphColor = "#ff1447";
+                else if ((float)totalSleep.TotalHours > recommendedSleepMax) graphColor = "#FFDA00";
                 else graphColor = "#00e400";
 
                 // Create chart entry
-                chartEntries.Add(new ChartEntry((float)sleepTime.TotalHours)
+                chartEntries.Add(new ChartEntry((float)totalSleep.TotalHours)
                 {
                     Color = SKColor.Parse(graphColor),
                     Label = dateTime,
-                    //ValueLabel = $"{Math.Floor((float)sleepTime.TotalHours)}H {(float)sleepTime.Minutes}Min"
-                    ValueLabel = $"{Math.Round((float)sleepTime.TotalHours, 1)}H"
+                    ValueLabel = $"{Math.Round((float)totalSleep.TotalHours, 1)}H"
                 });
-
             }
         }
     }

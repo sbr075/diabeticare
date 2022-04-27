@@ -20,7 +20,7 @@ namespace Diabeticare.Services
 
         public async Task<IEnumerable<CarbohydrateModel>> GetCarbEntriesAsync()
         {
-            var carbEntries = await carbDatabase.Table<CarbohydrateModel>().ToListAsync();
+            var carbEntries = await carbDatabase.Table<CarbohydrateModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
             return carbEntries;
         }
 
@@ -34,6 +34,7 @@ namespace Diabeticare.Services
         {
             var carb = new CarbohydrateModel
             {
+                UserID = App.user.ID,
                 ServerID = server_id,
                 Carbohydrates = carbohydrates,
                 DateOfInput = dateOfInput,
@@ -56,6 +57,23 @@ namespace Diabeticare.Services
         public async Task DeleteCarbEntryAsync(int id)
         {
             await carbDatabase.DeleteAsync<CarbohydrateModel>(id);
+        }
+
+        public async Task DeleteUserCarbEntriesAsync()
+        {
+            try
+            {
+                // Get all entries related to user
+                var carbEntries = await carbDatabase.Table<CarbohydrateModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
+                foreach (var carbEntry in carbEntries)
+                {
+                    await carbDatabase.DeleteAsync(carbEntry);
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
         }
     }
 }

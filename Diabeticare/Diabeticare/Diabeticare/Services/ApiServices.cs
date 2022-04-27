@@ -235,6 +235,50 @@ namespace Diabeticare.Services
             catch { return (0, "Failed to contact server"); }
         }
 
+        public async Task<(int, string)> DeleteAccount()
+        {
+            if (App.user == null)
+                return (0, "You are not signed in");
+
+            try
+            {
+                var data = new
+                {
+                    username = App.user.Username,
+                    password = App.user.Password
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "u/delete-account", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted account") : (0, "Session timed out");
+            }
+            catch { return (0, "Failed to contact server"); }
+        }
+
+        public async Task<(int, string)> DeleteAllData()
+        {
+            if (App.user == null)
+                return (0, "You are not signed in");
+
+            try
+            {
+                var data = new
+                {
+                    username = App.user.Username,
+                    password = App.user.Password
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "u/delete-all-data", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted all data") : (0, "Session timed out");
+            }
+            catch { return (0, "Failed to contact server"); }
+        }
+
         public async Task<(int, string, int)> AddOrUpdateBGLAsync(float value, DateTime time, int server_id = -1)
         {
             /*

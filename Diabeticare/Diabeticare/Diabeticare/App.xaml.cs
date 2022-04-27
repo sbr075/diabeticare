@@ -82,7 +82,7 @@ namespace Diabeticare
         public App()
         {
             InitializeComponent();
-            MainPage = new NavigationPage(new LoginPage()); ;
+            MainPage = new LoginShell();
 
             server_addr = "10.0.2.2:5000";
         }
@@ -91,9 +91,11 @@ namespace Diabeticare
         {
         }
 
-        protected override void OnSleep()
+        protected override async void OnSleep()
         {
-            // dirty hack
+            if (App.user.AutoLogIn == false)
+                await App.Udatabase.UpdateUserEntryAsync(App.user, "", false);
+
             App.user = null;
         }
 

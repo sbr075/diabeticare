@@ -23,7 +23,7 @@ namespace Diabeticare.ViewModels
         public AsyncCommand<object> SelectedSlpCommand { get; }
         public AsyncCommand DisplayGroupsCommand { get; }
         public AsyncCommand DisplayEntriesCommand { get; }
-        public SlpViewModel(int month=0)
+        public SlpViewModel(int day=0)
         {
             
             SlpEntries = new ObservableRangeCollection<SleepModel>();
@@ -40,7 +40,7 @@ namespace Diabeticare.ViewModels
             SlpStart = DateTime.Today.AddDays(-1);
             SlpEnd = DateTime.Today;
             slpTimeEnd = DateTime.Now.TimeOfDay;
-            Month = month;
+            Day = day;
         }
 
         GroupModel selectedSlpGroup;
@@ -85,11 +85,11 @@ namespace Diabeticare.ViewModels
             set => SetProperty(ref slpTimeEnd, value);
         }
 
-        int month;
-        public int Month
+        int day;
+        public int Day
         {
-            get => month;
-            set => SetProperty(ref month, value);
+            get => day;
+            set => SetProperty(ref day, value);
         }
 
         // Creates a new sleep entry
@@ -149,7 +149,7 @@ namespace Diabeticare.ViewModels
 
             SelectedSlpGroup = null;
             SlpGroups.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
-            await App.Current.MainPage.Navigation.PushAsync(new EditSlpPage(slpGroup.GroupDate.Month));
+            await App.Current.MainPage.Navigation.PushAsync(new EditSlpPage(slpGroup.GroupDate.Day));
         }
 
         async Task SelectedEntry(object arg)
@@ -167,14 +167,44 @@ namespace Diabeticare.ViewModels
         {
             IsBusy = true;
             SlpGroups.Clear();
-            var bglEntries = await App.Sdatabase.GetSlpEntriesAsync();
-            var distinctDates = bglEntries.Select(ent => ent.SleepStart.Date).Distinct().OrderByDescending(ent => ent.Date);
-            foreach (var date in distinctDates)
-            {
-                var allGroupBgl = bglEntries.Where(ent => ent.SleepStart.Date == date);
-                var avgGroupBgl = (float) allGroupBgl.Select(ent => (ent.SleepEnd - ent.SleepStart).Hours).Average();
+            var slpEntries = await App.Sdatabase.GetSlpEntriesAsync();
 
-                SlpGroups.Add(new GroupModel { GroupDate = date, GroupAvg = avgGroupBgl });
+            var sleepStartDays = slpEntries.Select(ent => ent.SleepStart.Date.Day);
+            var sleepEndDays = slpEntries.Select(ent => ent.SleepEnd.Date.Day);
+
+            var sleepAllDays = sleepStartDays.Concat(sleepEndDays);
+            var distinctDays = sleepAllDays.Distinct().OrderByDescending(ent => ent);
+
+            foreach (var day in distinctDays)
+            {
+                var allGroupSlp = slpEntries.Where(ent => ent.SleepStart.Day == day || ent.SleepEnd.Day == day);
+
+                TimeSpan totalSleep;
+                foreach (var group in allGroupSlp)
+                {
+                    // If Sleep start and sleep end is not on the same day
+                    if (group.SleepStart.Day != group.SleepEnd.Day)
+                    {
+                        // If current day is looking at sleep start days
+                        if (group.SleepStart.Day == day)
+                        {
+                            DateTime endOfDay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, group.SleepStart.Day, 23, 59, 59);
+                            totalSleep += endOfDay - group.SleepStart;
+                        }
+                        // Current day is looking at sleep end days
+                        else
+                        {
+                            DateTime startOfDay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, group.SleepEnd.Day);
+                            totalSleep += group.SleepEnd - startOfDay;
+                        }
+                    }
+                    else
+                    {
+                        totalSleep += (group.SleepEnd - group.SleepStart);
+                    }
+                }
+
+                SlpGroups.Add(new GroupModel { GroupDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, day), GroupDuration = totalSleep });
             }
 
             IsBusy = false;
@@ -186,6 +216,7 @@ namespace Diabeticare.ViewModels
             IsBusy = true;
             SlpEntries.Clear();
             var slpEntries = await App.Sdatabase.GetSlpEntriesAsync();
+            slpEntries = slpEntries.Where(ent => ent.SleepStart.Day == Day || ent.SleepEnd.Day == Day);
             SlpEntries.AddRange(slpEntries.Reverse());
             IsBusy = false;
         }

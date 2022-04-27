@@ -94,7 +94,10 @@ namespace Diabeticare.ViewModels
         public async Task Register()
         {
             if (Username == null || Email == null || Password == null || ConfirmPassword == null)
+            {
+                await App.Current.MainPage.DisplayAlert("Alert", "Fields cannot be left empty", "Ok");
                 return;
+            }
 
             string username = Username;
             string email = Email;
@@ -139,9 +142,7 @@ namespace Diabeticare.ViewModels
             (int code, string message) = await App.apiServices.LoginAsync(username, password);
             if (code == 1)
             {
-                // If user choose to remember password
-                if (IsChecked)
-                    await App.Udatabase.UpdateUserEntryAsync(App.user, password, IsChecked);
+                await App.Udatabase.UpdateUserEntryAsync(App.user, password, IsChecked);
 
                 // Redirect user to default page
                 App.Current.MainPage = new AppShell();
@@ -155,6 +156,12 @@ namespace Diabeticare.ViewModels
 
         public async Task Login()
         {
+            if (Username == null || Password == null)
+            {
+                await App.Current.MainPage.DisplayAlert("Alert", "Fields cannot be empty", "Ok");
+                return;
+
+            }
             string username = Username;
             string password = Password;
 
@@ -184,6 +191,7 @@ namespace Diabeticare.ViewModels
             UserModel usr = arg as UserModel;
             if (usr == null) return;
 
+            IsChecked = true;
             await _Login(usr.Username, usr.Password);
         }
 

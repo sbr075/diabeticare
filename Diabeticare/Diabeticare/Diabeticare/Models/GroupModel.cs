@@ -6,5 +6,6 @@ namespace Diabeticare.Models
     {
         public DateTime GroupDate { get; set; }
         public float GroupAvg { get; set; }
+        public TimeSpan GroupDuration { get; set; }
     }
 }

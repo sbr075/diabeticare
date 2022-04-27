@@ -26,10 +26,10 @@
                 </Entry>
 
                 <Label Text="Time of measurment"/>
-                <TimePicker Time="{Binding BglTime, Mode=TwoWay}" Format="HH:mm" />
+                <TimePicker Time="{Binding BglTime, Mode=TwoWay}" Format="HH:mm" HorizontalOptions="Center"/>
 
                 <Label Text="Date of measurment"/>
-                <DatePicker Date="{Binding BglDate, Mode=TwoWay}"/>
+                <DatePicker Date="{Binding BglDate, Mode=TwoWay}" HorizontalOptions="Center"/>
 
                 <Label 
                     Text="NB: Measurments are in mmol/L" 

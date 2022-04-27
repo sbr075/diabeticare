@@ -6,7 +6,6 @@ using Microcharts;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Diabeticare.Models;
-using Diabeticare.ViewModels;
 
 namespace Diabeticare.Views
 {

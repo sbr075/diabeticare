@@ -7,10 +7,10 @@ namespace Diabeticare.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EditSlpPage : ContentPage
     {
-        public EditSlpPage(int month)
+        public EditSlpPage(int day)
         {
             InitializeComponent();
-            BindingContext = new SlpViewModel(month);
+            BindingContext = new SlpViewModel(day);
         }
     }
 }

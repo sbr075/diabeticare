@@ -161,14 +161,14 @@ namespace Diabeticare.ViewModels
             IsBusy = true;
             CarbGroups.Clear();
             var carbEntries = await App.Cdatabase.GetCarbEntriesAsync();
-            var distinctDates = carbEntries.Select(ent => ent.DateOfInput.Date).Distinct().OrderByDescending(ent => ent.Date);
+            var distinctDays = carbEntries.Select(ent => ent.DateOfInput.Date.Day).Distinct().OrderByDescending(ent => ent);
 
-            foreach (var date in distinctDates)
+            foreach (var day in distinctDays)
             {
-                var allGroupCarb = carbEntries.Where(ent => ent.DateOfInput.Date.Day == date.Day);
+                var allGroupCarb = carbEntries.Where(ent => ent.DateOfInput.Date.Day == day);
                 var avgGroupCarb = allGroupCarb.Select(ent => ent.Carbohydrates).Sum();
 
-                CarbGroups.Add(new GroupModel { GroupDate = date, GroupAvg = avgGroupCarb });
+                CarbGroups.Add(new GroupModel { GroupDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, day), GroupAvg = avgGroupCarb });
             }
 
             IsBusy = false;
@@ -180,6 +180,7 @@ namespace Diabeticare.ViewModels
             IsBusy = true;
             CarbEntries.Clear();
             var carbEntries = await App.Cdatabase.GetCarbEntriesAsync();
+            carbEntries = carbEntries.Where(ent => ent.DateOfInput.Day == Day);
             CarbEntries.AddRange(carbEntries.Reverse());
             IsBusy = false;
         }

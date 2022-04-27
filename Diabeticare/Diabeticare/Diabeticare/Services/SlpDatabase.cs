@@ -19,7 +19,7 @@ namespace Diabeticare.Services
         public async Task<IEnumerable<SleepModel>> GetSlpEntriesAsync()
         {
             // Returns all sleep entries
-            var slpEntries = await slpDatabase.Table<SleepModel>().ToListAsync();
+            var slpEntries = await slpDatabase.Table<SleepModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
             return slpEntries;
         }
 
@@ -33,6 +33,7 @@ namespace Diabeticare.Services
         {
             var slpEntry = new SleepModel
             {
+                UserID = App.user.ID,
                 ServerID = server_id,
                 SleepStart = sleepStart,
                 SleepEnd = sleepEnd,
@@ -55,6 +56,23 @@ namespace Diabeticare.Services
         public async Task DeleteSlpEntryAsync(int id)
         {
             await slpDatabase.DeleteAsync<SleepModel>(id);
+        }
+
+        public async Task DeleteUserSlpEntriesAsync()
+        {
+            try
+            {
+                // Get all entries related to user
+                var slpEntries = await slpDatabase.Table<SleepModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
+                foreach (var slpEntry in slpEntries)
+                {
+                    await slpDatabase.DeleteAsync(slpEntry);
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
         }
     }
 }

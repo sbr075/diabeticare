@@ -4,8 +4,8 @@ using SkiaSharp;
 using Microcharts;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Diabeticare.Models;
 using System.Linq;
+using Diabeticare.ViewModels;
 
 namespace Diabeticare.Views
 {
@@ -20,6 +20,7 @@ namespace Diabeticare.Views
         public CarbStatisticsPage()
         {
             InitializeComponent();
+            BindingContext = new CarbViewModel();
         }
 
         protected override void OnAppearing()

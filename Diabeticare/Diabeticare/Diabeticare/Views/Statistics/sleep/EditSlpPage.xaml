@@ -80,7 +80,6 @@
         <!-- Footer for the page -->
         <ListView.Footer>
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Button Text="Load More"/>
             </StackLayout>
         </ListView.Footer>
     </ListView>

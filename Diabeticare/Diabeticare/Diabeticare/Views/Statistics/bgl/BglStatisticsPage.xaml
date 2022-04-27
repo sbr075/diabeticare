@@ -6,7 +6,6 @@
     xmlns:views="clr-namespace:Diabeticare.Views" 
     x:DataType="views:BglStatisticsPage"
     x:Class="Diabeticare.Views.BglStatisticsPage"
-    xmlns:font="clr-namespace:Diabeticare.Resources.Helpers"
     x:Name="StatPage">
 
     <StackLayout>

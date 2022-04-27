@@ -9,8 +9,14 @@
     xmlns:font="clr-namespace:Diabeticare.Resources.Helpers"
     x:Name="StatPage">
 
-    <StackLayout>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary" IconImageSource="icon_about.png" Command="{Binding InfoCommand}"></ToolbarItem>
+        <ToolbarItem Text="Settings" Order="Secondary" Command="{Binding SettingsCommand}"></ToolbarItem>
+        <ToolbarItem Text="About" Order="Secondary" Command="{Binding AboutCommand}"></ToolbarItem>
+        <ToolbarItem Text="Sign Out" Order="Secondary" Command="{Binding LogoutCommand}"></ToolbarItem>
+    </ContentPage.ToolbarItems>
 
+    <StackLayout>
         <!-- Top button layout -->
         <StackLayout Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Center" Padding="5">
             <Button 
