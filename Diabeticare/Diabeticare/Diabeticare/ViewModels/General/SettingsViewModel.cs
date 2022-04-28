@@ -18,6 +18,8 @@ namespace Diabeticare.ViewModels
             await App.Bdatabase.DeleteUserBglEntriesAsync();
             await App.Sdatabase.DeleteUserSlpEntriesAsync();
             await App.Cdatabase.DeleteUserCarbEntriesAsync();
+            await App.Mdatabase.DeleteUserMoodEntriesAsync();
+            await App.Edatabase.DeleteUserExerciseEntriesAsync();
         }
 
         public async void DeleteAccount()

@@ -149,7 +149,7 @@ namespace Diabeticare.Services
                 return (response.IsSuccessStatusCode) ? (1, "Successfully registered user") : (0, "Invalid input");
             }
             catch { return (0, "Failed to contact server"); }
-                
+
         }
 
         public async Task<(int, string)> LoginAsync(string username, string password)
@@ -179,7 +179,7 @@ namespace Diabeticare.Services
 
             if (App.user != null)
                 return (0, "You are already logged in");
-            
+
             try
             {
                 string token = await FetchToken();
@@ -290,10 +290,10 @@ namespace Diabeticare.Services
                     await UpdateToken(response);
 
                 // Log out user if token has expired
-                else if ((int) response.StatusCode == 498)
+                else if ((int)response.StatusCode == 498)
                     await ExpireUserSession();
 
-                    return (response.IsSuccessStatusCode) ? (1, "Successfully deleted all data") : (0, "Session timed out");
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted all data") : (0, "Session timed out");
             }
             catch { return (0, "Failed to contact server"); }
         }
@@ -921,6 +921,167 @@ namespace Diabeticare.Services
                 string content = JsonConvert.SerializeObject(data);
 
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/mood/del", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+                // On success, update user and token
+                if (response.IsSuccessStatusCode)
+                    await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
+            }
+            catch { return (0, "Failed to contact server"); }
+        }
+
+        public async Task<(int, string, int)> AddOrUpdateExerciseAsync(string name, DateTime start, DateTime stop, int server_id = -1)
+        {
+            /*
+             * Sends a POST request to add or update sleep entry
+             * On succesful request the users token is updated
+             * 
+             * Arguments
+             *  start: DateTime
+             *      Date and time when user went to sleep
+             *  stop: DateTime
+             *      Date and time when user woke up
+             *  server_id: int
+             *      ID to identify the entry (server side)
+             * 
+             * Return
+             * code, message, s_id: int, string, int
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
+             *      s_id: primary id in server database
+             *
+             * Note
+             * - Cannot send request if user is not logged in
+             */
+
+            if (App.user == null)
+                return (0, "You are not signed in", -1);
+
+            try
+            {
+                long unixStart = ((DateTimeOffset)start).ToUnixTimeSeconds();
+                long unixStop = ((DateTimeOffset)stop).ToUnixTimeSeconds();
+
+                var data = new
+                {
+                    username = App.user.Username,
+                    name = name,
+                    start = unixStart,
+                    stop = unixStop,
+                    server_id = server_id
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/exercise/set", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // On success, update user and token
+                if (response.IsSuccessStatusCode)
+                    await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", (int)JObject.Parse(responseBody)["SERVERID"]) : (0, "Session timed out", -1);
+            }
+            catch { return (0, "Failed to contact server", -1); }
+        }
+
+        public async Task<(int, string)> FetchExerciseAsync(string name, DateTime time)
+        {
+            /*
+             * Sends a GET request to fetch all entries after timestamp
+             * On succesful request the users token is updated
+             * 
+             * Arguments
+             *  time: DateTime
+             *      Date and time of input
+             * 
+             * Return
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
+             *
+             * Note
+             * - Cannot send request if user is not logged in
+             */
+
+            if (App.user == null)
+                return (0, "You are not signed in");
+
+            try
+            {
+                long unixTime = ((DateTimeOffset)time).ToUnixTimeSeconds();
+
+                var data = new
+                {
+                    username = App.user.Username,
+                    name = name,
+                    timestamp = unixTime
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Get, "s/exercise/get", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+                // On success, update user and token
+                if (response.IsSuccessStatusCode)
+                    await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
+            }
+            catch { return (0, "Failed to contact server"); }
+        }
+
+        public async Task<(int, string)> DeleteExerciseAsync(int server_id)
+        {
+            /*
+             * Sends a POST request to delete specified entry
+             * On succesful request the users token is updated
+             * 
+             * Arguments
+             *  server_id: int
+             *      ID to identify the entry (server side)
+             *      
+             * Return
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
+             *
+             * Note
+             * - Cannot send request if user is not logged in
+             * - Cannot delete entries that does not belong to the user
+             * - Cannot delete entries that do not match the identifier
+             */
+
+            if (App.user == null)
+                return (0, "You are not signed in");
+
+            try
+            {
+                var data = new
+                {
+                    username = App.user.Username,
+                    identifier = server_id
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/exercise/del", content, App.user.Token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 

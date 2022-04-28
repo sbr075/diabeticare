@@ -16,30 +16,26 @@
         <Frame VerticalOptions="CenterAndExpand" HasShadow="True">
             <StackLayout>
                 <Label Text="Sleep Date" HorizontalOptions="Center" FontSize="Medium"/>
-                <Grid >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <Label Text="Start" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Label Text="End" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <DatePicker Date="{Binding SlpStart, Mode=TwoWay}" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center"/>
-                    <DatePicker Date="{Binding SlpEnd, Mode=TwoWay}" Format="dd/MM/yyyy" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" />
-                </Grid>
-                
-                <Label Text="Sleep Time" HorizontalOptions="Center" FontSize="Medium"/>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Start date" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <DatePicker Date="{Binding SlpStart, Mode=TwoWay}" Format="dd/MM/yyyy" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </StackLayout>
 
-                    <Label Text="Bedtime" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Label Text="Wake-up" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <TimePicker Time="{Binding SlpTimeStart, Mode=TwoWay}" Format="HH:mm" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center"/>
-                    <TimePicker Time="{Binding SlpTimeEnd, Mode=TwoWay}" Format="HH:mm" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"/>
-                </Grid>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Stop date" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <DatePicker Date="{Binding SlpEnd, Mode=TwoWay}" Format="dd/MM/yyyy" VerticalOptions="Center" HorizontalOptions="Center" />
+                </StackLayout>
+
+                <Label Text="Sleep Time" HorizontalOptions="Center" FontSize="Medium"/>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Bedtime" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <TimePicker Time="{Binding SlpTimeStart, Mode=TwoWay}" Format="HH:mm" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Wake-up" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <TimePicker Time="{Binding SlpTimeEnd, Mode=TwoWay}" Format="HH:mm" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </StackLayout>
             </StackLayout>
         </Frame>
         

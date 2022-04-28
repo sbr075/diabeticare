@@ -14,7 +14,7 @@ namespace Diabeticare.Views
     public partial class SlpStatisticsPage : ContentPage
     {
         List<ChartEntry> ChartEntries = new List<ChartEntry>();
-        Random random = new Random();
+        
         readonly int recommendedSleepMin = 7;
         readonly int recommendedSleepMax = 9;
         public SlpStatisticsPage()
@@ -86,7 +86,7 @@ namespace Diabeticare.Views
             {
                 Color = SKColor.Parse(graphColor),
                 //ValueLabelColor = SKColor.Parse(graphColor),
-                Label = $"Today",
+                Label = "Today",
                 ValueLabel = $"{Math.Floor((float)sleepTime.TotalHours)}H {(float)sleepTime.Minutes}Min"
             });
 
@@ -137,13 +137,14 @@ namespace Diabeticare.Views
         }
 
         // Creates chart entries for sleep entries the last N days
-        private async void CreateChartEntries(int days, List<ChartEntry> chartEntries, string labelFormat)
+        private async void CreateChartEntries(int daysBack, List<ChartEntry> chartEntries, string labelFormat)
         {
             // Empty chart list before adding new data
             chartEntries.Clear();
 
             // Get list of entries from database
             var slpEntries = await App.Sdatabase.GetSlpEntriesAsync();
+            slpEntries = slpEntries.Where(ent => ent.SleepStart >= DateTime.Today.AddDays(-daysBack) && ent.SleepEnd <= DateTime.Today.AddDays(1));
 
             var sleepStartDays = slpEntries.Select(ent => ent.SleepStart.Date.Day);
             var sleepEndDays = slpEntries.Select(ent => ent.SleepEnd.Date.Day);

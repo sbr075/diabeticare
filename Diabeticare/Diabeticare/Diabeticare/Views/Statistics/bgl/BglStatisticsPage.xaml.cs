@@ -14,7 +14,6 @@ namespace Diabeticare.Views
     {
 
         List<ChartEntry> ChartEntries = new List<ChartEntry>();
-        Random random = new Random();
 
         readonly int BglLowDangerLimit = 4;
         readonly int BglHighSoftLimit = 10;

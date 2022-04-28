@@ -2,36 +2,36 @@
 <ContentPage 
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="Diabeticare.Views.SlpEntryPage"
+    x:Class="Diabeticare.Views.ExerciseEntryPage"
     Shell.PresentationMode="Modal">
-    
+
     <StackLayout Padding="10">
         <Frame VerticalOptions="CenterAndExpand" HasShadow="True" BorderColor="LightSkyBlue">
             <StackLayout>
-                <Label Text="Change Sleep Date" HorizontalOptions="Center" FontSize="Medium"/>
+                <Label Text="Change Exercise Date" HorizontalOptions="Center" FontSize="Medium"/>
                 <StackLayout Orientation="Horizontal">
-                    <Label Text="Start" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="Start date" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <DatePicker x:Name="dateStart" Format="dd/MM/yyyy" VerticalOptions="Center" HorizontalOptions="Center"/>
                 </StackLayout>
 
                 <StackLayout Orientation="Horizontal">
-                    <Label Text="End" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="End date" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <DatePicker x:Name="dateEnd" Format="dd/MM/yyyy" VerticalOptions="Center" HorizontalOptions="Center"/>
                 </StackLayout>
 
-                <Label Text="Change Sleep Time" HorizontalOptions="Center" FontSize="Medium"/>
+                <Label Text="Change Exercise Time" HorizontalOptions="Center" FontSize="Medium"/>
                 <StackLayout Orientation="Horizontal">
-                    <Label Text="Bedtime" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="Start time" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <TimePicker x:Name="timeStart" Format="HH:mm" VerticalOptions="Center" HorizontalOptions="Center"/>
                 </StackLayout>
 
                 <StackLayout Orientation="Horizontal">
-                    <Label Text="Wake-up" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Label Text="Stop time" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <TimePicker x:Name="timeEnd" Format="HH:mm" VerticalOptions="Center" HorizontalOptions="Center"/>
                 </StackLayout>
 
                 <Button Text="Cancel" Clicked="CancelUpdate"/>
-                <Button Text="Save" Clicked="SaveUpdatedSlpEntry"/>
+                <Button Text="Save" Clicked="SaveUpdatedExerciseEntry"/>
             </StackLayout>
         </Frame>
     </StackLayout>

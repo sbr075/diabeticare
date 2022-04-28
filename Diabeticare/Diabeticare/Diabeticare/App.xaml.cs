@@ -78,6 +78,18 @@ namespace Diabeticare
             }
         }
 
+        static ExerciseDatabase exerciseDatabase;
+        public static ExerciseDatabase Edatabase
+        {
+            get
+            {
+                if (exerciseDatabase == null)
+                {
+                    exerciseDatabase = new ExerciseDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "exerciseEntries.db3"));
+                }
+                return exerciseDatabase;
+            }
+        }
 
         static ApiServices apiservices;
         public static ApiServices apiServices

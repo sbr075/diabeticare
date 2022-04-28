@@ -51,6 +51,21 @@
     <EmbeddedResource Update="Views\Diet\EditCarbPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Views\Exercise\AddExerciseDataPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Exercise\EditExercisePage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Exercise\ExerciseEntriesPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Exercise\ExerciseEntryPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Exercise\ExerciseStatisticsPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Views\General\AboutPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
@@ -102,13 +117,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\Exercise\AddExerciseDataPage.xaml.cs">
+      <DependentUpon>AddExerciseDataPage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Statistics\bgl\BglStatisticsPage.xaml.cs">
       <DependentUpon>BglStatisticsPage.xaml</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\Exercise\" />
-    <Folder Include="Views\Exercise\" />
   </ItemGroup>
 </Project>

@@ -56,7 +56,6 @@
 
         <!-- Bottom button layout -->
         <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="Center" Padding="5">
-
             <Button 
                 x:Name="viewData"
                 Text="View Data"
