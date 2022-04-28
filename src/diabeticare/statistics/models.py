@@ -54,3 +54,21 @@ class CISchema(ma.SQLAlchemyAutoSchema):
     carbohydrates = ma.auto_field()
     name = ma.auto_field()
     timestamp = ma.auto_field()
+
+
+class Mood(db.Model):
+    __tablename__ = "mood"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    mood = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.Integer, nullable=False)
+    
+
+class MoodSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Mood
+
+    mood = ma.auto_field()
+    timestamp = ma.auto_field()

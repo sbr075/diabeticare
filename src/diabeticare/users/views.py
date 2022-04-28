@@ -53,7 +53,7 @@ def logout():
             token = request.headers["X-CSRFToken"]
 
             if not validate_token(user, token):
-                return jsonify({"ERROR": "Invalid token"}), 403
+                return jsonify({"ERROR": "Invalid token"}), 498
 
             nullify_token(user)
             return jsonify({"RESPONSE": "Successfully logged out"})
@@ -114,7 +114,7 @@ def deleteAccount():
             token = request.headers["X-CSRFToken"]
 
             if not validate_token(user, token):
-                return jsonify({"ERROR": "Invalid token"}), 403
+                return jsonify({"ERROR": "Invalid token"}), 498
 
             _deleteAllData(user.id)
             db.session.delete(user)
@@ -145,7 +145,7 @@ def deleteAllData():
             token = request.headers["X-CSRFToken"]
 
             if not validate_token(user, token):
-                return jsonify({"ERROR": "Invalid token"}), 403
+                return jsonify({"ERROR": "Invalid token"}), 498
 
             _deleteAllData(user.id)
 

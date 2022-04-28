@@ -5,8 +5,8 @@ from werkzeug.datastructures import MultiDict
 
 from diabeticare import db
 from diabeticare.statistics import bp
-from diabeticare.statistics.forms import BGLForm, SleepForm, CIForm
-from diabeticare.statistics.models import BGL, BGLSchema, Sleep, SleepSchema, CI, CISchema
+from diabeticare.statistics.forms import BGLForm, SleepForm, CIForm, MoodForm
+from diabeticare.statistics.models import BGL, BGLSchema, Sleep, SleepSchema, CI, CISchema, Mood, MoodSchema
 from diabeticare.users.models import User
 from diabeticare.main.views import validate_token, update_token
 
@@ -41,14 +41,14 @@ def bglSet():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 
 		bgl_form = BGLForm(MultiDict({"measurement": value, "timestamp": timestamp}))
 		if bgl_form.validate():
 			if server_id:
 				entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==server_id).first()
 				if not entry:
-					return jsonify({"ERROR": "Invalid paramaters"})
+					return jsonify({"ERROR": "Invalid parameters"}), 401
 				
 				entry.measurement = value
 				entry.timestamp = timestamp
@@ -91,7 +91,7 @@ def bglGet():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 		
 		entries = BGL.query.filter(BGL.user_id==user.id, BGL.timestamp>=timestamp).all()
 		if entries:
@@ -129,11 +129,11 @@ def bglDel():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 		
 		entry = BGL.query.filter(BGL.user_id==user.id, BGL.id==server_id)
 		if not entry.first():
-			return jsonify({"ERROR": "Invalid paramaters"})
+			return jsonify({"ERROR": "Invalid parameters"}), 401
 
 		entry.delete()
 
@@ -173,14 +173,14 @@ def sleepSet():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 		
 		sleep_form = SleepForm(MultiDict({"start": start, "stop": stop}))
 		if sleep_form.validate():
 			if server_id:
 				entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==server_id).first()
 				if not entry:
-					return jsonify({"ERROR": "Invalid paramaters"})
+					return jsonify({"ERROR": "Invalid parameters"}), 401
 				
 				entry.start = start
 				entry.stop  = stop
@@ -223,7 +223,7 @@ def sleepGet():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 		
 		entries = Sleep.query.filter(Sleep.user_id==user.id, Sleep.start>=timestamp).all()
 		if entries:
@@ -261,11 +261,11 @@ def sleepDel():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 		
 		entry = Sleep.query.filter(Sleep.user_id==user.id, Sleep.id==server_id)
 		if not entry.first():
-			return jsonify({"ERROR": "Invalid paramaters"})
+			return jsonify({"ERROR": "Invalid parameters"}), 401
 			
 		entry.delete()
 		db.session.commit()
@@ -305,14 +305,14 @@ def ciSet():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 		
 		ci_form = CIForm(MultiDict({"carbohydrates": value, "name": name, "timestamp": timestamp}))
 		if ci_form.validate():
 			if server_id:
 				entry = CI.query.filter(CI.user_id==user.id, CI.id==server_id).first()
 				if not entry:
-					return jsonify({"ERROR": "Invalid paramaters"})
+					return jsonify({"ERROR": "Invalid parameters"}), 401
 				
 				entry.carbohydrates = value
 				entry.timestamp = timestamp
@@ -355,7 +355,7 @@ def ciGet():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 		
 		entries = CI.query.filter(CI.user_id==user.id, CI.timestamp>=timestamp).all()
 		if entries:
@@ -393,11 +393,142 @@ def ciDel():
 		# Get user and check token validity
 		user = User.query.filter_by(username=username).first()
 		if not validate_token(user, token):
-			return jsonify({"ERROR": "Invalid token"}), 403
+			return jsonify({"ERROR": "Invalid token"}), 498
 
 		entry = CI.query.filter(CI.user_id==user.id, CI.id==server_id)
 		if not entry.first():
-			return jsonify({"ERROR": "Invalid paramaters"})
+			return jsonify({"ERROR": "Invalid parameters"}), 401
+		
+		entry.delete()
+		db.session.commit()
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"X-CSRFToken": new_token})
+
+	return jsonify({"ERROR": "Invalid request"}), 405
+
+
+@bp.route("/mood/set", methods=["POST"])
+def moodSet():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:  name of user
+
+		value:	   value of entry
+		timestamp: time when measurement was taken (UNIXTIMESTAMP)
+		server_id: (optional) used to overwrite existing entry
+	"""
+
+	if request.method == "POST":
+		data = json.loads(request.data)
+		username  = data["username"]
+		value     = data["value"]
+		timestamp = data["timestamp"]
+		server_id = data["server_id"] if data["server_id"] >= 0 else None
+		token     = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"ERROR": "Invalid token"}), 498
+		
+		mood_form = MoodForm(MultiDict({"mood": value, "timestamp": timestamp}))
+		if mood_form.validate():
+			if server_id:
+				entry = Mood.query.filter(Mood.user_id==user.id, Mood.id==server_id).first()
+				if not entry:
+					return jsonify({"ERROR": "Invalid parameters"}), 401
+				
+				entry.mood = value
+				entry.timestamp = timestamp
+
+			else:
+				entry = Mood(user_id=user.id, mood=value, timestamp=timestamp)
+				db.session.add(entry)
+
+			db.session.commit()
+
+			# Update user token
+			new_token = update_token(user)
+
+			return jsonify({"X-CSRFToken": new_token, "SERVERID": entry.id})
+
+		else:
+			return jsonify({"ERROR": mood_form.errors}), 401	
+
+	return jsonify({"ERROR": "Invalid request"}), 405
+
+
+@bp.route("/mood/get", methods=["GET"])
+def moodGet():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
+	"""
+
+	if request.method == "GET":
+		data = json.loads(request.data)
+		username  = data["username"]
+		timestamp = data["timestamp"]
+		token      = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"ERROR": "Invalid token"}), 498
+		
+		entries = Mood.query.filter(Mood.user_id==user.id, Mood.timestamp>=timestamp).all()
+		if entries:
+			mood_schema = MoodSchema(many=True)
+			results = mood_schema.dump(entries)
+		else:
+			results = []
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESULTS": results, "X-CSRFToken": new_token})
+
+	return jsonify({"ERROR": "Invalid request"}), 405
+
+
+@bp.route("/mood/del", methods=["POST"])
+def moodDel():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:  name of user
+		server_id: id of entry
+	"""
+
+	if request.method == "POST":
+		data = json.loads(request.data)
+		username  = data["username"]
+		server_id = data["server_id"]
+		token     = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"ERROR": "Invalid token"}), 498
+
+		entry = Mood.query.filter(Mood.user_id==user.id, Mood.id==server_id)
+		if not entry.first():
+			return jsonify({"ERROR": "Invalid parameters"}), 401
 		
 		entry.delete()
 		db.session.commit()

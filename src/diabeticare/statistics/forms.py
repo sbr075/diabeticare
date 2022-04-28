@@ -31,15 +31,23 @@ class SleepForm(FlaskForm):
 
 
 class CIForm(FlaskForm):
-	carbohydrates = IntegerField("Carbohydrates", [InputRequired()])
+	carbohydrates = FloatField("Carbohydrates", [InputRequired()])
 	name = StringField("Name", [InputRequired(), Length(max=100, message="Name cannot be longer than 100 characters")])
 	timestamp = IntegerField("Timestamp", [InputRequired(), validateDate])
 
 	def validate_carbohydrates(self, carbohydrates):
-		if not isinstance(carbohydrates.data, int):
+		if not isinstance(carbohydrates.data, float):
 			raise ValidationError("Invalid format")
 	
 	def validate_name(self, name):
 		if not isinstance(name.data, str):
 			raise ValidationError("Invalid format")
 		
+
+class MoodForm(FlaskForm):
+	mood = IntegerField("Mood", [InputRequired()])
+	timestamp = IntegerField("Timestamp", [InputRequired(), validateDate])
+
+	def validate_mood(self, mood):
+		if not isinstance(mood.data, int):
+			raise ValidationError("Invalid format")
