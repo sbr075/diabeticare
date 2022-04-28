@@ -8,12 +8,7 @@
     x:DataType="viewmodels:SlpViewModel"
     x:Class="Diabeticare.Views.EditSlpPage"
     x:Name="SlpDataPage">
-    
-    <!-- Setting BindingContext for page -->
-    <ContentPage.BindingContext>
-        <viewmodels:SlpViewModel/>
-    </ContentPage.BindingContext>
-    
+
     <!-- Converter used for extracting the item selected by the user -->
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -25,7 +20,7 @@
     <ContentPage.Behaviors>
         <xct:EventToCommandBehavior 
                 EventName="Appearing"
-                Command="{Binding DisplayEntries}"/>
+                Command="{Binding DisplayEntriesCommand}"/>
     </ContentPage.Behaviors>
 
 
@@ -85,7 +80,6 @@
         <!-- Footer for the page -->
         <ListView.Footer>
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Button Text="Load More"/>
             </StackLayout>
         </ListView.Footer>
     </ListView>

@@ -2,12 +2,13 @@
 <ContentPage 
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="Diabeticare.Views.DefaultPage"
     xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
+    xmlns:font="clr-namespace:Diabeticare.Resources.Helpers"
+    x:Class="Diabeticare.Views.DefaultPage"
     BackgroundColor="White">
 
     <ContentPage.BindingContext>
-        <viewmodels:ViewModelBase/>
+        <viewmodels:HomeViewModel/>
     </ContentPage.BindingContext>
 
     <ContentPage.ToolbarItems>
@@ -16,13 +17,103 @@
         <ToolbarItem Text="About" Order="Secondary" Command="{Binding AboutCommand}"></ToolbarItem>
         <ToolbarItem Text="Sign Out" Order="Secondary" Command="{Binding LogoutCommand}"></ToolbarItem>
     </ContentPage.ToolbarItems>
-    
-    <StackLayout VerticalOptions="Start" Padding="10">
-        <Label 
-            Text="Home Page"
-            FontSize="Large"
-            VerticalOptions="CenterAndExpand" 
-            HorizontalOptions="CenterAndExpand" />
-    </StackLayout>
 
+    <StackLayout HorizontalOptions="Center" Padding="10">
+        <Label 
+            Text="{Binding Username, StringFormat='Welcome, {0}!'}"
+            FontSize="Large"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center"/>
+
+        <StackLayout HorizontalOptions="Center">
+            <Label Text="Rate your current mood."></Label>
+        </StackLayout>
+
+        <StackLayout Orientation="Horizontal" Padding="10">
+            <Button x:Name="mood1" 
+                    Text="1" 
+                    Command="{Binding AddMoodCommand}"
+                    CommandParameter="{x:Reference mood1}"
+                    BackgroundColor="#f13e3d">
+
+                <Button.WidthRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.WidthRequest>
+                <Button.HeightRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.HeightRequest>
+                <Button.CornerRadius>
+                    <OnIdiom x:TypeArguments="x:Int32" Phone="30"/>
+                </Button.CornerRadius>
+            </Button>
+
+            <Button x:Name="mood2" 
+                    Text="2" 
+                    Command="{Binding AddMoodCommand}"
+                    CommandParameter="{x:Reference mood2}"
+                    BackgroundColor="#fd5b67">
+
+                <Button.WidthRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.WidthRequest>
+                <Button.HeightRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.HeightRequest>
+                <Button.CornerRadius>
+                    <OnIdiom x:TypeArguments="x:Int32" Phone="30"/>
+                </Button.CornerRadius>
+            </Button>
+
+            <Button x:Name="mood3" 
+                    Text="3" 
+                    Command="{Binding AddMoodCommand}"
+                    CommandParameter="{x:Reference mood3}"
+                    BackgroundColor="#fb852f">
+
+                <Button.WidthRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.WidthRequest>
+                <Button.HeightRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.HeightRequest>
+                <Button.CornerRadius>
+                    <OnIdiom x:TypeArguments="x:Int32" Phone="30"/>
+                </Button.CornerRadius>
+            </Button>
+
+            <Button x:Name="mood4" 
+                    Text="4" 
+                    Command="{Binding AddMoodCommand}"
+                    CommandParameter="{x:Reference mood4}"
+                    BackgroundColor="#fed230">
+
+                <Button.WidthRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.WidthRequest>
+                <Button.HeightRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.HeightRequest>
+                <Button.CornerRadius>
+                    <OnIdiom x:TypeArguments="x:Int32" Phone="30"/>
+                </Button.CornerRadius>
+            </Button>
+
+            <Button x:Name="mood5" 
+                    Text="5" 
+                    Command="{Binding AddMoodCommand}"
+                    CommandParameter="{x:Reference mood5}"
+                    BackgroundColor="#27de83">
+
+                <Button.WidthRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.WidthRequest>
+                <Button.HeightRequest>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
+                </Button.HeightRequest>
+                <Button.CornerRadius>
+                    <OnIdiom x:TypeArguments="x:Int32" Phone="30"/>
+                </Button.CornerRadius>
+            </Button>
+        </StackLayout>
+     </StackLayout>
 </ContentPage>

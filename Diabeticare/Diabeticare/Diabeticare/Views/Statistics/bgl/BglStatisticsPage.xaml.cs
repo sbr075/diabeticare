@@ -6,7 +6,6 @@ using Microcharts;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Diabeticare.Models;
-using Diabeticare.ViewModels;
 
 namespace Diabeticare.Views
 {
@@ -15,7 +14,6 @@ namespace Diabeticare.Views
     {
 
         List<ChartEntry> ChartEntries = new List<ChartEntry>();
-        Random random = new Random();
 
         readonly int BglLowDangerLimit = 4;
         readonly int BglHighSoftLimit = 10;
@@ -47,15 +45,15 @@ namespace Diabeticare.Views
             // Iterating through entries and removing those that were not registered today
             // Note: Iterating backwards to avoid index shifting issues when removing elements
             for (int i = BglEntries.Count - 1; i >= 0; i--)
-                if (BglEntries[i].TimeOfMeasurment < DateTime.Today) 
+                if (BglEntries[i].TimeOfMeasurment.Day != DateTime.Now.Day)
                     BglEntries.RemoveAt(i);
-            
-            // Sort entries based on BGLtime
-            BglEntries = BglEntries.OrderBy(bglEntry => bglEntry.TimeOfMeasurment.TimeOfDay).ToList();
 
             // Limiting max number of entries in the chart.
             while (BglEntries.Count > maxDayChartEntries)
                 BglEntries.RemoveAt(0);
+
+            // Sort entries based on BGLtime
+            BglEntries = BglEntries.OrderBy(bglEntry => bglEntry.TimeOfMeasurment.TimeOfDay).ToList();
 
             // Create chart entries for each BGL entry
             for (int i = 0; i < BglEntries.Count; i++)
@@ -107,16 +105,16 @@ namespace Diabeticare.Views
             BglChart.Chart = new PointChart { Entries = ChartEntries, LabelTextSize = 30, PointAreaAlpha = 200, PointSize = 10, LabelOrientation = Orientation.Vertical, ValueLabelOrientation = Orientation.Horizontal };
         }
 
-        // GoTo EditBglPage
-        async void Edit_BGL_Data(object sender, EventArgs e)
+        // GoTo ViewBglDataPage
+        async void ViewBGLEntries(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(EditBglPage));
+            await App.Current.MainPage.Navigation.PushAsync(new BglEntriesPage());
         }
 
         // GoTo AddBglDataPage
-        private async void Create_BGL_Data(object sender, EventArgs e)
+        private async void CreateBGLEntry(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(AddBglDataPage));
+            await App.Current.MainPage.Navigation.PushAsync(new AddBglDataPage());
         }
 
         // Creates chart entries for BGL measurements the last N days
@@ -126,36 +124,24 @@ namespace Diabeticare.Views
             chartEntries.Clear();
 
             // Get list of entries from database
-            List<BglModel> bglEntries = (List<BglModel>)await App.Bdatabase.GetBglEntriesAsync();
+            var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
 
-            // Set date to N days ago
-            DateTime nDaysAgo = DateTime.Today.AddDays(-days);
+            bglEntries = bglEntries.Where(ent => ent.TimeOfMeasurment <= DateTime.Now && ent.TimeOfMeasurment >= DateTime.Now.AddDays(-days));
+            if (bglEntries.Count() == 0)
+                return;
 
-            // Iterate through N days
-            for (DateTime day = nDaysAgo; day.Date <= DateTime.Now; day = day.AddDays(1))
+            var distinctDays = bglEntries.Select(ent => ent.TimeOfMeasurment.Day).Distinct().OrderBy(ent => ent);
+            foreach (var day in distinctDays)
             {
-                float sum = 0;
-                int num_measurements = 0;
-                for (int i = 0; i < bglEntries.Count; i++)
-                {
-                    // Check if the BGL entries were registered on the current day/iteration
-                    if (bglEntries[i].TimeOfMeasurment.Date == day.Date)
-                    {
-                        sum += bglEntries[i].BGLmeasurement;
-                        num_measurements++;
-                    }
-                }
-
-                // Calculate average BGL
-                float bglAverage = sum / num_measurements;
-
-                // Skip to next iteration/day if there are no measurements to avoid creating empty chart entries
-                if (sum == 0) continue;
+                var dayBgl = bglEntries.Where(ent => ent.TimeOfMeasurment.Day == day);
+                var bglAverage = bglEntries.Select(ent => ent.BGLmeasurement).Average();
 
                 // Change datetime format
                 string dateTime;
-                if (day.Date == DateTime.Today) dateTime = "Today";
-                else dateTime = day.Date.ToString(labelFormat);
+                if (day == DateTime.Now.Day)
+                    dateTime = "Today";
+                else
+                    dateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, day).ToString(labelFormat);
 
                 // Set graph color based on BGL value
                 string graphColor;
@@ -170,7 +156,6 @@ namespace Diabeticare.Views
                     Label = $"{dateTime}",
                     ValueLabel = $"{Math.Round(bglAverage, 1)}"
                 });
-
             }
         }
     }

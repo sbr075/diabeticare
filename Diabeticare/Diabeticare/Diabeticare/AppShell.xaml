@@ -49,14 +49,14 @@
             <Tab.Icon>
                 <FontImageSource FontFamily="Solid" Glyph="{x:Static font:FontAwesome.PersonWalking}"/>
             </Tab.Icon>
-            <ShellContent ContentTemplate="{DataTemplate views:DefaultPage}"/>
+            <ShellContent ContentTemplate="{DataTemplate views:ExerciseStatisticsPage}"/>
         </Tab>
 
         <Tab Title="Diet">
             <Tab.Icon>
                 <FontImageSource FontFamily="Solid" Glyph="{x:Static font:FontAwesome.AppleWhole}"/>
             </Tab.Icon>
-            <ShellContent ContentTemplate="{DataTemplate views:DefaultPage}"/>
+            <ShellContent ContentTemplate="{DataTemplate views:CarbStatisticsPage}"/>
         </Tab>
     </TabBar>
 

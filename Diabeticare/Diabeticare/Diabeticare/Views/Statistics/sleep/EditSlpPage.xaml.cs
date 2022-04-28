@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Diabeticare.ViewModels;
 
 namespace Diabeticare.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EditSlpPage : ContentPage
     {
-        public EditSlpPage()
+        public EditSlpPage(int day)
         {
             InitializeComponent();
+            BindingContext = new SlpViewModel(day);
         }
     }
 }

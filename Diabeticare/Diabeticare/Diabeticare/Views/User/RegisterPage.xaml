@@ -16,7 +16,8 @@
         <Entry Text="{Binding Username}"
                Placeholder="Username"/>
         <Entry Text="{Binding Email}"
-               Placeholder="Email"/>
+               Placeholder="Email"
+               Keyboard="Email"/>
         <Entry Text="{Binding Password}"
                Placeholder="Password"
                IsPassword="True"/>

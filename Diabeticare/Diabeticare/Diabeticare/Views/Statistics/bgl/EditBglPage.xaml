@@ -9,25 +9,20 @@
     x:DataType="viewmodels:BglViewModel"
     x:Name="BglDataPage">
 
-    <!-- Setting BindingContext for page -->
-    <ContentPage.BindingContext>
-        <viewmodels:BglViewModel/>
-    </ContentPage.BindingContext>
-    
     <!-- Converter used for extracting the item selected by the user -->
     <ContentPage.Resources>
         <ResourceDictionary>
             <xct:ItemSelectedEventArgsConverter x:Key="ItemSelectedEventArgsConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    
+
     <!-- Converting page events to ViewModel commands.-->
     <ContentPage.Behaviors>
         <xct:EventToCommandBehavior 
                 EventName="Appearing"
-                Command="{Binding DisplayEntries}"/>
+                Command="{Binding DisplayEntriesCommand}"/>
     </ContentPage.Behaviors>
-    
+
     <!-- ListView that displays BGL entries stored in the SQLite database -->
     <ListView
         SelectedItem="{Binding SelectedBgl, Mode=TwoWay}"
@@ -87,7 +82,6 @@
         <!-- Footer for the page -->
         <ListView.Footer>
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Button Text="Load More"/>
             </StackLayout>
         </ListView.Footer>
     </ListView>

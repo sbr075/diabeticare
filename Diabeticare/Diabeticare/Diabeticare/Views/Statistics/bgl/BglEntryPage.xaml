@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
     xmlns:model="clr-namespace:Diabeticare.Models"
     x:Class="Diabeticare.Views.BglEntryPage"
-    x:DataType="model:Bgl"
+    x:DataType="model:BglModel"
     Shell.PresentationMode="Modal">
     
     <StackLayout Padding="10">

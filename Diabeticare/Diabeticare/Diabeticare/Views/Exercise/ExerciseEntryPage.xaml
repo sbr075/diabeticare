@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Diabeticare.Views.ExerciseEntryPage"
+    Shell.PresentationMode="Modal">
+
+    <StackLayout Padding="10">
+        <Frame VerticalOptions="CenterAndExpand" HasShadow="True" BorderColor="LightSkyBlue">
+            <StackLayout>
+                <Label Text="Change Exercise Date" HorizontalOptions="Center" FontSize="Medium"/>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Start date" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <DatePicker x:Name="dateStart" Format="dd/MM/yyyy" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="End date" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <DatePicker x:Name="dateEnd" Format="dd/MM/yyyy" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <Label Text="Change Exercise Time" HorizontalOptions="Center" FontSize="Medium"/>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Start time" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <TimePicker x:Name="timeStart" Format="HH:mm" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Stop time" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <TimePicker x:Name="timeEnd" Format="HH:mm" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <Button Text="Cancel" Clicked="CancelUpdate"/>
+                <Button Text="Save" Clicked="SaveUpdatedExerciseEntry"/>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</ContentPage>

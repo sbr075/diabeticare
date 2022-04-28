@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Diabeticare.Models;
-using Diabeticare.ViewModels;
+﻿using Diabeticare.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,7 +10,7 @@ namespace Diabeticare.Views
         public AddBglDataPage()
         {
             InitializeComponent();
+            BindingContext = new BglViewModel();
         }
-
     }
 }

@@ -19,9 +19,7 @@ namespace Diabeticare.Services
 
         public async Task<IEnumerable<BglModel>> GetBglEntriesAsync()
         {
-            var bglEntries = await bglDatabase.Table<BglModel>().ToListAsync();
-
-            // Compare entries, and sync server database
+            var bglEntries = await bglDatabase.Table<BglModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
             return bglEntries;
         }
 
@@ -35,6 +33,7 @@ namespace Diabeticare.Services
         {
             var bgl = new BglModel
             {
+                UserID = App.user.ID,
                 ServerID = server_id,
                 BGLmeasurement = bglMeasurement,
                 TimeOfMeasurment = timeOfMeasurment
@@ -60,6 +59,21 @@ namespace Diabeticare.Services
             await bglDatabase.DeleteAsync<BglModel>(id);
         }
 
-
+        public async Task DeleteUserBglEntriesAsync()
+        {
+            try
+            {
+                // Get all entries related to user
+                var bglEntries = await bglDatabase.Table<BglModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
+                foreach (var bglEntry in bglEntries)
+                {
+                    await bglDatabase.DeleteAsync(bglEntry);
+                }
+            }
+            catch
+            {
+                return;
+            }
+        }
     }
 }

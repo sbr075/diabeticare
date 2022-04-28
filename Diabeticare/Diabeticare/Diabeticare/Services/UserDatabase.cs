@@ -60,9 +60,9 @@ namespace Diabeticare.Services
             return userDatabase.UpdateAsync(userEntry);
         }
 
-        public async Task DeleteUserEntryAsync(int id)
+        public async Task DeleteUserEntryAsync()
         {
-            await userDatabase.DeleteAsync<UserModel>(id);
+            await userDatabase.DeleteAsync<UserModel>(App.user.ID);
         }
     }
 }

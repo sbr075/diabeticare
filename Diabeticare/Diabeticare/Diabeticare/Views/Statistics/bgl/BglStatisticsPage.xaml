@@ -6,7 +6,6 @@
     xmlns:views="clr-namespace:Diabeticare.Views" 
     x:DataType="views:BglStatisticsPage"
     x:Class="Diabeticare.Views.BglStatisticsPage"
-    xmlns:font="clr-namespace:Diabeticare.Resources.Helpers"
     x:Name="StatPage">
 
     <StackLayout>
@@ -15,7 +14,7 @@
         <StackLayout Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Center" Padding="5">
             <Button 
                 x:Name="today"
-                Text="I Dag" 
+                Text="TODAY" 
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -23,7 +22,7 @@
 
             <Button
                 x:Name="week" 
-                Text="1 Week" 
+                Text="1 WEEK" 
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -31,7 +30,7 @@
 
             <Button 
                 x:Name="month" 
-                Text="1 Month"
+                Text="1 MONTH"
                 HorizontalOptions="Center"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
@@ -49,7 +48,7 @@
             <Frame CornerRadius="10" HasShadow="True" BorderColor="Black">
                 <microcharts:ChartView x:Name="BglChart" HeightRequest="200" HorizontalOptions="Fill"/>
             </Frame>
-            
+
 
             <Label x:Name="ChartDescription" Text="" FontSize="Small" HorizontalOptions="Center"/>
         </StackLayout>
@@ -57,23 +56,19 @@
 
         <!-- Bottom button layout -->
         <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="Center" Padding="5">
-
             <Button 
-                x:Name="editData"
-                Text="Edit Data"
+                x:Name="viewData"
+                Text="View Data"
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
-                Clicked="Edit_BGL_Data"/>
+                Clicked="ViewBGLEntries"/>
 
             <Button
                 x:Name="enterData" 
                 Text="Add Data" 
                 CornerRadius="10"
                 BackgroundColor="{StaticResource Primary}"
-                Clicked="Create_BGL_Data"/>
+                Clicked="CreateBGLEntry"/>
         </StackLayout>
-
     </StackLayout>
-    
-    
 </ContentPage>

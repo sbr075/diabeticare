@@ -3,19 +3,17 @@ using Xamarin.Forms;
 using System.IO;
 using Diabeticare.Services;
 using Diabeticare.Models;
+using Diabeticare.Views;
 
 namespace Diabeticare
 {
     public partial class App : Application
     {
         public static UserModel user;
-
-        static ApiServices apiservices;
-        static UserDatabase userDatabase;
-        static SlpDatabase slpDatabase;
-        static BglDatabase bglDatabase;
+        public static string server_addr;
 
         // Create the database connection as a singleton.
+        static UserDatabase userDatabase;
         public static UserDatabase Udatabase
         {
             get
@@ -28,6 +26,7 @@ namespace Diabeticare
             }
         }
 
+        static SlpDatabase slpDatabase;
         public static SlpDatabase Sdatabase
         {
             get
@@ -40,7 +39,7 @@ namespace Diabeticare
             }
         }
 
-        // Create the database connection as a singleton.
+        static BglDatabase bglDatabase;
         public static BglDatabase Bdatabase
         {
             get
@@ -52,7 +51,47 @@ namespace Diabeticare
                 return bglDatabase;
             }
         }
+        
+        static CarbDatabase carbDatabase;
+        public static CarbDatabase Cdatabase
+        {
+            get
+            {
+                if (carbDatabase == null)
+                {
+                    carbDatabase = new CarbDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "carbEntries.db3"));
+                }
+                return carbDatabase;
+            }
+        }
 
+        static MoodDatabase moodDatabase;
+        public static MoodDatabase Mdatabase
+        {
+            get
+            {
+                if (moodDatabase == null)
+                {
+                    moodDatabase = new MoodDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "moodEntries.db3"));
+                }
+                return moodDatabase;
+            }
+        }
+
+        static ExerciseDatabase exerciseDatabase;
+        public static ExerciseDatabase Edatabase
+        {
+            get
+            {
+                if (exerciseDatabase == null)
+                {
+                    exerciseDatabase = new ExerciseDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "exerciseEntries.db3"));
+                }
+                return exerciseDatabase;
+            }
+        }
+
+        static ApiServices apiservices;
         public static ApiServices apiServices
         {
             get
@@ -69,15 +108,20 @@ namespace Diabeticare
         {
             InitializeComponent();
             MainPage = new LoginShell();
+
+            server_addr = "10.0.2.2:5000";
         }
 
         protected override void OnStart()
         {
-            
         }
 
-        protected override void OnSleep()
+        protected override async void OnSleep()
         {
+            if (App.user.AutoLogIn == false)
+                await App.Udatabase.UpdateUserEntryAsync(App.user, "", false);
+
+            App.user = null;
         }
 
         protected override void OnResume()

@@ -2,14 +2,11 @@
 using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Forms;
 using Command = MvvmHelpers.Commands.Command;
-using Xamarin.CommunityToolkit.Extensions;
 using Diabeticare.Views;
+
 
 namespace Diabeticare.ViewModels
 {
@@ -17,25 +14,40 @@ namespace Diabeticare.ViewModels
     {
         // Data collection of BGL entries
         public ObservableRangeCollection<BglModel> BglEntries { get; set; }
+        public ObservableRangeCollection<GroupModel> BglGroups { get; set; }
 
         public Command AddBglCommand { get; }
         public AsyncCommand RefreshCommand { get; }
         public AsyncCommand<BglModel> DeleteBglCommand { get; }
+        public AsyncCommand<object> SelectedBglGroupCommand { get; }
         public AsyncCommand<object> SelectedBglCommand { get; }
-        public AsyncCommand DisplayEntries { get; }
+        public AsyncCommand DisplayGroupsCommand { get; }
+        public AsyncCommand DisplayEntriesCommand { get; }
         public AsyncCommand LoadMoreCommand { get; }
 
-        public BglViewModel()
+        public BglViewModel(int day=0)
         {
             BglEntries = new ObservableRangeCollection<BglModel>();
+            BglGroups = new ObservableRangeCollection<GroupModel>();
+
             AddBglCommand = new Command(AddBgl);
             RefreshCommand = new AsyncCommand(ViewRefresh);
             DeleteBglCommand = new AsyncCommand<BglModel>(DeleteBgl);
+            SelectedBglGroupCommand = new AsyncCommand<object>(SelectedGroup);
             SelectedBglCommand = new AsyncCommand<object>(SelectedEntry);
-            DisplayEntries = new AsyncCommand(LoadBglEntries);
+            DisplayGroupsCommand = new AsyncCommand(LoadBglGroups);
+            DisplayEntriesCommand = new AsyncCommand(LoadBglEntries);
 
             BglDate = DateTime.Now;
             BglTime = DateTime.Now.TimeOfDay;
+            Day = day;
+        }
+
+        GroupModel selectedBglGroup;
+        public GroupModel SelectedBglGroup
+        {
+            get => selectedBglGroup;
+            set => SetProperty(ref selectedBglGroup, value);
         }
 
         BglModel selectedBgl;
@@ -67,12 +79,17 @@ namespace Diabeticare.ViewModels
             set => SetProperty(ref bglDate, value);
         }
 
+        int day;
+        public int Day
+        {
+            get => day;
+            set => SetProperty(ref day, value);
+        }
+
         // Creates a new BGL entry
         public async void AddBgl()
         {
-            // TODO: display text if the entry field is empty
-            if (BglEntry == null)
-                return;
+            if (BglEntry == null) return;
 
             var measurement = float.Parse(BglEntry);
 
@@ -87,7 +104,7 @@ namespace Diabeticare.ViewModels
             else
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
 
-            await Shell.Current.GoToAsync("..");
+            await App.Current.MainPage.Navigation.PopAsync();
         }
 
         // Refresh the bgl listview
@@ -115,6 +132,16 @@ namespace Diabeticare.ViewModels
             await ViewRefresh();
         }
 
+        async Task SelectedGroup(object arg)
+        {
+            GroupModel bglGroup = arg as GroupModel;
+            if (bglGroup == null) return;
+
+            SelectedBglGroup = null;
+            BglGroups.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
+            await App.Current.MainPage.Navigation.PushAsync(new EditBglPage(bglGroup.GroupDate.Day));
+        }
+
         async Task SelectedEntry(object arg)
         {
             BglModel bgl = arg as BglModel;
@@ -122,15 +149,33 @@ namespace Diabeticare.ViewModels
 
             SelectedBgl = null; // Deselect item
             BglEntries.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
-            var route = $"{nameof(BglEntryPage)}?BglID={bgl.ID}";
-            await Shell.Current.GoToAsync(route);
+            await App.Current.MainPage.Navigation.PushAsync(new BglEntryPage(bgl.ID));
+        }
+
+        async Task LoadBglGroups()
+        {
+            IsBusy = true;
+            BglGroups.Clear();
+            var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
+            var distinctDays = bglEntries.Select(ent => ent.TimeOfMeasurment.Date.Day).Distinct().OrderByDescending(ent => ent);
+            foreach (var day in distinctDays)
+            {
+                var allGroupBgl = bglEntries.Where(ent => ent.TimeOfMeasurment.Date.Day == day);
+                var avgGroupBgl = allGroupBgl.Select(ent => ent.BGLmeasurement).Average();
+
+                BglGroups.Add(new GroupModel { GroupDate=new DateTime(DateTime.Now.Year, DateTime.Now.Month, day), GroupAvg=avgGroupBgl });
+            }
+
+            IsBusy = false;
         }
 
         // Loads BGL entries
         async Task LoadBglEntries()
         {
             IsBusy = true;
+            BglEntries.Clear();
             var bglEntries = await App.Bdatabase.GetBglEntriesAsync();
+            bglEntries = bglEntries.Where(ent => ent.TimeOfMeasurment.Day == Day);
             BglEntries.AddRange(bglEntries.Reverse());
             IsBusy = false;
         }
