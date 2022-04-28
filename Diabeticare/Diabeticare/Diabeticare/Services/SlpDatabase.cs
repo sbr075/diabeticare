@@ -69,7 +69,7 @@ namespace Diabeticare.Services
                     await slpDatabase.DeleteAsync(slpEntry);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return;
             }

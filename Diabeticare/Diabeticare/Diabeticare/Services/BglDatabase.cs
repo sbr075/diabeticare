@@ -70,7 +70,7 @@ namespace Diabeticare.Services
                     await bglDatabase.DeleteAsync(bglEntry);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return;
             }

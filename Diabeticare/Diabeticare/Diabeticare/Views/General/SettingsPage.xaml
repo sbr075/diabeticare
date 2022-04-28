@@ -6,7 +6,7 @@
     x:Class="Diabeticare.Views.SettingsPage">
     
     <ContentPage.BindingContext>
-        <viewmodels:ViewModelBase/>
+        <viewmodels:SettingsViewModel/>
     </ContentPage.BindingContext>
     
     <StackLayout>
@@ -21,7 +21,6 @@
         <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="5">
             <Frame HasShadow="True" Padding="5">
                 <StackLayout>
-                    
                     <Button Text="Delete All Data" 
                         FontSize="Medium" 
                         TextColor="Red" 

@@ -88,7 +88,7 @@ namespace Diabeticare.ViewModels
             if (password.All(char.IsLetter))
                 return (false, "Password needs to contain atleast 1 number");
 
-            return (true, "Passowrd valid");
+            return (true, "Password valid");
         }
 
         public async Task Register()
@@ -169,21 +169,11 @@ namespace Diabeticare.ViewModels
             await _Login(username, passwordHash);
         }
 
-        // Refresh the user listview
-        async Task ViewRefresh()
-        {
-            IsBusy = true;
-            UsrEntries.Clear();
-            var usrEntries = await App.Udatabase.GetUserEntriesAsync();
-            UsrEntries.AddRange(usrEntries);
-            IsBusy = false;
-        }
-
         // Remove password from specified user entry
         async Task DeleteUser(UserModel user)
         {
             await App.Udatabase.UpdateUserEntryAsync(user, null, false);
-            await ViewRefresh();
+            await LoadUserEntries();
         }
 
         async Task SelectedEntry(object arg)

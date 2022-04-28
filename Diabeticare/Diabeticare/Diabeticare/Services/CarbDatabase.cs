@@ -70,7 +70,7 @@ namespace Diabeticare.Services
                     await carbDatabase.DeleteAsync(carbEntry);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return;
             }

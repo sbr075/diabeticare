@@ -4,6 +4,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Diabeticare.Views;
 
 namespace Diabeticare.Services
 {
@@ -91,6 +92,12 @@ namespace Diabeticare.Services
 
             // Update token in database for user
             await App.Udatabase.UpdateUserTokenAsync(App.user, token);
+        }
+
+        private async Task ExpireUserSession()
+        {
+            App.user = null;
+            await App.Current.MainPage.Navigation.PushAsync(new LoginPage());
         }
 
         public async Task<(int, string)> RegisterAsync(string username, string email, string password, string confirm)
@@ -252,6 +259,9 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "u/delete-account", content, App.user.Token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+                if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
                 return (response.IsSuccessStatusCode) ? (1, "Successfully deleted account") : (0, "Session timed out");
             }
             catch { return (0, "Failed to contact server"); }
@@ -274,7 +284,16 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "u/delete-all-data", content, App.user.Token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted all data") : (0, "Session timed out");
+
+                // On success, update user and token
+                if (response.IsSuccessStatusCode)
+                    await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int) response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                    return (response.IsSuccessStatusCode) ? (1, "Successfully deleted all data") : (0, "Session timed out");
             }
             catch { return (0, "Failed to contact server"); }
         }
@@ -322,15 +341,17 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/bgl/set", content, App.user.Token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
                 string responseBody = await response.Content.ReadAsStringAsync();
-                int s_id = (int)JObject.Parse(responseBody)["SERVERID"];
 
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", s_id) : (0, "Session timed out", -1);
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", (int)JObject.Parse(responseBody)["SERVERID"]) : (0, "Session timed out", -1);
             }
             catch { return (0, "Failed to contact server", -1); }
         }
@@ -375,6 +396,10 @@ namespace Diabeticare.Services
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
 
                 return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
             }
@@ -421,6 +446,10 @@ namespace Diabeticare.Services
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
 
                 return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
             }
@@ -471,15 +500,17 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/sleep/set", content, App.user.Token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
                 string responseBody = await response.Content.ReadAsStringAsync();
-                int s_id = (int)JObject.Parse(responseBody)["SERVERID"];
 
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", s_id) : (0, "Session timed out", -1);
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", (int)JObject.Parse(responseBody)["SERVERID"]) : (0, "Session timed out", -1);
             }
             catch { return (0, "Failed to contact server", -1); }
         }
@@ -524,6 +555,10 @@ namespace Diabeticare.Services
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
 
                 return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
             }
@@ -570,6 +605,10 @@ namespace Diabeticare.Services
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
 
                 return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
             }
@@ -623,15 +662,17 @@ namespace Diabeticare.Services
                 var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/ci/set", content, App.user.Token);
 
                 HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
                 string responseBody = await response.Content.ReadAsStringAsync();
-                int s_id = (int)JObject.Parse(responseBody)["SERVERID"];
 
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
 
-                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", s_id) : (0, "Session timed out", -1);
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", (int)JObject.Parse(responseBody)["SERVERID"]) : (0, "Session timed out", -1);
             }
             catch { return (0, "Failed to contact server", -1); }
         }
@@ -676,6 +717,10 @@ namespace Diabeticare.Services
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
 
                 return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
             }
@@ -722,6 +767,170 @@ namespace Diabeticare.Services
                 // On success, update user and token
                 if (response.IsSuccessStatusCode)
                     await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
+            }
+            catch { return (0, "Failed to contact server"); }
+        }
+
+        public async Task<(int, string, int)> AddOrUpdateMoodAsync(int value, DateTime date, int server_id = -1)
+        {
+            /*
+             * Sends a POST request to add or update carbohydrate entry entry
+             * On succesful request the users token is updated
+             * 
+             * Arguments
+             *  value: float
+             *      BGL value
+             *  name: string
+             *      Name of food/drink
+             *  time: DateTime
+             *      Date and time of input
+             *  server_id: int
+             *      ID to identify the entry (server side)
+             * 
+             * Return
+             * code, message, s_id: int, string, int
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
+             *      s_id: entrys id in server database
+             *
+             * Note
+             * - Cannot send request if user is not logged in
+             */
+
+            if (App.user == null)
+                return (0, "You are not signed in", -1);
+
+            try
+            {
+                long unixTime = ((DateTimeOffset)date).ToUnixTimeSeconds();
+
+                var data = new
+                {
+                    username = App.user.Username,
+                    value = value,
+                    timestamp = unixTime,
+                    server_id = server_id
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/mood/set", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // On success, update user and token
+                if (response.IsSuccessStatusCode)
+                    await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully added/updated entry", (int)JObject.Parse(responseBody)["SERVERID"]) : (0, "Session timed out", -1);
+            }
+            catch { return (0, "Failed to contact server", -1); }
+        }
+
+        public async Task<(int, string)> FetchMoodAsync(DateTime date)
+        {
+            /*
+             * Sends a GET request to fetch all entries after timestamp
+             * On succesful request the users token is updated
+             * 
+             * Arguments
+             *  time: DateTime
+             *      Date and time of input
+             * 
+             * Return
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
+             *
+             * Note
+             * - Cannot send request if user is not logged in
+             */
+
+            if (App.user == null)
+                return (0, "You are not signed in");
+
+            try
+            {
+                long unixTime = ((DateTimeOffset)date).ToUnixTimeSeconds();
+
+                var data = new
+                {
+                    username = App.user.Username,
+                    timestamp = unixTime
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Get, "s/mood/get", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+                // On success, update user and token
+                if (response.IsSuccessStatusCode)
+                    await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
+
+                return (response.IsSuccessStatusCode) ? (1, "Successfully fetched entry/entries") : (0, "Session timed out");
+            }
+            catch { return (0, "Failed to contact server"); }
+        }
+
+        public async Task<(int, string)> DeleteMoodAsync(int server_id)
+        {
+            /*
+             * Sends a POST request to delete specified entry
+             * On succesful request the users token is updated
+             * 
+             * Arguments
+             *  server_id: int
+             *      ID to identify the entry (server side)
+             *      
+             * Return
+             * code, message: int, string
+             *      code: 0 -> fail | 1 -> success
+             *      message: message from server
+             *
+             * Note
+             * - Cannot send request if user is not logged in
+             * - Cannot delete entries that does not belong to the user
+             * - Cannot delete entries that do not match the identifier
+             */
+
+            if (App.user == null)
+                return (0, "You are not signed in");
+
+            try
+            {
+                var data = new
+                {
+                    username = App.user.Username,
+                    identifier = server_id
+                };
+                string content = JsonConvert.SerializeObject(data);
+
+                var httpRequestMessage = createHttpRequestMessage(HttpMethod.Post, "s/mood/del", content, App.user.Token);
+
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+                // On success, update user and token
+                if (response.IsSuccessStatusCode)
+                    await UpdateToken(response);
+
+                // Log out user if token has expired
+                else if ((int)response.StatusCode == 498)
+                    await ExpireUserSession();
 
                 return (response.IsSuccessStatusCode) ? (1, "Successfully deleted entry") : (0, "Session timed out");
             }

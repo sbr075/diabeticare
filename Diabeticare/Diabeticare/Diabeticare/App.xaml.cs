@@ -65,6 +65,19 @@ namespace Diabeticare
             }
         }
 
+        static MoodDatabase moodDatabase;
+        public static MoodDatabase Mdatabase
+        {
+            get
+            {
+                if (moodDatabase == null)
+                {
+                    moodDatabase = new MoodDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "moodEntries.db3"));
+                }
+                return moodDatabase;
+            }
+        }
+
 
         static ApiServices apiservices;
         public static ApiServices apiServices

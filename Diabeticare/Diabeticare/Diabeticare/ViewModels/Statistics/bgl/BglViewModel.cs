@@ -89,9 +89,7 @@ namespace Diabeticare.ViewModels
         // Creates a new BGL entry
         public async void AddBgl()
         {
-            // TODO: display text if the entry field is empty
-            if (BglEntry == null)
-                return;
+            if (BglEntry == null) return;
 
             var measurement = float.Parse(BglEntry);
 
