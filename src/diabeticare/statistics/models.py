@@ -72,3 +72,23 @@ class MoodSchema(ma.SQLAlchemyAutoSchema):
 
     mood = ma.auto_field()
     timestamp = ma.auto_field()
+
+
+class Exercise(db.Model):
+    __tablename__ = "exercise"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    name  = db.Column(db.String, nullable=False)
+    start = db.Column(db.Integer, nullable=False)
+    stop  = db.Column(db.Integer, nullable=False)
+
+
+class ExerciseSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Exercise
+
+    name = ma.auto_field()
+    start = ma.auto_field()
+    stop = ma.auto_field()

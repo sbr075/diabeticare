@@ -5,7 +5,7 @@ from diabeticare import db
 from diabeticare.users import bp
 from diabeticare.users.forms import RegistrationForm, LoginForm, LogoutForm
 from diabeticare.users.models import User
-from diabeticare.statistics.models import BGL, Sleep, CI
+from diabeticare.statistics.models import BGL, Sleep, CI, Mood, Exercise
 from diabeticare.main.views import validate_token, update_token, nullify_token
 
 import logging
@@ -95,6 +95,8 @@ def _deleteAllData(user_id):
     BGL.query.filter(BGL.user_id == user_id).delete()
     Sleep.query.filter(Sleep.user_id == user_id).delete()
     CI.query.filter(CI.user_id == user_id).delete()
+    Mood.query.filter(Mood.user_id == user_id).delete()
+    Exercise.query.filter(Exercise.user_id == user_id).delete()
     db.session.commit()
 
 @bp.route("/delete-account", methods=["POST"])

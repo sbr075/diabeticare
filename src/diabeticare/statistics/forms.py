@@ -51,3 +51,21 @@ class MoodForm(FlaskForm):
 	def validate_mood(self, mood):
 		if not isinstance(mood.data, int):
 			raise ValidationError("Invalid format")
+
+
+class ExerciseForm(FlaskForm):
+	name = StringField("Name", [InputRequired()])
+	start = IntegerField("Start", [InputRequired()])
+	stop =  IntegerField("Stop",  [InputRequired()])
+
+	def validate_name(self, name):
+		if not isinstance(name.name, str):
+			raise ValidationError("Invalid format")
+
+	def validate_start(self, start):
+		if not isinstance(start.data, int):
+			raise ValidationError("Invalid format")
+	
+	def validate_stop(self, stop):
+		if not isinstance(stop.data, int):
+			raise ValidationError("Invalid format")

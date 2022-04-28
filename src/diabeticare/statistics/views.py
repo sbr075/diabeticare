@@ -5,8 +5,8 @@ from werkzeug.datastructures import MultiDict
 
 from diabeticare import db
 from diabeticare.statistics import bp
-from diabeticare.statistics.forms import BGLForm, SleepForm, CIForm, MoodForm
-from diabeticare.statistics.models import BGL, BGLSchema, Sleep, SleepSchema, CI, CISchema, Mood, MoodSchema
+from diabeticare.statistics.forms import BGLForm, SleepForm, CIForm, MoodForm, ExerciseForm
+from diabeticare.statistics.models import BGL, BGLSchema, Sleep, SleepSchema, CI, CISchema, Mood, MoodSchema, Exercise, ExerciseSchema
 from diabeticare.users.models import User
 from diabeticare.main.views import validate_token, update_token
 
@@ -530,6 +530,142 @@ def moodDel():
 		if not entry.first():
 			return jsonify({"ERROR": "Invalid parameters"}), 401
 		
+		entry.delete()
+		db.session.commit()
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"X-CSRFToken": new_token})
+
+	return jsonify({"ERROR": "Invalid request"}), 405
+
+
+@bp.route("/exercise/set", methods=["POST"])
+def exerciseSet():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:  name of user
+
+		name: 	   name of exercise
+		start:	   time when user went to sleep (UNIXTIMESTAMP)
+		stop:	   time when user woke up  	 (UNIXTIMESTAMP)
+		server_id: (optional) used to overwrite existing entry
+	"""
+
+	if request.method == "POST":
+		data = json.loads(request.data)
+		username  = data["username"]
+		name	  = data["name"]
+		start	  = data["start"]
+		stop      = data["stop"]
+		server_id = data["server_id"] if data["server_id"] >= 0 else None
+		token     = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"ERROR": "Invalid token"}), 498
+		
+		exercise_form = ExerciseForm(MultiDict({"name": name, "start": start, "stop": stop}))
+		if exercise_form.validate():
+			if server_id:
+				entry = Exercise.query.filter(Exercise.user_id==user.id, Exercise.id==server_id).first()
+				if not entry:
+					return jsonify({"ERROR": "Invalid parameters"}), 401
+				
+				entry.name = name
+				entry.start = start
+				entry.stop  = stop
+			
+			else:
+				entry = Exercise(user_id=user.id, name=name, start=start, stop=stop)
+				db.session.add(entry)
+			
+			db.session.commit()
+
+			# Update user token
+			new_token = update_token(user)
+
+			return jsonify({"X-CSRFToken": new_token, "SERVERID": entry.id})
+
+		else:
+			return jsonify({"ERROR": exercise_form.errors}), 401
+
+	return jsonify({"ERROR": "Invalid request"}), 405
+
+
+@bp.route("/exercise/get", methods=["GET"])
+def exerciseGet():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:   name of user
+		timestamp:  time when measurement was taken (UNIXTIMESTAMP)
+	"""
+
+	if request.method == "GET":
+		data = json.loads(request.data)
+		username  = data["username"]
+
+		name = data["name"]
+		timestamp = data["timestamp"]
+		token = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"ERROR": "Invalid token"}), 498
+		
+		entries = Exercise.query.filter(Exercise.user_id==user.id, Exercise.name==name, Exercise.start>=timestamp).all()
+		if entries:
+			exercise_schema = ExerciseSchema(many=True)
+			results = exercise_schema.dump(entries)
+		else:
+			results = []
+
+		# Update user token
+		new_token = update_token(user)
+
+		return jsonify({"RESULTS": results, "X-CSRFToken": new_token})
+
+	return jsonify({"ERROR": "Invalid request"}), 405
+
+
+@bp.route("/exercise/del", methods=["POST"])
+def exerciseDel():
+	"""
+	Request parameters
+	headers
+		X-CSRFToken: current valid token
+	
+	content/data (json format)
+		username:  name of user
+		server_id: id of entry
+	"""
+
+	if request.method == "POST":
+		data = json.loads(request.data)
+		username  = data["username"]
+		server_id = data["server_id"]
+		token     = request.headers["X-CSRFToken"]
+
+		# Get user and check token validity
+		user = User.query.filter_by(username=username).first()
+		if not validate_token(user, token):
+			return jsonify({"ERROR": "Invalid token"}), 498
+		
+		entry = Exercise.query.filter(Exercise.user_id==user.id, Exercise.id==server_id)
+		if not entry.first():
+			return jsonify({"ERROR": "Invalid parameters"}), 401
+			
 		entry.delete()
 		db.session.commit()
 
