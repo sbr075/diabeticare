@@ -208,3 +208,4 @@ src/migrations/
 *.pyc
 migrations/
 .VSCodeCounter/
+src/diabeticare/certs/

@@ -47,7 +47,9 @@ Using pgAdmin to manage postgresql server
 - pyOpenSSL (>=22.0.0)
 
 ### Run with Docker
-1. cd into /src/diabeticare and make sure that you are using the config.docker.py (rename it to config.py)
-2. Run `sudo docker-compose up` and maybe `sudo docker-compose build` if needed
-3. Run `sudo docker-compose run -d` to run as a daemon
-4. Run `sudo docker-compose exec web sh src/diabeticare/migrate.sh` to run the database migrations. If you get a bunch of errors, make sure you're using the correct config.py
+1. Generate SSL certs with generate_cert.sh. 
+2. cd into /src/diabeticare and make sure that you are using the config.docker.py (rename it to config.py)
+3. Run `sudo docker-compose --project-name 'diabeticare' build`
+4. Run `sudo docker-compose up` to run for testing (CTRL-C to stop)
+5. Run `sudo docker-compose exec web sh src/diabeticare/migrate.sh` to run the database migrations. If you get a bunch of errors, make sure you're using the correct config.py
+6. Run `sudo docker run -d -p 12345:8000 diabeticare_web` to start the server
