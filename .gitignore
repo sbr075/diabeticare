@@ -205,3 +205,4 @@ venv.bak/
 
 # Migrations
 src/migrations/
+*.pyc
