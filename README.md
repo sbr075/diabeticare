@@ -45,3 +45,9 @@ Using pgAdmin to manage postgresql server
 - passlib (>=1.7.4)
 - python-dotenv (>=0.19.2)
 - pyOpenSSL (>=22.0.0)
+
+### Run with Docker
+1. cd into /src/diabeticare and make sure that you are using the config.docker.py (rename it to config.py)
+2. Run `sudo docker-compose up` and maybe `sudo docker-compose build` if needed
+3. Run `sudo docker-compose run -d` to run as a daemon
+4. Run `sudo docker-compose exec web sh src/diabeticare/migrate.sh` to run the database migrations. If you get a bunch of errors, make sure you're using the correct config.py
