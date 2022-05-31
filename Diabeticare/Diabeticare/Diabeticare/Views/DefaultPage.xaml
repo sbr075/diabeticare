@@ -34,7 +34,7 @@
                     Text="1" 
                     Command="{Binding AddMoodCommand}"
                     CommandParameter="{x:Reference mood1}"
-                    BackgroundColor="#f13e3d">
+                    BackgroundColor="#ff3e3d">
 
                 <Button.WidthRequest>
                     <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
@@ -51,7 +51,7 @@
                     Text="2" 
                     Command="{Binding AddMoodCommand}"
                     CommandParameter="{x:Reference mood2}"
-                    BackgroundColor="#fd5b67">
+                    BackgroundColor="#fba02f">
 
                 <Button.WidthRequest>
                     <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
@@ -68,7 +68,7 @@
                     Text="3" 
                     Command="{Binding AddMoodCommand}"
                     CommandParameter="{x:Reference mood3}"
-                    BackgroundColor="#fb852f">
+                    BackgroundColor="#fefa10">
 
                 <Button.WidthRequest>
                     <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
@@ -85,7 +85,7 @@
                     Text="4" 
                     Command="{Binding AddMoodCommand}"
                     CommandParameter="{x:Reference mood4}"
-                    BackgroundColor="#fed230">
+                    BackgroundColor="#a0fb00">
 
                 <Button.WidthRequest>
                     <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
@@ -102,7 +102,7 @@
                     Text="5" 
                     Command="{Binding AddMoodCommand}"
                     CommandParameter="{x:Reference mood5}"
-                    BackgroundColor="#27de83">
+                    BackgroundColor="#29ff20">
 
                 <Button.WidthRequest>
                     <OnIdiom x:TypeArguments="x:Double" Phone="60"/>
