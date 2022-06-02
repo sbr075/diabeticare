@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Testing script for backend server """
+from http import server
 import requests
 import argparse
 import logging
@@ -30,7 +31,7 @@ class HTTPMethods():
     def do_GET_CSRF(self):
         url = self.create_URL("/get_token")
         resp = session.get(url)
-        return resp.json()["CSRF-Token"]
+        return resp.json()["X-CSRFToken"]
 
     def do_GET(self, url: str, headers, data):
         return session.get(url, headers=headers, json=data)
@@ -65,7 +66,7 @@ class Tester(HTTPMethods):
         logger.info(f" Response from server: {resp.json()}")
         
         global CSRF_TOKEN, USERNAME
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
         USERNAME = username
 
     def logout(self): # TEST 3
@@ -90,13 +91,13 @@ class Tester(HTTPMethods):
         
         headers = {"X-CSRFToken": CSRF_TOKEN}
         time = datetime.datetime.now().timestamp()
-        data = {"username": USERNAME, "value": value, "timestamp": time}
+        data = {"username": USERNAME, "value": value, "timestamp": time, "server_id": -1}
         url = self.create_URL("s/bgl/set")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
     
     def bgl_update(self): # TEST 5
         global CSRF_TOKEN
@@ -105,17 +106,17 @@ class Tester(HTTPMethods):
             return
         
         value = input("Enter value: ")
-        identifier = input("Enter existing id: ")
+        server_id = input("Enter existing id: ")
         
         headers = {"X-CSRFToken": CSRF_TOKEN}
         time = datetime.datetime.now().timestamp()
-        data = {"username": USERNAME, "value": value, "timestamp": time, "identifier": identifier}
+        data = {"username": USERNAME, "value": value, "timestamp": time, "server_id": server_id}
         url = self.create_URL("s/bgl/set")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
     def bgl_get(self): # TEST 6
         global CSRF_TOKEN
@@ -133,7 +134,7 @@ class Tester(HTTPMethods):
         resp = self.do_GET(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
     def bgl_delete(self): # TEST 7
         global CSRF_TOKEN
@@ -141,16 +142,16 @@ class Tester(HTTPMethods):
             logger.info(" Not logged in")
             return
         
-        identifiers = [int(i) for i in input("Enter existing id: ").split(" ")]
+        server_id = int(input("Enter existing id: "))
         
         headers = {"X-CSRFToken": CSRF_TOKEN}
-        data = {"username": USERNAME, "identifiers": identifiers}
+        data = {"username": USERNAME, "server_id": server_id}
         url = self.create_URL("s/bgl/del")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
     def sleep_add(self): # TEST 8
         global CSRF_TOKEN
@@ -160,13 +161,13 @@ class Tester(HTTPMethods):
 
         headers = {"X-CSRFToken": CSRF_TOKEN}
         time = datetime.datetime.now().timestamp()
-        data = {"username": USERNAME, "start": time, "stop": time+1000, "timestamp": time}
+        data = {"username": USERNAME, "start": time, "stop": time+1000, "server_id": -1}
         url = self.create_URL("s/sleep/set")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
     
     def sleep_update(self): # TEST 9
         global CSRF_TOKEN
@@ -174,17 +175,17 @@ class Tester(HTTPMethods):
             logger.info(" Not logged in")
             return
         
-        identifier = input("Enter existing id: ")
+        server_id = int(input("Enter existing id: "))
 
         headers = {"X-CSRFToken": CSRF_TOKEN}
         time = datetime.datetime.now().timestamp()
-        data = {"username": USERNAME, "start": time, "stop": time+1000, "timestamp": time, "identifier": identifier}
+        data = {"username": USERNAME, "start": time, "stop": time+1000, "server_id": server_id}
         url = self.create_URL("s/sleep/set")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
     
     def sleep_get(self): # TEST 10
         global CSRF_TOKEN
@@ -202,7 +203,7 @@ class Tester(HTTPMethods):
         resp = self.do_GET(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
     
     def sleep_delete(self): # TEST 11
         global CSRF_TOKEN
@@ -210,16 +211,16 @@ class Tester(HTTPMethods):
             logger.info(" Not logged in")
             return
         
-        identifiers = [int(i) for i in input("Enter existing id: ").split(" ")]
+        server_id = int(input("Enter existing id: "))
         
         headers = {"X-CSRFToken": CSRF_TOKEN}
-        data = {"username": USERNAME, "identifiers": identifiers}
+        data = {"username": USERNAME, "server_id": server_id}
         url = self.create_URL("s/sleep/del")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
     def ci_add(self): # TEST 12
         global CSRF_TOKEN
@@ -231,13 +232,13 @@ class Tester(HTTPMethods):
         
         headers = {"X-CSRFToken": CSRF_TOKEN}
         time = datetime.datetime.now().timestamp()
-        data = {"username": USERNAME, "value": value, "timestamp": time}
+        data = {"username": USERNAME, "value": value, "name": "FoodItem", "timestamp": time, "server_id": -1}
         url = self.create_URL("s/ci/set")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
     def ci_update(self): # TEST 13
         global CSRF_TOKEN
@@ -246,17 +247,17 @@ class Tester(HTTPMethods):
             return
 
         value = input("Enter value: ")
-        identifier = input("Enter existing id: ")
+        server_id = input("Enter existing id: ")
         
         headers = {"X-CSRFToken": CSRF_TOKEN}
         time = datetime.datetime.now().timestamp()
-        data = {"username": USERNAME, "value": value, "timestamp": time, "identifier": identifier}
+        data = {"username": USERNAME, "value": value, "name": "UpdatedFoodItem", "timestamp": time, "server_id": server_id}
         url = self.create_URL("s/ci/set")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
     def ci_get(self): # TEST 14
         global CSRF_TOKEN
@@ -274,7 +275,7 @@ class Tester(HTTPMethods):
         resp = self.do_GET(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
     def ci_delete(self): # TEST 15
         global CSRF_TOKEN
@@ -282,16 +283,157 @@ class Tester(HTTPMethods):
             logger.info(" Not logged in")
             return
         
-        identifiers = [int(i) for i in input("Enter existing id: ").split(" ")]
+        server_id = int(("Enter existing id: "))
         
         headers = {"X-CSRFToken": CSRF_TOKEN}
-        data = {"username": USERNAME, "identifiers": identifiers}
+        data = {"username": USERNAME, "server_id": server_id}
         url = self.create_URL("s/ci/del")
 
         resp = self.do_POST(url, headers, data)
         logger.info(f" Response from server: {resp.json()}")
         
-        CSRF_TOKEN = resp.json()["CSRF-Token"]
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+    
+    def mood_add(self): # TEST 16
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        value = input("Enter value: ")
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "value": value, "timestamp": time, "server_id": -1}
+        url = self.create_URL("s/mood/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+
+    def mood_update(self): # TEST 17
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+
+        value = input("Enter value: ")
+        server_id = input("Enter existing id: ")
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "value": value, "timestamp": time, "server_id": server_id}
+        url = self.create_URL("s/mood/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+
+    def mood_get(self): # TEST 18
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        minutes = int(input("Minutes: "))
+        time = (datetime.datetime.now() - datetime.timedelta(minutes=minutes)).timestamp()
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        data = {"username": USERNAME, "timestamp": time}
+        url = self.create_URL("s/mood/get")
+
+        resp = self.do_GET(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+
+    def mood_delete(self): # TEST 19
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        server_id = int(input("Enter existing id: "))
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        data = {"username": USERNAME, "server_id": server_id}
+        url = self.create_URL("s/mood/del")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+    
+    def exercise_add(self): # TEST 20
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "name": "ExerciseName", "start": time, "stop": time+1000, "server_id": -1}
+        url = self.create_URL("s/exercise/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+    
+    def exercise_update(self): # TEST 21
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        server_id = int(input("Enter existing id: "))
+
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        time = datetime.datetime.now().timestamp()
+        data = {"username": USERNAME, "name": "UpdatedExerciseName", "start": time, "stop": time+1000, "server_id": server_id}
+        url = self.create_URL("s/exercise/set")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+    
+    def exercise_get(self): # TEST 22
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        minutes = int(input("Minutes: "))
+        time = (datetime.datetime.now() - datetime.timedelta(minutes=minutes)).timestamp()
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        data = {"username": USERNAME, "timestamp": time}
+        url = self.create_URL("s/exercise/get")
+
+        resp = self.do_GET(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
+    
+    def exercise_delete(self): # TEST 23
+        global CSRF_TOKEN
+        if not CSRF_TOKEN:
+            logger.info(" Not logged in")
+            return
+        
+        server_id = int(input("Enter existing id: "))
+        
+        headers = {"X-CSRFToken": CSRF_TOKEN}
+        data = {"username": USERNAME, "server_id": server_id}
+        url = self.create_URL("s/exercise/del")
+
+        resp = self.do_POST(url, headers, data)
+        logger.info(f" Response from server: {resp.json()}")
+        
+        CSRF_TOKEN = resp.json()["X-CSRFToken"]
 
 
 testerFuncs = Tester()
@@ -317,7 +459,19 @@ tests = {
     "12": testerFuncs.ci_add,
     "13": testerFuncs.ci_update,
     "14": testerFuncs.ci_get,
-    "15": testerFuncs.ci_delete
+    "15": testerFuncs.ci_delete,
+
+    # Mood database functions
+    "16": testerFuncs.mood_add,
+    "17": testerFuncs.mood_update,
+    "18": testerFuncs.mood_get,
+    "19": testerFuncs.mood_delete,
+
+    # Exercise database functions
+    "20": testerFuncs.exercise_add,
+    "21": testerFuncs.exercise_update,
+    "22": testerFuncs.exercise_get,
+    "23": testerFuncs.exercise_delete
 }
 
 def main(args):
