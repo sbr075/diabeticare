@@ -1,0 +1,52 @@
+Date : 2022-04-28 17:18:44
+Directory : c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src
+Total : 18 files,  842 codes, 275 comments, 335 blanks, all 1452 lines
+
+Languages
++--------------+------------+------------+------------+------------+------------+
+| language     | files      | code       | comment    | blank      | total      |
++--------------+------------+------------+------------+------------+------------+
+| Python       |         15 |        794 |        275 |        322 |      1,391 |
+| Ini          |          1 |         38 |          0 |         13 |         51 |
+| JSON         |          1 |          6 |          0 |          0 |          6 |
+| Shell Script |          1 |          4 |          0 |          0 |          4 |
++--------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                   |         18 |        842 |        275 |        335 |      1,452 |
+| .vs                                                                                                 |          1 |          6 |          0 |          0 |          6 |
+| diabeticare                                                                                         |         12 |        663 |        220 |        289 |      1,172 |
+| diabeticare\main                                                                                    |          2 |         25 |          1 |         12 |         38 |
+| diabeticare\statistics                                                                              |          4 |        461 |        181 |        205 |        847 |
+| diabeticare\users                                                                                   |          4 |        145 |         27 |         64 |        236 |
+| migrations                                                                                          |          3 |        146 |         44 |         39 |        229 |
+| migrations\versions                                                                                 |          1 |         67 |         12 |          7 |         86 |
++-----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| filename                                                                                            | language     | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\.vs\VSWorkspaceState.json            | JSON         |          6 |          0 |          0 |          6 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\config.py                            | Python       |         25 |         11 |          6 |         42 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\__init__.py              | Python       |         28 |         11 |          8 |         47 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\main\__init__.py         | Python       |          3 |          0 |          2 |          5 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\main\views.py            | Python       |         22 |          1 |         10 |         33 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\migrate.sh               | Shell Script |          4 |          0 |          0 |          4 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\statistics\__init__.py   | Python       |          3 |          0 |          2 |          5 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\statistics\forms.py      | Python       |         51 |          0 |         20 |         71 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\statistics\models.py     | Python       |         60 |          0 |         34 |         94 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\statistics\views.py      | Python       |        347 |        181 |        149 |        677 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\users\__init__.py        | Python       |          3 |          0 |          2 |          5 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\users\forms.py           | Python       |         37 |          0 |         17 |         54 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\users\models.py          | Python       |         14 |          0 |          4 |         18 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\diabeticare\users\views.py           | Python       |         91 |         27 |         41 |        159 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\migrations\alembic.ini               | Ini          |         38 |          0 |         13 |         51 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\migrations\env.py                    | Python       |         41 |         32 |         19 |         92 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\migrations\versions\3739e953f4cd_.py | Python       |         67 |         12 |          7 |         86 |
+| c:\Users\Sondre\Documents\UIT\INF-3780\backend\diabeticare\src\wsgi.py                              | Python       |          2 |          0 |          1 |          3 |
+| Total                                                                                               |              |        842 |        275 |        335 |      1,452 |
++-----------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+

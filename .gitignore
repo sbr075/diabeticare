@@ -193,3 +193,15 @@ UpgradeLog*.htm
 FakesAssemblies/
 
 .vscode/settings.json
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Migrations
+src/migrations/
