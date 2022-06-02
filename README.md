@@ -14,7 +14,8 @@ There are four steps required to test the application
 2. Open Visual Studio 2022, select 'Open a project or solution', and navigate to the Diabeticare folder until you find 'Diabeticare.sln'
 3. Create a virtual device or connect your device to the computer
 4. Build the program and open the application (either by running the simulator or on your device)
-**NB!** The Diabeticare backend server needs to be running to test the application
+  
+**NB!** The Diabeticare backend server needs to be running to test the application  
 **NB!** The current iteration of the application has a flag to enable HTTP communication and is unsafe. **DO NOT USE IN DEPLOYMENT**
 
 ### Dependencies Installation
