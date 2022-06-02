@@ -37,7 +37,8 @@ It is recommended to have a database mangner, e.g., pgAdmin 4, to set up and man
 Using pgAdmin to manage postgresql server 
 1. Download the executable from https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 2. During installation set the postgres password
-**NB!** This password needs to match the database password found in the [config](src/config.py) file
+  
+**NB!** This password needs to match the database password found in the [config](src/config.py) file  
 **NB!** It is recommended to change the password to something only known to you
 
 ## How to Migrate Database Changes
@@ -46,6 +47,7 @@ This pushes the database schema onto the PostgreSQL database
 To migrate the database do the following
 1. Navigate to the 'src' folder
 2. Run 'sh diabeticare/migrate.sh' in your terminal
+  
 **NB!** On Windows an special terminal is required, e.g., Git Bash, to run bash scripts
 
 ## Program Usage
@@ -75,15 +77,15 @@ An example test would be
 #### All Tests
 There are currently five components available each with four tests
 1. blood glucose levels
-  - Test IDs: 4, 5, 6, 7
+    - Test IDs: 4, 5, 6, 7
 2. sleep
-  - Test IDs: 8, 9, 10, 11
+   - Test IDs: 8, 9, 10, 11
 3. carbohydrate intake
-  - Test IDs: 12, 13, 14, 15
+    - Test IDs: 12, 13, 14, 15
 4. mood
-  - Test IDs: 16, 17, 18, 19
+    - Test IDs: 16, 17, 18, 19
 5. exercise
-  - Test IDs: 20, 21, 22, 23
+    - Test IDs: 20, 21, 22, 23
 
 Tests are in the following order
 add - update - get - delete
