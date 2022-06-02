@@ -37,7 +37,7 @@ It is recommended to have a database mangner, e.g., pgAdmin 4, to set up and man
 Using pgAdmin to manage postgresql server 
 1. Download the executable from https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 2. During installation set the postgres password
-**NB!** This password needs to match the database password found in the [config](config.py) file
+**NB!** This password needs to match the database password found in the [src/config](config.py) file
 **NB!** It is recommended to change the password to something only known to you
 
 ## How to Migrate Database Changes
