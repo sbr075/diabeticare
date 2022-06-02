@@ -51,7 +51,8 @@ To migrate the database do the following
 ## Program Usage
 After the virtual environment has been set up, dependencies installed, and the database has been migrated you are ready to start the server.
 To do so navigate to the diabeticare folder and run the following command
-> flask run --port XXXX
+> flask run --port XXXX  
+  
 **NB!** The port can be any valid port, but the application is set to listen to 5000
 
 ### Tests
@@ -61,12 +62,14 @@ To run tests make sure the Flask server is running and navigate to the [test](te
 #### Registration, login, and logout
 To use run any of the tests an active account is required. To register an account run the following test
 > python3 test.py -T 1
+  
 *You will be prompted to enter a username and password*
 
 After an account has been registered, you need to run test 2 before any other test
 This is needed because the server requires a valid CSRF Token to authenticate requests
 An example test would be
 > python3 test.py -T 2 4
+  
 *This will login the account and run the add bgl entry test*
 
 #### All Tests
