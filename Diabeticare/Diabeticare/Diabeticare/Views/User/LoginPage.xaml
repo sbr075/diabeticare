@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"  
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit" 
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
+    xmlns:model="clr-namespace:Diabeticare.Models"
+    x:DataType="viewmodels:UserViewModel"
+    x:Class="Diabeticare.Views.LoginPage"
+    x:Name="UserLoginPage"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
+
+    <!-- Setting BindingContext for page -->
+    <ContentPage.BindingContext>
+        <viewmodels:UserViewModel/>
+    </ContentPage.BindingContext>
+
+    <!-- Converter used for extracting the item selected by the user -->
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <xct:ItemSelectedEventArgsConverter x:Key="ItemSelectedEventArgsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!-- Converting page events to ViewModel commands.-->
+    <ContentPage.Behaviors>
+        <xct:EventToCommandBehavior 
+                EventName="Appearing"
+                Command="{Binding DisplayEntries}"/>
+    </ContentPage.Behaviors>
+
+    <StackLayout Orientation="Vertical">
+        <Entry Text="{Binding Username}"
+               Placeholder="Username"/>
+        <Entry Text="{Binding Password}"
+               Placeholder="Password"
+               IsPassword="True"/>
+
+        <StackLayout Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding IsChecked}" 
+                      Color="Green"
+                      VerticalOptions="Center"/>
+
+            <Label Text="Remember me?"
+                   VerticalOptions="Center"/>
+        </StackLayout>
+        
+        <Button Command="{Binding LoginCommand}"
+            Text="Login"/>
+
+        <!-- ListView that displays BGL entries stored in the SQLite database -->
+        <Entry Text="Saved logins"/>
+        <ListView
+            SelectedItem="{Binding SelectedUser, Mode=TwoWay}"
+            ItemsSource="{Binding UsrEntries}"
+            CachingStrategy="RecycleElement"
+            BackgroundColor="Transparent"
+            SeparatorVisibility="None"
+            HasUnevenRows="True">
+
+            <!-- Used for invoking commands through listview events -->
+            <ListView.Behaviors>
+                <xct:EventToCommandBehavior 
+                    EventName="ItemSelected"
+                    Command="{Binding SelectedUserCommand}"
+                    EventArgsConverter="{StaticResource ItemSelectedEventArgsConverter}"/>
+            </ListView.Behaviors>
+
+            <!-- Setting datatemplate for ItemsSource -->
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="model:UserModel">
+                    <ViewCell>
+                        <!-- Menu options that appear when a user long clicks an item -->
+                        <ViewCell.ContextActions>
+                            <MenuItem Text="Remove from list"
+                                      Command="{Binding Source={x:Reference UserLoginPage}, Path=BindingContext.DeleteUserCommand}"
+                                      CommandParameter="{Binding .}"/>
+                        </ViewCell.ContextActions>
+                        <!-- Formatting for the displayed USER entries -->
+                        <Grid Padding="10">
+                            <Frame CornerRadius="10" HasShadow="True">
+                                <StackLayout>
+                                    <Label VerticalOptions="Center"
+                                           FontSize="Medium"
+                                           Text="{Binding Username}"/>
+                                    <Label VerticalOptions="Center"
+                                           FontSize="Micro"
+                                           Text="{Binding CreatedAt, StringFormat='Created: {0:MMMM dd, yyyy}'}"/>
+                                </StackLayout>
+                            </Frame>
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>

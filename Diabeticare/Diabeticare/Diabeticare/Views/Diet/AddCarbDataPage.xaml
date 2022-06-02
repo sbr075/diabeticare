@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
+    x:Class="Diabeticare.Views.AddCarbDataPage"
+    Shell.PresentationMode="Modal">
+
+    <StackLayout Padding="10">
+        <Label 
+            VerticalOptions="Start" 
+            Text="Add new carbohydrate data" 
+            HorizontalOptions="Center" 
+            FontSize="Large"/>
+
+        <Frame VerticalOptions="CenterAndExpand">
+            <StackLayout>
+
+                <!-- Change max length later -->
+                <Entry Text="{Binding CarbEntry, Mode=TwoWay}"
+                       MaxLength="5" 
+                       Placeholder="Carbohydrates" 
+                       Keyboard="Numeric"
+                       HorizontalTextAlignment="Center">
+                </Entry>
+
+                <Entry Text="{Binding FoodName, Mode=TwoWay}"
+                       MaxLength="100" 
+                       Placeholder="Name of Food/Drink" 
+                       Keyboard="Text"
+                       HorizontalTextAlignment="Center">
+                </Entry>
+
+                <Label Text="Time of meal"/>
+                <TimePicker Time="{Binding CarbTime, Mode=TwoWay}" Format="HH:mm" HorizontalOptions="Center"/>
+
+                <Label Text="Date of meal"/>
+                <DatePicker Date="{Binding CarbDate, Mode=TwoWay}" HorizontalOptions="Center"/>
+            </StackLayout>
+        </Frame>
+        
+        <Button
+            Text="Cancel" 
+            VerticalOptions="End"
+            IsEnabled="True"
+            BackgroundColor="{StaticResource Primary}"
+            Command="{Binding GoBackCommand}"/>
+        <Button
+            Text="Legg til måling" 
+            VerticalOptions="End"
+            IsEnabled="True"
+            BackgroundColor="{StaticResource Primary}"
+            Command="{Binding AddCarbCommand}"/>
+    </StackLayout>
+</ContentPage>

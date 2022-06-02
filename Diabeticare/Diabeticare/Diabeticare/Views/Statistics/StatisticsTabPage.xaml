@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:views="clr-namespace:Diabeticare.Views"
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels"
+    x:Class="Diabeticare.Views.StatisticsTabPage"
+    SelectedTabColor="Black"
+    UnselectedTabColor="LightSteelBlue">
+
+    <TabbedPage.BindingContext>
+        <viewmodels:ViewModelBase/>
+    </TabbedPage.BindingContext>
+    
+    
+    <TabbedPage.ToolbarItems>
+        <ToolbarItem Order="Primary" IconImageSource="icon_about.png" Command="{Binding InfoCommand}"></ToolbarItem>
+        <ToolbarItem Text="Settings" Order="Secondary" Command="{Binding SettingsCommand}"></ToolbarItem>
+        <ToolbarItem Text="About" Order="Secondary" Command="{Binding AboutCommand}"></ToolbarItem>
+        <ToolbarItem Text="Sign Out" Order="Secondary" Command="{Binding LogoutCommand}"></ToolbarItem>
+    </TabbedPage.ToolbarItems>
+    
+    <views:BglStatisticsPage Title="BGL"/>
+    <views:SlpStatisticsPage Title="Sleep"/>
+</TabbedPage>

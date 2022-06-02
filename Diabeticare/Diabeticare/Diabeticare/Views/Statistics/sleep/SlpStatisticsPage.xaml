@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms"
+             xmlns:views="clr-namespace:Diabeticare.Views" 
+             x:DataType="views:SlpStatisticsPage"
+             x:Class="Diabeticare.Views.SlpStatisticsPage">
+
+    <StackLayout>
+
+        <!-- Top button layout -->
+        <StackLayout Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Center" Padding="5">
+            <Button 
+                x:Name="today"
+                Text="TODAY" 
+                HorizontalOptions="Center"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenDayChart"/>
+
+            <Button
+                x:Name="week" 
+                Text="1 WEEK" 
+                HorizontalOptions="Center"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenWeekChart"/>
+
+            <Button 
+                x:Name="month" 
+                Text="1 MONTH"
+                HorizontalOptions="Center"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="GenMonthChart"/>
+        </StackLayout>
+        <!-- Chart layout -->
+        <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="5">
+            <Label
+                x:Name="LabelMid"
+                TextColor="Black"
+                FontSize="Large"
+                Text="Statistics Page"
+                HorizontalOptions="Center"/>
+
+            <Frame CornerRadius="10" HasShadow="True" BorderColor="Black">
+                <microcharts:ChartView x:Name="SlpChart" HeightRequest="200" HorizontalOptions="Fill"/>
+            </Frame>
+
+
+            <Label x:Name="ChartDescription" Text="" FontSize="Small" HorizontalOptions="Center"/>
+        </StackLayout>
+
+
+        <!-- Bottom button layout -->
+        <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="Center" Padding="5">
+            <Button 
+                x:Name="viewData"
+                Text="View Data"
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="ViewSLPEntries"/>
+
+            <Button
+                x:Name="enterData" 
+                Text="Add Data" 
+                CornerRadius="10"
+                BackgroundColor="{StaticResource Primary}"
+                Clicked="CreateSLPEntry"/>
+        </StackLayout>
+
+    </StackLayout>
+
+</ContentPage>

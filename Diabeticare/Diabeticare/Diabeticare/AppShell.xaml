@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Shell xmlns="http://xamarin.com/schemas/2014/forms" 
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:Diabeticare.Views"
+       xmlns:font="clr-namespace:Diabeticare.Resources.Helpers"
+       Title="Diabeticare"
+       x:Class="Diabeticare.AppShell">
+
+    <!--
+        The overall app visual hierarchy is defined here, along with navigation.
+    
+        https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/shell/
+    -->
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style x:Key="BaseStyle" TargetType="Element">
+                <Setter Property="Shell.BackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="Shell.ForegroundColor" Value="White" />
+                <Setter Property="Shell.TitleColor" Value="White" />
+                <Setter Property="Shell.DisabledColor" Value="#B4FFFFFF" />
+                <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
+                <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="White"/>
+                <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF"/>
+                <Setter Property="Shell.TabBarTitleColor" Value="White"/>
+            </Style>
+            <Style TargetType="TabBar" BasedOn="{StaticResource BaseStyle}" />
+            <Style TargetType="FlyoutItem" BasedOn="{StaticResource BaseStyle}" />
+        </ResourceDictionary>
+    </Shell.Resources>
+
+    <TabBar>
+        <Tab Title="Home">
+            <Tab.Icon>
+                <FontImageSource FontFamily="Solid" Glyph="{x:Static font:FontAwesome.House}"/>
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate views:DefaultPage}"/>
+        </Tab>
+
+        <Tab Title="Statistics">
+            <Tab.Icon>
+                <FontImageSource FontFamily="Solid" Glyph="{x:Static font:FontAwesome.ChartLine}"/>
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate views:StatisticsTabPage}"/>
+        </Tab>
+
+        <Tab Title="Exercise">
+            <Tab.Icon>
+                <FontImageSource FontFamily="Solid" Glyph="{x:Static font:FontAwesome.PersonWalking}"/>
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate views:ExerciseStatisticsPage}"/>
+        </Tab>
+
+        <Tab Title="Diet">
+            <Tab.Icon>
+                <FontImageSource FontFamily="Solid" Glyph="{x:Static font:FontAwesome.AppleWhole}"/>
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate views:CarbStatisticsPage}"/>
+        </Tab>
+    </TabBar>
+
+</Shell>

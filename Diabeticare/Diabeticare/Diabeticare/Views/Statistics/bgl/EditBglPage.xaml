@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:Diabeticare.ViewModels" 
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit" 
+    xmlns:model="clr-namespace:Diabeticare.Models"
+    x:Class="Diabeticare.Views.EditBglPage"
+    x:DataType="viewmodels:BglViewModel"
+    x:Name="BglDataPage">
+
+    <!-- Converter used for extracting the item selected by the user -->
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <xct:ItemSelectedEventArgsConverter x:Key="ItemSelectedEventArgsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!-- Converting page events to ViewModel commands.-->
+    <ContentPage.Behaviors>
+        <xct:EventToCommandBehavior 
+                EventName="Appearing"
+                Command="{Binding DisplayEntriesCommand}"/>
+    </ContentPage.Behaviors>
+
+    <!-- ListView that displays BGL entries stored in the SQLite database -->
+    <ListView
+        SelectedItem="{Binding SelectedBgl, Mode=TwoWay}"
+        IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+        RefreshCommand="{Binding RefreshCommand}"
+        ItemsSource="{Binding BglEntries}"
+        RefreshControlColor="RoyalBlue"
+        CachingStrategy="RecycleElement"
+        BackgroundColor="Transparent"
+        IsPullToRefreshEnabled="True"
+        SeparatorVisibility="None"
+        HasUnevenRows="True">
+        
+        <!-- Used for invoking commands through listview events -->
+        <ListView.Behaviors>
+            <xct:EventToCommandBehavior 
+                EventName="ItemSelected"
+                Command="{Binding SelectedBglCommand}"
+                EventArgsConverter="{StaticResource ItemSelectedEventArgsConverter}"/>
+        </ListView.Behaviors>
+        
+        <!-- Setting datatemplate for ItemsSource -->
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="model:BglModel">
+                <ViewCell>
+                    <!-- Menu options that appear when a user long clicks an item -->
+                    <ViewCell.ContextActions>
+                        <MenuItem Text="Delete"
+                                  Command="{Binding Source={x:Reference BglDataPage}, Path=BindingContext.DeleteBglCommand}"
+                                  CommandParameter="{Binding .}"/>
+                    </ViewCell.ContextActions>
+                    <!-- Formatting for the displayed BGL entries -->
+                    <Grid Padding="10">
+                        <Frame CornerRadius="10" HasShadow="True">
+                            <StackLayout>
+                                <Label VerticalOptions="Center"
+                                       FontSize="Medium"
+                                       Text="{Binding BGLmeasurement, StringFormat='BGL: {0:F1}'}"/>
+                                <Label VerticalOptions="Center"
+                                       FontSize="Small"
+                                       Text="{Binding TimeOfMeasurment.TimeOfDay, StringFormat='Time: {0:hh\\:mm}'}"/>
+                                <Label VerticalOptions="Center"
+                                       FontSize="Micro"
+                                       Text="{Binding TimeOfMeasurment.Date, StringFormat='Created: {0:MMMM dd, yyyy}'}"/>
+                            </StackLayout>
+                        </Frame>
+                    </Grid>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <!-- Header for the page -->
+        <ListView.Header>
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                <Label Text="BGL Data" FontSize="Large" TextColor="Black"/>
+            </StackLayout>
+        </ListView.Header>
+        <!-- Footer for the page -->
+        <ListView.Footer>
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+            </StackLayout>
+        </ListView.Footer>
+    </ListView>
+</ContentPage>
