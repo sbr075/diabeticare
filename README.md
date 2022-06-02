@@ -14,6 +14,7 @@ All programming and testing was done using a virtual enviroment (using GIT BASH 
 - [Program Usage](#program-usage)
   - [Tests](#tests)
     - [Registration, login, and logout](#registration-login-and-logout)
+    - [All Tests](#all-tests)
 - [Important Changes](#important-changes)
 
 ## How to set up a venv
