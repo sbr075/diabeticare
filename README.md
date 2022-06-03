@@ -1,6 +1,7 @@
 ## Mobile application implementation for Diabeticare
 This is the **unfinished** version of Diabeticare for mobile devices.
 All programming and testing was done on Windows using an Android emulator with the help of [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+  
 **NB!** These guidelines are for Windows using Visual Studio 2022
   
 ## Table of Contents
