@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, FloatField
 from wtforms.validators import InputRequired, ValidationError, Length
 
+# Validates input from application with forms
+
 def validateDate(form, field):
 	timestamp = form.timestamp.data
 	if not isinstance(timestamp, int):

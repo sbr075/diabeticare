@@ -31,6 +31,7 @@ class Config(object):
         }
     }
 
+    # Selects database and generete uri for database request
     selected_db = "default"
     DB_HOST = databases[selected_db]["HOST"]
     DB_PORT = databases[selected_db]["PORT"]

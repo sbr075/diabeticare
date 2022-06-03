@@ -92,6 +92,7 @@ def register():
     return jsonify({"ERROR": "Invalid request"}), 405
 
 def _deleteAllData(user_id):
+    # Delets all data with user_id columns matching specified user id
     BGL.query.filter(BGL.user_id == user_id).delete()
     Sleep.query.filter(Sleep.user_id == user_id).delete()
     CI.query.filter(CI.user_id == user_id).delete()

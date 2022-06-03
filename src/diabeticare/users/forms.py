@@ -4,6 +4,8 @@ from wtforms.validators import InputRequired, EqualTo, Length, ValidationError, 
 
 from diabeticare.users.models import User
 
+# Validates input from application with forms
+
 def validateLogin(form, field):
     username = form.username.data
     password = form.password.data

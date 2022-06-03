@@ -1,5 +1,9 @@
 from diabeticare import db, ma
 
+# Models for PostgreSQL database
+# Database is column based
+# Schemas are used for converting objects to readable strings for data transfer
+
 class BGL(db.Model):
     __tablename__ = "bgl"
 

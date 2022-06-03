@@ -7,6 +7,8 @@ Enable debug mode
 
 escape  - prevent injection attacks
 url_for - quick routing to URLs instead of hardcoding
+
+Sets settings for Flask server
 """
 
 from flask import Flask

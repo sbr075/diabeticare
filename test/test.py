@@ -48,6 +48,8 @@ class Tester(HTTPMethods):
         email    = f"{username}@mail.no"
 
         headers = {"X-CSRFToken": self.do_GET_CSRF()}
+
+        logger.info(headers)
         data = {"username": username, "email": email, "password": password, "confirm": confirm}
         url  = self.create_URL("u/register")
 

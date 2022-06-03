@@ -15,10 +15,12 @@ def get_token():
 
 
 def validate_token(user, token):
+    # Checks if token matches user registered token and has not expired
     return user.token == token and datetime.datetime.utcnow() <= user.timer
 
 
 def update_token(user):
+    # Generates new token for user with updated token
     new_token = generate_csrf()
     user.token = new_token
     user.timer = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
@@ -28,6 +30,7 @@ def update_token(user):
 
 
 def nullify_token(user):
+    # Removes token
     user.token = None
     user.timer = None
     db.session.commit()

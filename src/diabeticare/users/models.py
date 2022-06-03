@@ -2,6 +2,10 @@ from flask_login import UserMixin
 from diabeticare import login, db
 import datetime
 
+# Models for PostgreSQL database
+# Database is column based
+# Schemas are used for converting objects to readable strings for data transfer
+
 class User(UserMixin, db.Model):
     __tablename__ = "user"
     
