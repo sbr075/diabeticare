@@ -19,18 +19,21 @@ namespace Diabeticare.Services
 
         public async Task<IEnumerable<BglModel>> GetBglEntriesAsync()
         {
+            // Fetches all entries where entry's registered UserID matches current logged in UserID
             var bglEntries = await bglDatabase.Table<BglModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
             return bglEntries;
         }
 
         public async Task<BglModel> GetBglEntryAsync(int id)
         {
+            // Fetches single entry where entry's ID matches specified ID
             var bgl = await bglDatabase.Table<BglModel>().FirstOrDefaultAsync(bglEntry => bglEntry.ID == id);
             return bgl;
         }
 
         public async Task AddBglEntryAsync(float bglMeasurement, DateTime timeOfMeasurment, int server_id)
         {
+            // Creates a new object and adds to database
             var bgl = new BglModel
             {
                 UserID = App.user.ID,
@@ -44,10 +47,11 @@ namespace Diabeticare.Services
 
         public Task<int> UpdateBglEntryAsync(BglModel bglEntry, float newValue, DateTime newTime, int server_id)
         {
+            // Checks if ID is valid
             if (bglEntry.ID == 0)
                 return null;
 
-            // Push update to local
+            // Push update to local database
             bglEntry.ServerID = server_id;
             bglEntry.BGLmeasurement = newValue;
             bglEntry.TimeOfMeasurment = newTime;
@@ -72,6 +76,7 @@ namespace Diabeticare.Services
             }
             catch
             {
+                // Returns incase no entries exists for user
                 return;
             }
         }

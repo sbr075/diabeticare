@@ -34,12 +34,13 @@ namespace Diabeticare.Views
                 return;
             }
 
+            // Parses input and sends to server and local database
             var carbohydrates = float.Parse(entryCarb.Text);
             string foodname = entryFood.Text;
             DateTime dateOfInput = dateSelector.Date.Add(timeSelector.Time);
 
             (int code, string message, int server_id) = await App.apiServices.AddOrUpdateCIAsync(carbohydrates, foodname, dateOfInput, carbEntry.ServerID);
-            if (code == 1)
+            if (code == 1) // Successful request
             {
                 await App.Cdatabase.UpdateCarbEntryAsync(carbEntry, carbohydrates, dateOfInput, foodname, server_id);
             }

@@ -25,12 +25,14 @@ namespace Diabeticare.Services
 
         public async Task<UserModel> GetUserEntryAsync(string username)
         {
+            // Fetches user object which matches given username
             var user = await userDatabase.Table<UserModel>().FirstOrDefaultAsync(userEntry => userEntry.Username == username);
             return user;
         }
 
         public async Task AddUserEntryAsync(string username, string email)
         {
+            // Add new user object to database
             var userEntry = new UserModel
             {
                 Username = username,
@@ -41,9 +43,12 @@ namespace Diabeticare.Services
 
         public Task<int> UpdateUserEntryAsync(UserModel userEntry, string password, bool autoLogIn)
         {
+            // Checks for valid ID
             if (userEntry.ID == 0)
                 return null;
 
+            // Password and AutoLogIn can be empty and false if user did not select RememberMe option
+            // This keeps the password out of the device for security reasons
             userEntry.Password = password;
             userEntry.AutoLogIn = autoLogIn;
 

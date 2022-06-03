@@ -18,19 +18,21 @@ namespace Diabeticare.Services
 
         public async Task<IEnumerable<SleepModel>> GetSlpEntriesAsync()
         {
-            // Returns all sleep entries
+            // Fetches all entries where entry's registered UserID matches current logged in UserID
             var slpEntries = await slpDatabase.Table<SleepModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
             return slpEntries;
         }
 
         public async Task<SleepModel> GetSlpEntryAsync(int id)
         {
+            // Fetches single entry where entry's ID matches specified ID
             var slp = await slpDatabase.Table<SleepModel>().FirstOrDefaultAsync(slpEntry => slpEntry.ID == id);
             return slp;
         }
 
         public async Task AddSlpEntryAsync(DateTime sleepStart, DateTime sleepEnd, int server_id)
         {
+            // Creates a new object and adds to database
             var slpEntry = new SleepModel
             {
                 UserID = App.user.ID,
@@ -44,9 +46,11 @@ namespace Diabeticare.Services
 
         public Task<int> UpdateSlpEntryAsync(SleepModel slpEntry, DateTime newSleepStart, DateTime newSleepEnd, int server_id)
         {
+            // Checks if ID is valid
             if (slpEntry.ID == 0)
                 return null;
 
+            // Push update to local database
             slpEntry.ServerID = server_id;
             slpEntry.SleepStart = newSleepStart;
             slpEntry.SleepEnd = newSleepEnd;
@@ -71,6 +75,7 @@ namespace Diabeticare.Services
             }
             catch
             {
+                // Returns incase no entries exists for user
                 return;
             }
         }

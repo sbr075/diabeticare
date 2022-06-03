@@ -20,18 +20,21 @@ namespace Diabeticare.Services
 
         public async Task<IEnumerable<CarbohydrateModel>> GetCarbEntriesAsync()
         {
+            // Fetches all entries where entry's registered UserID matches current logged in UserID
             var carbEntries = await carbDatabase.Table<CarbohydrateModel>().Where(ent => ent.UserID == App.user.ID).ToListAsync();
             return carbEntries;
         }
 
         public async Task<CarbohydrateModel> GetCarbEntryAsync(int id)
         {
+            // Fetches single entry where entry's ID matches specified ID
             var carb = await carbDatabase.Table<CarbohydrateModel>().FirstOrDefaultAsync(carbEntry => carbEntry.ID == id);
             return carb;
         }
 
         public async Task AddCarbEntryAsync(float carbohydrates, DateTime dateOfInput, string foodName, int server_id)
         {
+            // Creates a new object and adds to database
             var carb = new CarbohydrateModel
             {
                 UserID = App.user.ID,
@@ -45,9 +48,11 @@ namespace Diabeticare.Services
 
         public Task<int> UpdateCarbEntryAsync(CarbohydrateModel carbEntry, float newValue, DateTime newDate, string foodName, int server_id)
         {
+            // Checks if ID is valid
             if (carbEntry.ID == 0)
                 return null;
 
+            // Push update to local database
             carbEntry.Carbohydrates = newValue;
             carbEntry.DateOfInput = newDate;
             carbEntry.FoodName = foodName;
@@ -72,6 +77,7 @@ namespace Diabeticare.Services
             }
             catch
             {
+                // Returns incase no entries exists for user
                 return;
             }
         }

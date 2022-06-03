@@ -98,6 +98,7 @@ namespace Diabeticare.ViewModels
             if (CarbEntry == null)
                 return;
 
+            // Parse data to be stored
             var carbohydrates = float.Parse(CarbEntry);
             string foodname = FoodName;
             DateTime dateOfInput = CarbDate.Date.Add(CarbTime);
@@ -105,7 +106,7 @@ namespace Diabeticare.ViewModels
             // Asks server to add entry
             (int code, string message, int server_id) = await App.apiServices.AddOrUpdateCIAsync(carbohydrates, foodname, dateOfInput);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Cdatabase.AddCarbEntryAsync(carbohydrates, dateOfInput, foodname, server_id);
             else
                 await App.Current.MainPage.DisplayAlert("Alert", message, "Ok");
@@ -127,7 +128,7 @@ namespace Diabeticare.ViewModels
             // Asks server to delete entry
             (int code, string message) = await App.apiServices.DeleteCIAsync(carb.ServerID);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Cdatabase.DeleteCarbEntryAsync(carb.ID);
 
             else
@@ -138,9 +139,11 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedGroup(object arg)
         {
+            // Convert object to GroupModel object
             GroupModel carbGroup = arg as GroupModel;
             if (carbGroup == null) return;
 
+            // Load group into edit page
             SelectedCarbGroup = null;
             CarbGroups.Clear(); // Temp fix to not load listview twice after coming back from CarbEntryPage
             await App.Current.MainPage.Navigation.PushAsync(new EditCarbPage(carbGroup.GroupDate.Day));
@@ -148,9 +151,11 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedEntry(object arg)
         {
+            // Convert object to CarbohydrateModel
             CarbohydrateModel carb = arg as CarbohydrateModel;
             if (carb == null) return;
 
+            // Load entry into carb entry page
             SelectedCarb = null; // Deselect item
             CarbEntries.Clear();
             await App.Current.MainPage.Navigation.PushAsync(new CarbEntryPage(carb.ID));
@@ -158,6 +163,7 @@ namespace Diabeticare.ViewModels
 
         async Task LoadCarbGroups()
         {
+            // Fetches all distinct dates of when carbohydrate entries were entered
             IsBusy = true;
             CarbGroups.Clear();
             var carbEntries = await App.Cdatabase.GetCarbEntriesAsync();
@@ -177,6 +183,7 @@ namespace Diabeticare.ViewModels
         // Loads carb entries
         async Task LoadCarbEntries()
         {
+            // Loads all carbohydrate entries for the given day
             IsBusy = true;
             CarbEntries.Clear();
             var carbEntries = await App.Cdatabase.GetCarbEntriesAsync();

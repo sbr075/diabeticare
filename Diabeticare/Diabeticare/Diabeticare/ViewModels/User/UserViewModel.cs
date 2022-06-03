@@ -73,20 +73,40 @@ namespace Diabeticare.ViewModels
             if (password.Length < 8)
                 return (false, "Password needs to be atleast 8 characters long");
 
+            // Check if password contains the username
             if (password.Contains(username))
                 return (false, "Password cannot contain username");
 
-            // Check if password contains one special character
-            if (password.All(char.IsLetterOrDigit))
-                return (false, "Password needs to contain atleast 1 special character");
+            // Check if password only contains one lower case character, one upper case character, and one special character
+            bool hasUpper = false;
+            bool hasLower = false;
+            bool hasSpecial = false;
+            for (int i = 0; i < password.Length; i++)
+            {
+                char c = password[i];
+                if (char.IsLetter(c))
+                {
+                    if (char.IsUpper(c))
+                        hasUpper = true;
 
-            // Check if password is only digits
-            if (password.All(char.IsDigit))
-                return (false, "Password needs to contain atleast 1 letter");
+                    else
+                        hasLower = true;
+                }
+                else
+                {
+                    hasSpecial = true;
+                }
+            }
 
-            // Check if passwor is only letters
-            if (password.All(char.IsLetter))
-                return (false, "Password needs to contain atleast 1 number");
+            if (!hasLower)
+                return (false, "Password needs to contain atleast 1 lower case character");
+
+            if (!hasUpper)
+                return (false, "Password needs to contain atleast 1 upper case character");
+
+            if (!hasSpecial)
+                return (false, "Password needs to contain atleast 1 lower case character");
+           
 
             return (true, "Password valid");
         }
@@ -104,7 +124,7 @@ namespace Diabeticare.ViewModels
             string password = Password;
             string confirmPassword = ConfirmPassword;
 
-            if (password.Equals(confirmPassword))
+            if (password.Equals(confirmPassword)) // Check if passwords matches
             {
                 // Validate that passwords are complex enough
                 (bool is_complex, string error_msg) = await validatePassword(username, password); 
@@ -114,12 +134,13 @@ namespace Diabeticare.ViewModels
                     return;
                 }
 
+                // Computes hash of password
                 string passwordHash = ComputeSHA256Hash(password);
                 string confirmPasswordHash = ComputeSHA256Hash(confirmPassword);
 
                 // Add to server
                 (int code, string message) = await App.apiServices.RegisterAsync(username, email, passwordHash, confirmPasswordHash);
-                if (code == 1)
+                if (code == 1) // Successful request
                 {
                     // Add locally
                     await App.Udatabase.AddUserEntryAsync(username, email);
@@ -139,8 +160,9 @@ namespace Diabeticare.ViewModels
         // LOGIN
         private async Task _Login(string username, string password)
         {
+            // Asks server for token
             (int code, string message) = await App.apiServices.LoginAsync(username, password);
-            if (code == 1)
+            if (code == 1) // Successful request
             {
                 await App.Udatabase.UpdateUserEntryAsync(App.user, password, IsChecked);
 
@@ -165,6 +187,7 @@ namespace Diabeticare.ViewModels
             string username = Username;
             string password = Password;
 
+            // Converts password to hash to be sent to server for authentication
             string passwordHash = ComputeSHA256Hash(password);
             await _Login(username, passwordHash);
         }
@@ -199,7 +222,6 @@ namespace Diabeticare.ViewModels
         private static string ComputeSHA256Hash(string input)
         {
             // Computes the SHA256 hash of the input and returns it as a string
-
             byte[] data = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
 
             var sBuilder = new StringBuilder();

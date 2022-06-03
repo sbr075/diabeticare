@@ -18,18 +18,21 @@ namespace Diabeticare.Services
 
         public async Task<IEnumerable<ExerciseModel>> GetExerciseEntriesAsync(string name)
         {
+            // Fetches all entries where entry's registered UserID matches current logged in UserID
             var exerciseEntries = await exerciseDatabase.Table<ExerciseModel>().Where(ent => ent.UserID == App.user.ID && ent.Name == name).ToListAsync();
             return exerciseEntries;
         }
 
         public async Task<ExerciseModel> GetExerciseEntryAsync(int id)
         {
+            // Fetches single entry where entry's ID matches specified ID
             var exercise = await exerciseDatabase.Table<ExerciseModel>().FirstOrDefaultAsync(exerciseEntry => exerciseEntry.ID == id);
             return exercise;
         }
 
         public async Task AddExerciseEntryAsync(string name, DateTime start, DateTime end, int server_id)
         {
+            // Creates a new object and adds to database
             var exercise = new ExerciseModel
             {
                 UserID = App.user.ID,
@@ -44,9 +47,11 @@ namespace Diabeticare.Services
 
         public Task<int> UpdateExerciseEntryAsync(ExerciseModel exerciseEntry, DateTime start, DateTime end, int server_id)
         {
+            // Checks if ID is valid
             if (exerciseEntry.ID == 0)
                 return null;
 
+            // Push update to local database
             exerciseEntry.ServerID = server_id;
             exerciseEntry.Name = exerciseEntry.Name;
             exerciseEntry.ExerciseStart = start;
@@ -72,6 +77,7 @@ namespace Diabeticare.Services
             }
             catch
             {
+                // Returns incase no entries exists for user
                 return;
             }
         }

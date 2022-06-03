@@ -3,6 +3,7 @@ using SQLite;
 
 namespace Diabeticare.Models
 {
+    // BGL model for local database
     public class BglModel
     {
         [PrimaryKey, AutoIncrement] public int ID { get; set; }

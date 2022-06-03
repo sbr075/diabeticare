@@ -107,8 +107,12 @@ namespace Diabeticare
         public App()
         {
             InitializeComponent();
-            MainPage = new LoginShell();
+            // LoginShell only has the register/login tabs such that user cannot navigate to other parts of the application
+            // without loggin on
+            MainPage = new LoginShell(); // Starts application with login shell
 
+
+            // Set address application will communicate with
             server_addr = "10.0.2.2:5000";
         }
 
@@ -118,6 +122,7 @@ namespace Diabeticare
 
         protected override async void OnSleep()
         {
+            // Logs out the user if they put down the application and has not enabled AutoLogIn
             if (App.user.AutoLogIn == false)
                 await App.Udatabase.UpdateUserEntryAsync(App.user, "", false);
 

@@ -89,6 +89,7 @@ namespace Diabeticare.ViewModels
         // Creates a new BGL entry
         public async void AddBgl()
         {
+            // Cannot add new entry if no entry was created
             if (BglEntry == null) return;
 
             var measurement = float.Parse(BglEntry);
@@ -98,7 +99,7 @@ namespace Diabeticare.ViewModels
             // Asks server to add entry
             (int code, string message, int server_id) = await App.apiServices.AddOrUpdateBGLAsync(measurement, timeOfMeasurment);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Bdatabase.AddBglEntryAsync(measurement, timeOfMeasurment, server_id);
 
             else
@@ -123,7 +124,7 @@ namespace Diabeticare.ViewModels
             // Asks server to delete entry
             (int code, string message) = await App.apiServices.DeleteBGLAsync(bgl.ServerID);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Bdatabase.DeleteBglEntryAsync(bgl.ID);
 
             else
@@ -134,9 +135,11 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedGroup(object arg)
         {
+            // Converts selected group to GroupModel
             GroupModel bglGroup = arg as GroupModel;
             if (bglGroup == null) return;
 
+            // Call edit page (dispaly all entries) to display all for given day
             SelectedBglGroup = null;
             BglGroups.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
             await App.Current.MainPage.Navigation.PushAsync(new EditBglPage(bglGroup.GroupDate.Day));
@@ -144,6 +147,7 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedEntry(object arg)
         {
+            // Loads specific bgl entry into entry view to be edited
             BglModel bgl = arg as BglModel;
             if (bgl == null) return;
 
@@ -154,6 +158,7 @@ namespace Diabeticare.ViewModels
 
         async Task LoadBglGroups()
         {
+            // Fetches all distinct days and gathers information about the entries for those days to be displayed
             IsBusy = true;
             BglGroups.Clear();
             var bglEntries = await App.Bdatabase.GetBglEntriesAsync();

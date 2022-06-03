@@ -108,13 +108,14 @@ namespace Diabeticare.ViewModels
                 return;
             }
 
+            // Parse data
             DateTime start = ExerciseStart.Date.Add(ExerciseTimeStart);
             DateTime end = ExerciseEnd.Date.Add(ExerciseTimeEnd);
 
             // Asks server to add entry
             (int code, string message, int server_id) = await App.apiServices.AddOrUpdateExerciseAsync(ExerciseName, start, end);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Edatabase.AddExerciseEntryAsync(ExerciseName, start, end, server_id);
 
             else
@@ -139,7 +140,7 @@ namespace Diabeticare.ViewModels
             // Asks server to delete entry
             (int code, string message) = await App.apiServices.DeleteExerciseAsync(exercise.ServerID);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Edatabase.DeleteExerciseEntryAsync(exercise.ID);
 
             else
@@ -150,6 +151,7 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedGroup(object arg)
         {
+            // Convert object to GroupModel object
             GroupModel exerciseGroup = arg as GroupModel;
             if (exerciseGroup == null) return;
 
@@ -160,7 +162,7 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedEntry(object arg)
         {
-
+            // Convert object to ExerciseModel object
             ExerciseModel exercise = arg as ExerciseModel;
             if (exercise == null) return;
 
@@ -171,6 +173,9 @@ namespace Diabeticare.ViewModels
 
         async Task LoadExerciseGroups()
         {
+            // Fetches all distinct days of when exercise entries were registered
+            // Distinguishes between exercises which started and ended on different days
+            // (counts as one exercise, but seperates hours to both days)
             IsBusy = true;
             ExerciseGroups.Clear();
             var exerciseEntries = await App.Edatabase.GetExerciseEntriesAsync(ExerciseName);
@@ -219,6 +224,7 @@ namespace Diabeticare.ViewModels
         // Loads exercise entries
         async Task LoadExerciseEntries()
         {
+            // Loads ell exercise entries for that given day
             IsBusy = true;
             ExerciseEntries.Clear();
             var exerciseEntries = await App.Edatabase.GetExerciseEntriesAsync(ExerciseName);

@@ -5,6 +5,7 @@ namespace Diabeticare.Models
 {
     public class UserModel
     {
+        // User model for local database, all models (except GroupModel) is tied to a user model
         public UserModel()
         {
             CreatedAt = DateTime.Now;

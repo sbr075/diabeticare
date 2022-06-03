@@ -5,6 +5,7 @@ namespace Diabeticare.Models
 {
     public class CarbohydrateModel
     {
+        // Carbohydrate model for local database
         [PrimaryKey, AutoIncrement] public int ID { get; set; }
         public int UserID { get; set; }
         public int ServerID { get; set; }

@@ -108,7 +108,7 @@ namespace Diabeticare.ViewModels
             // Asks server to add entry
             (int code, string message, int server_id) = await App.apiServices.AddOrUpdateSleepAsync(start, end);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Sdatabase.AddSlpEntryAsync(start, end, server_id);
 
             else
@@ -133,7 +133,7 @@ namespace Diabeticare.ViewModels
             // Asks server to delete entry
             (int code, string message) = await App.apiServices.DeleteSleepAsync(slp.ServerID);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Sdatabase.DeleteSlpEntryAsync(slp.ID);
 
             else
@@ -144,9 +144,11 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedGroup(object arg)
         {
+            // Converts select group to GroupModel
             GroupModel slpGroup = arg as GroupModel;
             if (slpGroup == null) return;
 
+            // Calls edit page (displays all entries) to load all entries for the selected day
             SelectedSlpGroup = null;
             SlpGroups.Clear(); // Temp fix to not load listview twice after coming back from BglEntryPage
             await App.Current.MainPage.Navigation.PushAsync(new EditSlpPage(slpGroup.GroupDate.Day));
@@ -154,7 +156,7 @@ namespace Diabeticare.ViewModels
 
         async Task SelectedEntry(object arg)
         {
-
+            // Converts selected entry to SleepModel and asks entry page to load details into new view
             SleepModel slp = arg as SleepModel;
             if (slp == null) return;
 
@@ -165,6 +167,9 @@ namespace Diabeticare.ViewModels
 
         async Task LoadSlpGroups()
         {
+            // Fetches all distinct days of when exercise entries were registered
+            // Distinguishes between exercises which started and ended on different days
+            // (counts as one exercise, but seperates hours to both days)
             IsBusy = true;
             SlpGroups.Clear();
             var slpEntries = await App.Sdatabase.GetSlpEntriesAsync();

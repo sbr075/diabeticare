@@ -33,12 +33,13 @@ namespace Diabeticare.ViewModels
 
         public async void AddMood(object sender)
         {
+            // Fetches value of button user pressed
             var moodButton = sender as Xamarin.Forms.Button;
             int moodValue = int.Parse(moodButton.Text);
 
             (int code, string message, int server_id) = await App.apiServices.AddOrUpdateMoodAsync(moodValue, DateTime.Today);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Mdatabase.AddMoodEntryAsync(moodValue, DateTime.Today, server_id);
 
             else
@@ -50,7 +51,7 @@ namespace Diabeticare.ViewModels
             // Asks server to delete entry
             (int code, string message) = await App.apiServices.DeleteMoodAsync(mood.ServerID);
 
-            if (code == 1)
+            if (code == 1) // Successfull request
                 await App.Bdatabase.DeleteBglEntryAsync(mood.ID);
 
             else
@@ -59,6 +60,7 @@ namespace Diabeticare.ViewModels
 
         async Task LoadMoodEntries()
         {
+            // Loads all mood entries for the current month
             IsBusy = true;
             MoodEntries.Clear();
             var moodEntries = await App.Mdatabase.GetMoodEntriesAsync();
